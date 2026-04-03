@@ -130,7 +130,7 @@ const normalizeShift = (value: unknown): ShiftKey | null => {
   return null;
 };
 
-export const Bubble: React.FC<BubbleProps> = ({ message, lang, blurred = false, onGoogleLogin }) => {
+export const Bubble: React.FC<BubbleProps> = ({ message, lang, blurred = false, onLogin }) => {
   const isUser = message.role === "user";
   const t = CONTENT[lang];
 
