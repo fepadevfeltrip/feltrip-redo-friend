@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { openCheckout } from '@/lib/stripe';
+import { openApplePurchase as openCheckout } from '@/lib/appleIAP';
 import CultSquadModal from './CultSquadModal';
 
 interface UpgradePaywallProps {

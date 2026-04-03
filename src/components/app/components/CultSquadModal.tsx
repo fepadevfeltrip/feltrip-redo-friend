@@ -14,7 +14,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Copy, Gift, Loader2, PartyPopper, Share2, Sparkles } from "lucide-react";
-import { openCheckout } from "@/lib/stripe";
+import { openApplePurchase as openCheckout } from "@/lib/appleIAP";
 
 const FREE_PROVIDERS = [
   "gmail.com", "googlemail.com",

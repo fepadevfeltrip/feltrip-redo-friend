@@ -1,5 +1,5 @@
 import React from 'react';
-import { openCheckout } from '@/lib/stripe';
+import { openApplePurchase as openCheckout } from '@/lib/appleIAP';
 import { Share2 } from 'lucide-react';
 
 interface ChatExpiredPaywallProps {
