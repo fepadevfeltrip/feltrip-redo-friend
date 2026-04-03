@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Check, Map, Compass, Gift } from "lucide-react";
-import { openCheckout, PriceKey } from "@/lib/stripe";
+import { openApplePurchase as openCheckout, PriceKey } from "@/lib/appleIAP";
 import CultSquadModal from "./components/CultSquadModal";
 import { useUserTier } from "@/hooks/useUserTier";
 import { getDisplayPrices } from "@/hooks/useDisplayCurrency";

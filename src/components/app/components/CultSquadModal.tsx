@@ -133,7 +133,7 @@ const CultSquadModal = ({ open, onOpenChange }: CultSquadModalProps) => {
     toast.success(t.linkCopied);
   };
 
-  const handleDiscountCheckout = async (priceKey: "gem_single" | "explorer") => {
+  const handleDiscountCheckout = async (priceKey: "personal_map" | "explorer") => {
     if (!user) {
       toast.error(t.loginFirst);
       return;

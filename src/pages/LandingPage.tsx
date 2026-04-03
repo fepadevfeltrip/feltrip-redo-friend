@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { AuthModal } from "@/components/app/components/AuthModal";
-import { getPendingCheckout, openCheckout, PriceKey } from "@/lib/stripe";
+import { getPendingCheckout, openApplePurchase as openCheckout, PriceKey } from "@/lib/appleIAP";
 import { getDisplayPrices } from "@/hooks/useDisplayCurrency";
 import type { Language } from "@/components/app/types";
 import { LEGAL_TEXT_PT, LEGAL_TEXT_EN, LEGAL_TEXT_ES } from "@/components/app/constants/legalTexts";
