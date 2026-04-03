@@ -37,18 +37,6 @@ export default function Auth() {
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  const handleGoogleSignIn = async () => {
-    setIsGoogleLoading(true);
-    const { error } = await signInWithGoogleNative();
-    if (error) {
-      toast({
-        title: t('auth.loginFailed'),
-        description: error.message,
-        variant: 'destructive',
-      });
-    }
-    setIsGoogleLoading(false);
-  };
   const lang = i18n.language?.substring(0, 2) || 'pt';
   const legalText = lang === 'en' ? LEGAL_TEXT_EN : lang === 'es' ? LEGAL_TEXT_ES : LEGAL_TEXT_PT;
 
