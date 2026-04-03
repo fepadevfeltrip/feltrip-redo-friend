@@ -172,7 +172,7 @@ const TEXTS = {
           "Roteiro Completo (até 7 dias)",
           "Suporte Concierge via Chat Ilimitado durante toda a jornada (até 7 dias)",
         ],
-        cta: "Gerar meu Roteiro",
+        cta: " Pagar com Apple",
       },
       {
         name: "A Imersão Completa",
