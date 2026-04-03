@@ -233,7 +233,7 @@ const TEXTS = {
           "4h of AI Language Tutoring",
           "Complete biographical consulting",
         ],
-        cta: "Unlock Premium Experience",
+        cta: " Unlock with Apple",
         highlight: true,
         badge: "Recommended for Expats",
       },
