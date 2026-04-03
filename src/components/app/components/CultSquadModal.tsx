@@ -138,7 +138,7 @@ const CultSquadModal = ({ open, onOpenChange }: CultSquadModalProps) => {
       toast.error(t.loginFirst);
       return;
     }
-    await openCheckout(priceKey, true);
+    await openCheckout(priceKey);
   };
 
   return (
