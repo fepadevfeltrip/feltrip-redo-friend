@@ -32,7 +32,7 @@ export default function Auth() {
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [forgotEmail, setForgotEmail] = useState('');
   const [isSendingReset, setIsSendingReset] = useState(false);
-  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  
   const { signIn, signUp } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
