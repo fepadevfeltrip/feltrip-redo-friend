@@ -221,7 +221,7 @@ const TEXTS = {
           "Full Itinerary (up to 7 days)",
           "Unlimited Concierge Chat Support throughout the journey (up to 7 days)",
         ],
-        cta: "Generate my Itinerary",
+        cta: " Unlock with Apple",
       },
       {
         name: "The Full Immersion",
