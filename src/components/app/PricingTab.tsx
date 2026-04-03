@@ -282,7 +282,7 @@ const TEXTS = {
           "4h de Tutoría de Idioma con IA",
           "Consultoría biográfica completa",
         ],
-        cta: "Desbloquear Experiencia Premium",
+        cta: " Desbloquear con Apple",
         highlight: true,
         badge: "Recomendado para Expats",
       },
