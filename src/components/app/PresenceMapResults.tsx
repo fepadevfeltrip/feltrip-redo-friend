@@ -10,7 +10,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useTranslation } from "react-i18next";
 import { useUserTier } from "@/hooks/useUserTier";
 import { useMapPurchase } from "@/hooks/useMapPurchase";
-import { openCheckout } from "@/lib/stripe";
+import { openApplePurchase as openCheckout } from "@/lib/appleIAP";
 import type { PillarScores } from "./PresenceQuestionnaire";
 import cultAnalystImage from "@/assets/cult-character-analyst.png";
 import { NotificationOptInBanner } from "./components/NotificationOptInBanner";

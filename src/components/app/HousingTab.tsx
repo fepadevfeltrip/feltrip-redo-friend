@@ -10,7 +10,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Home, Send, Loader2, MapPin, RotateCcw, MessageCircle, ArrowLeft, LogIn, Key } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { openCheckout } from "@/lib/stripe";
+import { openApplePurchase as openCheckout } from "@/lib/appleIAP";
 
 type City = "rio" | "florianopolis" | "sao-paulo";
 

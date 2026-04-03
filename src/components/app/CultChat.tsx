@@ -18,7 +18,7 @@ import { ArchetypeResultCard } from "./components/ArchetypeResultCard";
 import { AuthModal } from "./components/AuthModal";
 import PricingPaywall from "./components/PricingPaywall";
 import { ArchetypeShareCard } from "./components/ArchetypeShareCard";
-import { openCheckout } from "@/lib/stripe";
+import { openApplePurchase as openCheckout } from "@/lib/appleIAP";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserTier } from "@/hooks/useUserTier";
 import { useTranslation } from "react-i18next";

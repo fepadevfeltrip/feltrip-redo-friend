@@ -3,7 +3,7 @@ import { X, Check, Sparkles, Map } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { openCheckout } from "@/lib/stripe";
+import { openApplePurchase as openCheckout } from "@/lib/appleIAP";
 import CultSquadModal from "./CultSquadModal";
 import { getDisplayPrices } from "@/hooks/useDisplayCurrency";
 

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { X, Check, MapPin, MessageCircle, Map, Compass } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { openCheckout } from '@/lib/stripe';
+import { openApplePurchase as openCheckout } from '@/lib/appleIAP';
 import CultSquadModal from './CultSquadModal';
 import { getDisplayPrices } from '@/hooks/useDisplayCurrency';
 
