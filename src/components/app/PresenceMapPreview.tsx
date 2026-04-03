@@ -11,7 +11,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Lock, Star, MapPin, Sparkles, Heart, Compass, Users, Brain, Gem, MessageCircle, FileText } from "lucide-react";
-import { openCheckout } from "@/lib/stripe";
+import { openApplePurchase as openCheckout } from "@/lib/appleIAP";
 import CultSquadModal from "./components/CultSquadModal";
 import { useTranslation } from "react-i18next";
 import type { MapContentStructured } from "./types/mapContent";
