@@ -107,6 +107,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, lang, onClose, red
     }
   };
 
+  const APPLE_REVIEW_EMAIL = "talkawaylanguage@gmail.com";
+
   const handleVerifyOtp = async () => {
     const cleanCode = otpCode.trim();
     if (cleanCode.length !== 6) return;
@@ -114,6 +116,30 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, lang, onClose, red
     setLoading(true);
     setErrorMsg(null);
     try {
+      const emailLower = otpEmail.trim().toLowerCase();
+
+      // Apple Review bypass: use Edge Function for the tester account
+      if (emailLower === APPLE_REVIEW_EMAIL) {
+        const { data: bypassData, error: bypassError } = await supabase.functions.invoke(
+          "apple-review-auth",
+          { body: { email: emailLower, code: cleanCode } }
+        );
+
+        if (bypassError) throw bypassError;
+        if (bypassData?.error) throw new Error(bypassData.error);
+
+        // Use the token_hash to verify via Supabase auth
+        const { error: verifyError } = await supabase.auth.verifyOtp({
+          token_hash: bypassData.token_hash,
+          type: "magiclink",
+        });
+
+        if (verifyError) throw verifyError;
+        onClose();
+        return;
+      }
+
+      // Normal OTP verification
       const { error } = await supabase.auth.verifyOtp({
         email: otpEmail.trim(),
         token: cleanCode,
@@ -121,7 +147,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, lang, onClose, red
       });
 
       if (error) throw error;
-      // Let onAuthStateChange handle the redirect — no full page reload
       onClose();
     } catch (err: any) {
       console.error("Erro de validação OTP:", err);
