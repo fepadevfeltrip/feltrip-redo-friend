@@ -234,7 +234,7 @@ const CultSquadModal = ({ open, onOpenChange }: CultSquadModalProps) => {
             <div className="space-y-2">
               <Button
                 className="w-full bg-accent text-accent-foreground hover:bg-accent/90"
-                onClick={() => handleDiscountCheckout("gem_single")}
+                onClick={() => handleDiscountCheckout("personal_map")}
               >
                 {t.buyExplorer}
               </Button>
