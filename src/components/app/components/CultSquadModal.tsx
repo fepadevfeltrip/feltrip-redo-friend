@@ -133,12 +133,12 @@ const CultSquadModal = ({ open, onOpenChange }: CultSquadModalProps) => {
     toast.success(t.linkCopied);
   };
 
-  const handleDiscountCheckout = async (priceKey: "gem_single" | "explorer") => {
+  const handleDiscountCheckout = async (priceKey: "personal_map" | "explorer") => {
     if (!user) {
       toast.error(t.loginFirst);
       return;
     }
-    await openCheckout(priceKey, true);
+    await openCheckout(priceKey);
   };
 
   return (
@@ -234,7 +234,7 @@ const CultSquadModal = ({ open, onOpenChange }: CultSquadModalProps) => {
             <div className="space-y-2">
               <Button
                 className="w-full bg-accent text-accent-foreground hover:bg-accent/90"
-                onClick={() => handleDiscountCheckout("gem_single")}
+                onClick={() => handleDiscountCheckout("personal_map")}
               >
                 {t.buyExplorer}
               </Button>

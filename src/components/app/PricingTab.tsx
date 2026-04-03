@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Check, Map, Compass, Gift } from "lucide-react";
-import { openCheckout, PriceKey } from "@/lib/stripe";
+import { openApplePurchase as openCheckout, PriceKey } from "@/lib/appleIAP";
 import CultSquadModal from "./components/CultSquadModal";
 import { useUserTier } from "@/hooks/useUserTier";
 import { getDisplayPrices } from "@/hooks/useDisplayCurrency";
@@ -100,7 +100,7 @@ const PricingTab = () => {
 
                 {!isFreeCard && (
                   <Button
-                    className="w-full text-sm font-bold uppercase tracking-widest h-12 rounded-xl shadow-md"
+                    className="w-full text-sm font-bold uppercase tracking-widest h-auto min-h-[3rem] py-3 rounded-xl shadow-md whitespace-normal text-wrap"
                     variant={isHighlight ? "default" : "secondary"}
                     onClick={() => handlePlanClick(key)}
                     disabled={checkoutLoading !== null}
@@ -172,7 +172,7 @@ const TEXTS = {
           "Roteiro Completo (até 7 dias)",
           "Suporte Concierge via Chat Ilimitado durante toda a jornada (até 7 dias)",
         ],
-        cta: "Gerar meu Roteiro",
+        cta: " Pagar com Apple",
       },
       {
         name: "A Imersão Completa",
@@ -184,7 +184,7 @@ const TEXTS = {
           "4h de Tutoria de Idioma com IA",
           "Consultoria biográfica completa",
         ],
-        cta: "Desbloquear Experiência Premium",
+        cta: " Desbloquear com Apple",
         highlight: true,
         badge: "Recomendado para Expats",
       },
@@ -221,7 +221,7 @@ const TEXTS = {
           "Full Itinerary (up to 7 days)",
           "Unlimited Concierge Chat Support throughout the journey (up to 7 days)",
         ],
-        cta: "Generate my Itinerary",
+        cta: " Unlock with Apple",
       },
       {
         name: "The Full Immersion",
@@ -233,7 +233,7 @@ const TEXTS = {
           "4h of AI Language Tutoring",
           "Complete biographical consulting",
         ],
-        cta: "Unlock Premium Experience",
+        cta: " Unlock with Apple",
         highlight: true,
         badge: "Recommended for Expats",
       },
@@ -270,7 +270,7 @@ const TEXTS = {
           "Itinerario Completo (hasta 7 días)",
           "Soporte Concierge via Chat Ilimitado durante todo el viaje (hasta 7 días)",
         ],
-        cta: "Generar mi Itinerario",
+        cta: " Pagar con Apple",
       },
       {
         name: "La Inmersión Completa",
@@ -282,7 +282,7 @@ const TEXTS = {
           "4h de Tutoría de Idioma con IA",
           "Consultoría biográfica completa",
         ],
-        cta: "Desbloquear Experiencia Premium",
+        cta: " Desbloquear con Apple",
         highlight: true,
         badge: "Recomendado para Expats",
       },

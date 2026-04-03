@@ -8,16 +8,7 @@ export const isSupabaseConfigured = true;
 
 // --- AUTH ---
 
-// 1. Login com o Google
-export const signInWithGoogle = async () => {
-  return await supabase.auth.signInWithOAuth({
-    provider: "google",
-    options: {
-      // CORREÇÃO AQUI: Deve ser a origem de onde o usuário clicou
-      redirectTo: window.location.origin,
-    },
-  });
-};
+// Login via Email OTP only (Google removed for Apple compliance)
 
 // 2. Disparar o Código de 6 dígitos (OTP)
 export const sendOtpCode = async (email: string) => {

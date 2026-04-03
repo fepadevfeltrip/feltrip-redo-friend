@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { getPendingCheckout, openCheckout, PriceKey } from "@/lib/stripe";
+import { getPendingCheckout, openApplePurchase as openCheckout, PriceKey } from "@/lib/appleIAP";
 import { TERMS_TEXT_PT, TERMS_TEXT_EN, TERMS_TEXT_ES, PRIVACY_TEXT_PT, PRIVACY_TEXT_EN, PRIVACY_TEXT_ES, APPLE_EULA_URL } from "@/components/app/constants/legalTexts";
 import { isIOSDevice } from "@/lib/platform";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
