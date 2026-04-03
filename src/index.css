@@ -1,0 +1,214 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
+All colors MUST be HSL.
+*/
+
+@layer base {
+  :root {
+    --background: 50 33% 97%;
+    --foreground: 0 0% 1%;
+
+    --card: 50 33% 97%;
+    --card-foreground: 0 0% 1%;
+
+    --popover: 50 33% 97%;
+    --popover-foreground: 0 0% 1%;
+
+    --primary: 183 98% 22%;
+    --primary-foreground: 50 33% 97%;
+
+    --secondary: 38 84% 53%;
+    --secondary-foreground: 50 33% 97%;
+
+    --muted: 45 20% 92%;
+    --muted-foreground: 0 0% 35%;
+
+    --accent: 7 100% 71%;
+    --accent-foreground: 50 33% 97%;
+
+    --energy: 330 100% 50%;
+    --energy-foreground: 50 33% 97%;
+
+    --punk: 330 100% 50%;
+    --punk-foreground: 50 33% 97%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 50 33% 97%;
+
+    --border: 40 15% 88%;
+    --input: 40 15% 88%;
+    --ring: 183 98% 22%;
+
+    --radius: 1rem;
+
+    --boba-teal: 183 98% 22%;
+    --boba-coral: 7 100% 71%;
+    --boba-mustard: 38 84% 53%;
+    --boba-off-white: 50 33% 97%;
+    --boba-dark-card: 183 35% 16%;
+
+    --chart-1: 183 98% 22%;
+    --chart-2: 38 84% 53%;
+    --chart-3: 7 100% 71%;
+    --chart-4: 330 100% 50%;
+    --chart-5: 0 0% 35%;
+
+    --sidebar-background: 50 33% 97%;
+    --sidebar-foreground: 0 0% 1%;
+    --sidebar-primary: 183 98% 22%;
+    --sidebar-primary-foreground: 50 33% 97%;
+    --sidebar-accent: 45 20% 92%;
+    --sidebar-accent-foreground: 0 0% 1%;
+    --sidebar-border: 40 15% 90%;
+    --sidebar-ring: 183 98% 22%;
+  }
+
+  .dark {
+    --background: 200 30% 8%;
+    --foreground: 50 33% 97%;
+
+    --card: 200 25% 12%;
+    --card-foreground: 50 33% 97%;
+
+    --popover: 200 25% 12%;
+    --popover-foreground: 50 33% 97%;
+
+    --primary: 183 60% 40%;
+    --primary-foreground: 50 33% 97%;
+
+    --secondary: 38 70% 48%;
+    --secondary-foreground: 50 33% 97%;
+
+    --muted: 200 20% 18%;
+    --muted-foreground: 45 15% 65%;
+
+    --accent: 7 90% 65%;
+    --accent-foreground: 50 33% 97%;
+
+    --energy: 330 90% 55%;
+    --energy-foreground: 50 33% 97%;
+
+    --punk: 330 90% 55%;
+    --punk-foreground: 50 33% 97%;
+
+    --destructive: 0 63% 50%;
+    --destructive-foreground: 50 33% 97%;
+
+    --boba-teal: 183 98% 22%;
+    --boba-coral: 7 100% 71%;
+    --boba-mustard: 38 70% 48%;
+    --boba-off-white: 50 33% 97%;
+    --boba-dark-card: 200 25% 10%;
+
+    --border: 200 20% 18%;
+    --input: 200 20% 18%;
+    --ring: 183 60% 55%;
+
+    --chart-1: 183 60% 40%;
+    --chart-2: 38 70% 48%;
+    --chart-3: 7 90% 65%;
+    --chart-4: 330 90% 55%;
+    --chart-5: 45 15% 65%;
+
+    --sidebar-background: 200 30% 6%;
+    --sidebar-foreground: 50 33% 90%;
+    --sidebar-primary: 183 60% 40%;
+    --sidebar-primary-foreground: 50 33% 97%;
+    --sidebar-accent: 200 25% 14%;
+    --sidebar-accent-foreground: 50 33% 90%;
+    --sidebar-border: 200 20% 16%;
+    --sidebar-ring: 183 60% 55%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Editorial typography rhythm */
+  h1, h2, h3, h4, h5, h6 {
+    @apply tracking-tight;
+    text-wrap: balance;
+  }
+
+  h1 { @apply text-3xl md:text-4xl font-semibold; letter-spacing: -0.025em; }
+  h2 { @apply text-2xl md:text-3xl font-semibold; letter-spacing: -0.02em; }
+  h3 { @apply text-xl md:text-2xl font-medium; letter-spacing: -0.015em; }
+
+  p {
+    @apply leading-relaxed;
+    text-wrap: pretty;
+  }
+
+  /* Reduce visual noise from icons */
+  svg {
+    @apply stroke-[1.5];
+  }
+}
+
+/* Depth & layering utilities */
+@layer utilities {
+  .surface-elevated {
+    @apply bg-card shadow-sm;
+    box-shadow: 
+      0 1px 2px 0 rgb(0 0 0 / 0.03),
+      0 1px 3px 0 rgb(0 0 0 / 0.06);
+  }
+
+  .surface-inset {
+    @apply bg-muted/50;
+    box-shadow: inset 0 1px 2px 0 rgb(0 0 0 / 0.04);
+  }
+
+  .surface-interactive {
+    @apply transition-all duration-200;
+  }
+
+  .surface-interactive:hover {
+    box-shadow: 
+      0 2px 4px 0 rgb(0 0 0 / 0.04),
+      0 4px 8px 0 rgb(0 0 0 / 0.06);
+  }
+
+  /* Editorial spacing */
+  .breathing-y {
+    @apply py-8 md:py-12;
+  }
+
+  .breathing-x {
+    @apply px-6 md:px-8;
+  }
+
+  /* Subtle grain texture overlay */
+  .grain-overlay::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    opacity: 0.015;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  }
+}

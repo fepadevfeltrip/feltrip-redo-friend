@@ -1,0 +1,1 @@
+DROP POLICY IF EXISTS "Users can create their own mrp sessions" ON mrp_sessions;

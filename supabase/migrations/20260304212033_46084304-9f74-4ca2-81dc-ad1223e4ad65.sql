@@ -1,0 +1,4 @@
+INSERT INTO public.concierge_experts (full_name, specialty, bio, city, languages, categories, is_active, is_feltrip_indicated, is_cult_approved, is_community_verified) VALUES 
+('Claramente', 'Mental Health & Wellness', 'Atendimento presencial no Rio de Janeiro e online. Suporte em saúde mental e bem-estar para expatriados e pessoas em transição.', 'Rio de Janeiro', ARRAY['pt','en','es'], ARRAY['Mental Health','Wellness','Rio de Janeiro','Online'], true, true, true, false),
+('Luisa', 'Mental Health', 'Psicóloga especializada em saúde mental para expatriados. Atendimento presencial em São Paulo e online para todo o Brasil.', 'São Paulo', ARRAY['pt','en'], ARRAY['Mental Health','São Paulo','Online'], true, true, true, false),
+('Tekhne', 'Accounting', 'Contabilidade especializada para expatriados e empresas internacionais. Atendimento 100% online.', 'Online', ARRAY['pt','en'], ARRAY['Accounting','Online'], true, true, true, false);

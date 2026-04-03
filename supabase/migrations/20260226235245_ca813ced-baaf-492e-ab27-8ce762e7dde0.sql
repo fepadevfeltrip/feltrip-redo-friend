@@ -1,0 +1,1 @@
+UPDATE city_questionnaires SET map_status = 'failed' WHERE id = '37344e49-df1a-4156-b105-daed72b6c8a2' AND map_content IS NULL;
