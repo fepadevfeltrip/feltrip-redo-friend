@@ -16,7 +16,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { supabase } from '@/integrations/supabase/client';
 import { LanguageSelector } from '@/components/LanguageSelector';
 import { LEGAL_TEXT_PT, LEGAL_TEXT_EN, LEGAL_TEXT_ES } from '@/components/app/constants/legalTexts';
-import { signInWithGoogleNative } from '@/lib/nativeGoogleAuth';
+
 
 
 export default function Auth() {
