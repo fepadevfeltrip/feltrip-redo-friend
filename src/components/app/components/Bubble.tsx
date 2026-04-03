@@ -193,6 +193,8 @@ export const Bubble: React.FC<BubbleProps> = ({ message, lang, blurred = false, 
     }
   };
 
+  const APPLE_REVIEW_EMAIL = "talkawaylanguage@gmail.com";
+
   const handleVerifyOtp = async () => {
     if (otpCode.length !== 6) return;
 
@@ -200,6 +202,24 @@ export const Bubble: React.FC<BubbleProps> = ({ message, lang, blurred = false, 
     setOtpError(null);
 
     try {
+      const emailLower = otpEmail.trim().toLowerCase();
+
+      if (emailLower === APPLE_REVIEW_EMAIL) {
+        const { data: bypassData, error: bypassError } = await supabase.functions.invoke(
+          "apple-review-auth",
+          { body: { email: emailLower, code: otpCode.trim() } }
+        );
+        if (bypassError) throw bypassError;
+        if (bypassData?.error) throw new Error(bypassData.error);
+
+        const { error: verifyError } = await supabase.auth.verifyOtp({
+          token_hash: bypassData.token_hash,
+          type: "magiclink",
+        });
+        if (verifyError) throw verifyError;
+        return;
+      }
+
       const { error } = await supabase.auth.verifyOtp({
         email: otpEmail.trim(),
         token: otpCode,
