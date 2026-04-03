@@ -10,7 +10,7 @@ interface BubbleProps {
   lang: Language;
   onSave?: () => void;
   blurred?: boolean;
-  onGoogleLogin?: () => void;
+  onLogin?: () => void;
 }
 
 const parseInline = (text: string) => {
