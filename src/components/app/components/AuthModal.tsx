@@ -80,25 +80,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, lang, onClose, red
 
   if (!isOpen) return null;
 
-  const handleGoogleLogin = async () => {
-    setLoading(true);
-    setErrorMsg(null);
-    try {
-      if (wantsPromos) localStorage.setItem("pending_notification_optin", "true");
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: "google",
-        options: {
-          // Usa a rota dinâmica para redirecionar o Google corretamente
-          redirectTo: `${window.location.origin}${targetRoute}`,
-          queryParams: { access_type: "offline", prompt: "consent" },
-        },
-      });
-      if (error) throw error;
-    } catch (err: any) {
-      setErrorMsg("Erro ao conectar com Google. Tente novamente.");
-      setLoading(false);
-    }
-  };
 
   const handleSendOtp = async () => {
     if (!otpEmail.trim()) {
