@@ -100,7 +100,7 @@ const PricingTab = () => {
 
                 {!isFreeCard && (
                   <Button
-                    className="w-full text-sm font-bold uppercase tracking-widest h-12 rounded-xl shadow-md"
+                    className="w-full text-sm font-bold uppercase tracking-widest h-auto min-h-[3rem] py-3 rounded-xl shadow-md whitespace-normal text-wrap"
                     variant={isHighlight ? "default" : "secondary"}
                     onClick={() => handlePlanClick(key)}
                     disabled={checkoutLoading !== null}
