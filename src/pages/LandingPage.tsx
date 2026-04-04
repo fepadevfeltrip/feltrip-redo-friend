@@ -131,7 +131,7 @@ const LandingPage = () => {
     navigate("/app?tab=housing");
   };
 
-  // Nova Lógica de Checkout Unificada (Integração Stripe + Auth)
+  // Nova Lógica de Checkout Unificada (Integração Apple + Auth)
   const handlePricingCta = useCallback(async (cardIndex: number) => {
     if (cardIndex === 0) {
       navigate("/app");

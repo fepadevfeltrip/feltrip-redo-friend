@@ -30,19 +30,16 @@ const LOGIN_TEXTS = {
   pt: {
     title: "Seu Dossiê de Moradia está pronto! 🔑",
     desc: "Entre para desbloquear os bairros recomendados e falar com nossos curadores imobiliários.",
-    google: "Continuar com Google",
     loginBtn: "Entrar com E-mail",
   },
   en: {
     title: "Your Housing Dossier is ready! 🔑",
     desc: "Sign in to unlock recommended neighborhoods and talk to our real estate curators.",
-    google: "Continue with Google",
     loginBtn: "Sign in with Email",
   },
   es: {
     title: "¡Tu Dosier de Vivienda está listo! 🔑",
     desc: "Inicia sesión para desbloquear los barrios recomendados y hablar con nuestros curadores inmobiliarios.",
-    google: "Continuar con Google",
     loginBtn: "Iniciar sesión con E-mail",
   },
 };
@@ -52,7 +49,7 @@ const HOUSING_STORAGE_KEY = "feltrip_housing_result";
 const saveHousingResult = (data: { result: RefugeResult; city: City }) => {
   try {
     localStorage.setItem(HOUSING_STORAGE_KEY, JSON.stringify(data));
-  } catch {}
+  } catch { }
 };
 
 const loadHousingResult = (): { result: RefugeResult; city: City } | null => {
@@ -68,7 +65,7 @@ const loadHousingResult = (): { result: RefugeResult; city: City } | null => {
 const clearHousingResult = () => {
   try {
     localStorage.removeItem(HOUSING_STORAGE_KEY);
-  } catch {}
+  } catch { }
 };
 
 const trackHousingCompletion = async (result: RefugeResult, city: City, answers: Record<string, string>) => {
@@ -137,7 +134,6 @@ const HousingTab = () => {
   const [hasUsedFreeHousing, setHasUsedFreeHousing] = useState(false);
   const [checkingUsage, setCheckingUsage] = useState(true);
 
-  // Check if free user already used their 1x housing
   useEffect(() => {
     const checkUsage = async () => {
       if (!user || isAnonymous) {
@@ -268,15 +264,6 @@ const HousingTab = () => {
     resetHousingSession();
   };
 
-  const handleGoogleLogin = async () => {
-    localStorage.setItem("pending_action", "housing_results");
-    const redirectUrl = `${window.location.origin}/app?tab=housing`;
-    await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: { redirectTo: redirectUrl },
-    });
-  };
-
   const getWaLink = (bairro: string) => {
     const cityName = selectedCity ? CITIES[selectedCity].label : "";
     const text =
@@ -307,7 +294,6 @@ const HousingTab = () => {
     setInputValue("");
   };
 
-  // ── Loading usage check ──
   if (checkingUsage) {
     return (
       <div className="flex items-center justify-center h-full">
@@ -316,9 +302,6 @@ const HousingTab = () => {
     );
   }
 
-  // Anonymous users can now start the investigation freely — login is only required to see neighborhoods in the result phase
-
-  // ── Blocked: Free user already used 1x ──
   if (housingBlocked) {
     return (
       <div className="relative flex flex-col items-center justify-center h-full px-6 py-12 text-center gap-8 bg-background">
@@ -332,10 +315,10 @@ const HousingTab = () => {
           </h2>
           <p className="text-sm text-muted-foreground leading-relaxed">
             {lang === "en"
-              ? "Upgrade to the Full Immersion plan (R$ 89) for unlimited Housing Investigations."
+              ? "Upgrade to the Full Immersion plan for unlimited Housing Investigations."
               : lang === "es"
-                ? "Actualiza al plan de Inmersión Completa (R$ 89) para investigaciones ilimitadas."
-                : "Faça upgrade para o plano de Imersão Completa (R$ 89) para investigações ilimitadas."}
+                ? "Actualiza al plan de Inmersión Completa para investigaciones ilimitadas."
+                : "Faça upgrade para o plano de Imersão Completa para investigações ilimitadas."}
           </p>
         </div>
         <Button
@@ -348,7 +331,6 @@ const HousingTab = () => {
     );
   }
 
-  // ── Welcome ──
   if (phase === "welcome") {
     return (
       <div className="relative flex flex-col items-center justify-center h-full px-6 py-12 text-center gap-8 bg-background">
@@ -377,7 +359,6 @@ const HousingTab = () => {
     );
   }
 
-  // ── City Selection ──
   if (phase === "city") {
     return (
       <div className="relative flex flex-col items-center justify-center h-full px-6 py-12 text-center gap-8 bg-background">
@@ -403,7 +384,6 @@ const HousingTab = () => {
     );
   }
 
-  // ── Loading ──
   if (phase === "loading") {
     return (
       <div className="flex flex-col items-center justify-center h-full px-6 gap-6 bg-background">
@@ -415,14 +395,12 @@ const HousingTab = () => {
     );
   }
 
-  // ── Result (O Dossiê de Arquitetura) ──
   if (phase === "result" && result) {
     return (
       <ScrollArea className="h-full bg-muted/10">
         <div className="px-4 sm:px-6 py-10 space-y-10 max-w-3xl mx-auto relative">
           <BackButton onClick={handleReset} />
 
-          {/* Header Premium */}
           <div className="text-center space-y-4 pt-4">
             <div className="inline-block bg-primary/10 text-primary border border-primary/20 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-[0.2em] mb-2">
               Dossiê de Moradia
@@ -437,7 +415,6 @@ const HousingTab = () => {
             )}
           </div>
 
-          {/* Poetic Analysis */}
           <div className="bg-card border-l-4 border-primary p-6 sm:p-8 rounded-r-2xl shadow-sm">
             <p className="text-base sm:text-lg text-foreground/80 leading-relaxed font-serif italic">
               "{result.analisePoetica}"
@@ -446,7 +423,6 @@ const HousingTab = () => {
 
           <Separator className="bg-primary/10" />
 
-          {/* Neighborhoods with dedicated WhatsApp CTAs */}
           <div className="relative">
             <div
               className={isAnonymous ? "blur-[10px] select-none pointer-events-none transition-all duration-500" : ""}
@@ -471,7 +447,6 @@ const HousingTab = () => {
                         </div>
                         <p className="text-base text-muted-foreground leading-relaxed">{s.descricaoVibe}</p>
 
-                        {/* Botão de Curadoria Específico por Bairro */}
                         <div className="pt-4 border-t border-border/40 mt-4">
                           <Button
                             className="w-full bg-foreground hover:bg-foreground/90 text-background font-bold uppercase tracking-widest text-[10px] sm:text-xs rounded-xl py-6 shadow-md transition-all"
@@ -496,7 +471,6 @@ const HousingTab = () => {
               </div>
             </div>
 
-            {/* Login overlay for Anonymous B2B Lead Gen */}
             {isAnonymous && (
               <div className="absolute inset-0 flex items-start justify-center pt-10 z-20">
                 <div className="bg-card border border-border rounded-3xl p-8 shadow-2xl text-center max-w-sm mx-4 w-full space-y-6">
@@ -508,32 +482,6 @@ const HousingTab = () => {
                     <p className="text-sm text-muted-foreground">{lt.desc}</p>
                   </div>
                   <div className="space-y-3 pt-4">
-                    <button
-                      onClick={handleGoogleLogin}
-                      className="w-full flex items-center justify-center gap-3 bg-primary hover:bg-primary/90 text-primary-foreground font-bold py-4 rounded-xl shadow-lg text-xs uppercase tracking-widest hover:-translate-y-0.5 transition-all"
-                    >
-                      <div className="bg-white p-1 rounded-full flex items-center justify-center shrink-0">
-                        <svg className="w-4 h-4" viewBox="0 0 24 24">
-                          <path
-                            fill="#4285F4"
-                            d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                          />
-                          <path
-                            fill="#34A853"
-                            d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                          />
-                          <path
-                            fill="#FBBC05"
-                            d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-                          />
-                          <path
-                            fill="#EA4335"
-                            d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                          />
-                        </svg>
-                      </div>
-                      {lt.google}
-                    </button>
                     <Button
                       onClick={() => setShowAuthModal(true)}
                       variant="outline"
@@ -548,7 +496,6 @@ const HousingTab = () => {
             )}
           </div>
 
-          {/* Reset */}
           {!isAnonymous && (
             <div className="text-center pb-8 pt-4">
               <Button
@@ -572,7 +519,6 @@ const HousingTab = () => {
     );
   }
 
-  // ── Chat ──
   return (
     <div className="flex flex-col h-full bg-background">
       <div className="px-4 pt-4 pb-2 space-y-3 bg-background border-b border-border/50 shadow-sm">
@@ -603,11 +549,10 @@ const HousingTab = () => {
           {messages.map((msg, i) => (
             <div key={i} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
               <div
-                className={`max-w-[85%] rounded-2xl px-5 py-4 text-sm sm:text-base leading-relaxed shadow-sm ${
-                  msg.role === "user"
+                className={`max-w-[85%] rounded-2xl px-5 py-4 text-sm sm:text-base leading-relaxed shadow-sm ${msg.role === "user"
                     ? "bg-primary text-primary-foreground rounded-br-none"
                     : "bg-card border border-border text-foreground rounded-bl-none"
-                }`}
+                  }`}
               >
                 {msg.content}
               </div>

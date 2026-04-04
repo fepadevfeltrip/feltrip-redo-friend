@@ -13,8 +13,8 @@ export interface UserProfile {
   avatar_url: string | null;
   company_id: string | null;
   user_tier: string;
-  stripe_customer_id: string | null;
-  stripe_subscription_id: string | null;
+  payment_customer_id: string | null;
+  payment_subscription_id: string | null;
   subscription_end_date: string | null;
   cancel_at_period_end: boolean;
   created_at: string;

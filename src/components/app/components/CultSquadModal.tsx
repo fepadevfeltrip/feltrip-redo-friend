@@ -17,7 +17,6 @@ import { Copy, Gift, Loader2, PartyPopper, Share2, Sparkles } from "lucide-react
 import { openApplePurchase as openCheckout } from "@/lib/appleIAP";
 
 const FREE_PROVIDERS = [
-  "gmail.com", "googlemail.com",
   "hotmail.com", "hotmail.co.uk", "hotmail.fr",
   "outlook.com", "outlook.co",
   "yahoo.com", "yahoo.com.br", "yahoo.co.uk",
@@ -89,7 +88,6 @@ const CultSquadModal = ({ open, onOpenChange }: CultSquadModalProps) => {
     setStep("loading");
 
     try {
-      // Upsert squad entry
       const { error: insertError } = await supabase
         .from("institutional_squads" as any)
         .upsert(
@@ -110,7 +108,6 @@ const CultSquadModal = ({ open, onOpenChange }: CultSquadModalProps) => {
         return;
       }
 
-      // Get count for domain
       const { data: countData, error: countError } = await supabase.rpc(
         "get_squad_count" as any,
         { p_domain: extractedDomain }
@@ -154,7 +151,6 @@ const CultSquadModal = ({ open, onOpenChange }: CultSquadModalProps) => {
           )}
         </DialogHeader>
 
-        {/* Step 1: Email Input */}
         {step === "input" && (
           <div className="space-y-3 pt-2">
             <Input
@@ -182,7 +178,6 @@ const CultSquadModal = ({ open, onOpenChange }: CultSquadModalProps) => {
           </div>
         )}
 
-        {/* Step 2: Loading */}
         {step === "loading" && (
           <div className="flex flex-col items-center gap-3 py-8">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -190,7 +185,6 @@ const CultSquadModal = ({ open, onOpenChange }: CultSquadModalProps) => {
           </div>
         )}
 
-        {/* Step 3: Tracker */}
         {step === "tracker" && (
           <div className="space-y-5 pt-2">
             <div className="rounded-xl bg-primary/5 border border-primary/20 px-4 py-3 text-center">
@@ -222,7 +216,6 @@ const CultSquadModal = ({ open, onOpenChange }: CultSquadModalProps) => {
           </div>
         )}
 
-        {/* Step 4: Unlocked */}
         {step === "unlocked" && (
           <div className="space-y-5 pt-2 text-center">
             <div className="flex flex-col items-center gap-2">
@@ -273,7 +266,7 @@ const labels = {
     unlockedSub: "Vocês conquistaram 50% de desconto vitalício.",
     buyExplorer: "Explorador com 50% OFF",
     buyImmersion: "Imersão com 50% OFF",
-    institutionPlaceholder: "Nome da instituição (ex: USP, Google)",
+    institutionPlaceholder: "Nome da instituição (ex: USP, Empresa)",
     positionPlaceholder: "Sua posição (ex: estudante, gerente)",
   },
   en: {
@@ -296,7 +289,7 @@ const labels = {
     unlockedSub: "You've earned a lifetime 50% discount.",
     buyExplorer: "Explorer at 50% OFF",
     buyImmersion: "Immersion at 50% OFF",
-    institutionPlaceholder: "Institution name (e.g., MIT, Google)",
+    institutionPlaceholder: "Institution name (e.g., MIT, Enterprise)",
     positionPlaceholder: "Your position (e.g., student, manager)",
   },
   es: {
@@ -312,14 +305,14 @@ const labels = {
     domainDetected: "¡Dominio {domain} detectado!",
     progress: "Colegas activados",
     waitingMessage:
-      "¡Estás en la lista de espera VIP! Faltan solo {remaining} colegas de tu dominio para desbloquear el 50% de descuento para todos.",
+      "¡Estás en la lista de espera VIP! Faltam solo {remaining} colegas de tu dominio para desbloquear el 50% de descuento para todos.",
     copyLink: "Copiar enlace de invitación",
     linkCopied: "¡Enlace copiado! Envíalo a tus colegas.",
     unlocked: "¡Squad Desbloqueado! 🎉",
     unlockedSub: "Han conquistado 50% de descuento vitalicio.",
     buyExplorer: "Explorador con 50% OFF",
     buyImmersion: "Inmersión con 50% OFF",
-    institutionPlaceholder: "Nombre de la institución (ej: UNAM, Google)",
+    institutionPlaceholder: "Nombre de la institución (ej: UNAM, Empresa)",
     positionPlaceholder: "Tu posición (ej: estudiante, gerente)",
   },
 };

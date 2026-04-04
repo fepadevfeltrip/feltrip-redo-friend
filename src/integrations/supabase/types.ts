@@ -21,7 +21,7 @@ export type Database = {
           id: number
           name: string | null
           slug: string | null
-          stripe_account_id: string | null
+          payment_account_id: string | null
           "user id": string | null
         }
         Insert: {
@@ -30,7 +30,7 @@ export type Database = {
           id?: number
           name?: string | null
           slug?: string | null
-          stripe_account_id?: string | null
+          payment_account_id?: string | null
           "user id"?: string | null
         }
         Update: {
@@ -39,7 +39,7 @@ export type Database = {
           id?: number
           name?: string | null
           slug?: string | null
-          stripe_account_id?: string | null
+          payment_account_id?: string | null
           "user id"?: string | null
         }
         Relationships: []
@@ -908,7 +908,7 @@ export type Database = {
           is_active: boolean
           minutes_used_this_week: number
           starts_at: string
-          stripe_payment_id: string | null
+          payment_payment_id: string | null
           updated_at: string
           user_id: string
           week_reset_at: string
@@ -921,7 +921,7 @@ export type Database = {
           is_active?: boolean
           minutes_used_this_week?: number
           starts_at?: string
-          stripe_payment_id?: string | null
+          payment_payment_id?: string | null
           updated_at?: string
           user_id: string
           week_reset_at?: string
@@ -934,7 +934,7 @@ export type Database = {
           is_active?: boolean
           minutes_used_this_week?: number
           starts_at?: string
-          stripe_payment_id?: string | null
+          payment_payment_id?: string | null
           updated_at?: string
           user_id?: string
           week_reset_at?: string
@@ -1102,7 +1102,7 @@ export type Database = {
           created_at: string
           id: string
           purchase_type: string
-          stripe_payment_id: string | null
+          payment_payment_id: string | null
           user_id: string
         }
         Insert: {
@@ -1110,7 +1110,7 @@ export type Database = {
           created_at?: string
           id?: string
           purchase_type?: string
-          stripe_payment_id?: string | null
+          payment_payment_id?: string | null
           user_id: string
         }
         Update: {
@@ -1118,7 +1118,7 @@ export type Database = {
           created_at?: string
           id?: string
           purchase_type?: string
-          stripe_payment_id?: string | null
+          payment_payment_id?: string | null
           user_id?: string
         }
         Relationships: []
@@ -1424,8 +1424,8 @@ export type Database = {
           is_encrypted: boolean | null
           origin_city: string | null
           pronoun: string | null
-          stripe_customer_id: string | null
-          stripe_subscription_id: string | null
+          payment_customer_id: string | null
+          payment_subscription_id: string | null
           subscription_end_date: string | null
           updated_at: string
           user_id: string
@@ -1447,8 +1447,8 @@ export type Database = {
           is_encrypted?: boolean | null
           origin_city?: string | null
           pronoun?: string | null
-          stripe_customer_id?: string | null
-          stripe_subscription_id?: string | null
+          payment_customer_id?: string | null
+          payment_subscription_id?: string | null
           subscription_end_date?: string | null
           updated_at?: string
           user_id: string
@@ -1470,8 +1470,8 @@ export type Database = {
           is_encrypted?: boolean | null
           origin_city?: string | null
           pronoun?: string | null
-          stripe_customer_id?: string | null
-          stripe_subscription_id?: string | null
+          payment_customer_id?: string | null
+          payment_subscription_id?: string | null
           subscription_end_date?: string | null
           updated_at?: string
           user_id?: string
@@ -1542,7 +1542,7 @@ export type Database = {
           id: number
           metadata: Json | null
           status: string | null
-          stripe_invoice_id: string | null
+          payment_invoice_id: string | null
           user_id: string | null
         }
         Insert: {
@@ -1553,7 +1553,7 @@ export type Database = {
           id?: number
           metadata?: Json | null
           status?: string | null
-          stripe_invoice_id?: string | null
+          payment_invoice_id?: string | null
           user_id?: string | null
         }
         Update: {
@@ -1564,7 +1564,7 @@ export type Database = {
           id?: number
           metadata?: Json | null
           status?: string | null
-          stripe_invoice_id?: string | null
+          payment_invoice_id?: string | null
           user_id?: string | null
         }
         Relationships: []

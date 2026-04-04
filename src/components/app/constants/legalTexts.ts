@@ -154,9 +154,9 @@ O Usuário é responsável pela segurança do acesso à sua conta. A Feltrip res
 4. Pagamento
 Os produtos pagos são cobranças únicas, sem renovação automática. O pagamento é processado no momento da compra e o acesso é liberado imediatamente.
 
-4.1 Processamento de Pagamentos — Stripe
-Todos os pagamentos são processados pela Stripe Payments Europe, Ltd. A Feltrip não armazena dados de cartão de crédito ou débito do Usuário.
-Ao efetuar um pagamento, o Usuário concorda também com os Termos de Serviço e a Política de Privacidade da Stripe (stripe.com/br/privacy).
+4.1 Processamento de Pagamentos — Apple
+Todos os pagamentos são processados pela Apple Payments Europe, Ltd. A Feltrip não armazena dados de cartão de crédito ou débito do Usuário.
+Ao efetuar um pagamento, o Usuário concorda também com os Termos de Serviço e a Política de Privacidade da Apple (https://www.apple.com/legal/privacy/).
 
 5. Política de Reembolso
 Os produtos são digitais com fornecimento imediato de conteúdo personalizado. Nos termos do art. 49 do CDC, o direito de arrependimento não se aplica quando o fornecimento do conteúdo digital tem início imediato com a anuência do consumidor.
@@ -228,7 +228,7 @@ The definitive package for those in city transition:
 Access requires creating an account via Google or email (OTP) authentication. Feltrip receives and stores only the email associated with the account.
 
 4. Payment
-Paid products are one-time charges, with no automatic renewal. Processed by Stripe.
+Paid products are one-time charges, with no automatic renewal. Processed by Apple.
 
 5. Refund Policy
 Digital products with immediate delivery. No refunds after payment confirmation, except for undue/duplicate charges or severe technical failures (72h+). Contact: info@feltrip.com.

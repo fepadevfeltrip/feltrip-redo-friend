@@ -48,7 +48,7 @@ const Annotations = () => {
 
   const loadAnnotations = async () => {
     if (!user) return;
-    
+
     try {
       const { data, error } = await supabase
         .from("user_annotations")
@@ -97,8 +97,6 @@ const Annotations = () => {
 
     setIsSaving(true);
     try {
-
-      // Save the annotation
       const { error } = await supabase.from("user_annotations").insert({
         user_id: user.id,
         title: noteTitle.trim(),
@@ -111,7 +109,6 @@ const Annotations = () => {
 
       if (error) throw error;
 
-      // If sharing with community, also create a map_pin
       if (shareWithCommunity) {
         const { error: pinError } = await supabase.from("map_pins").insert({
           user_id: user.id,
@@ -163,7 +160,7 @@ const Annotations = () => {
       toast.error(t('annotations.mustBeLoggedIn'));
       return;
     }
-    
+
     try {
       const { error } = await supabase.from("map_pins").insert({
         user_id: user.id,
@@ -185,7 +182,6 @@ const Annotations = () => {
 
   const openCloudService = (service: string) => {
     const urls: Record<string, string> = {
-      'google-drive': 'https://drive.google.com',
       'icloud': 'https://www.icloud.com/iclouddrive',
       'dropbox': 'https://www.dropbox.com/home',
       'onedrive': 'https://onedrive.live.com'
@@ -207,7 +203,6 @@ const Annotations = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/30 to-accent/10 p-6 space-y-6 max-w-2xl mx-auto w-full">
-      {/* Header */}
       <div className="text-center space-y-2">
         <h1 className="text-3xl font-bold text-primary">{t('annotations.title')}</h1>
         <p className="text-muted-foreground">
@@ -218,13 +213,12 @@ const Annotations = () => {
         </Badge>
       </div>
 
-      {/* Interactive Map */}
       <Card className="p-3 sm:p-4">
         <h3 className="font-semibold text-foreground mb-3 sm:mb-4 flex items-center gap-2 text-sm sm:text-base">
           <MapPin className="h-4 w-4 sm:h-5 sm:w-5 text-primary shrink-0" />
           {t('annotations.searchOrTap')}
         </h3>
-        <MapboxMap 
+        <MapboxMap
           pins={mapPins}
           showUserLocation={true}
           showSearch={true}
@@ -238,14 +232,12 @@ const Annotations = () => {
         )}
       </Card>
 
-      {/* Add New Annotation */}
       <Card className="p-6 space-y-4">
         <h3 className="font-semibold text-foreground flex items-center gap-2">
           <Plus className="h-5 w-5 text-primary" />
           {t('annotations.newAnnotation')}
         </h3>
 
-        {/* Note Type Selection */}
         <div className="space-y-2">
           <Label>{t('annotations.type')}</Label>
           <div className="grid grid-cols-2 gap-2">
@@ -268,7 +260,6 @@ const Annotations = () => {
           </div>
         </div>
 
-        {/* Title */}
         <div className="space-y-2">
           <Label htmlFor="title">{t('annotations.titleLabel')}</Label>
           <Input
@@ -279,12 +270,11 @@ const Annotations = () => {
           />
         </div>
 
-        {/* Content */}
         <div className="space-y-2">
           <Label htmlFor="note">{t('annotations.note')}</Label>
           <Textarea
             id="note"
-            placeholder={noteType === 'language' 
+            placeholder={noteType === 'language'
               ? t('annotations.notePlaceholderLanguage')
               : t('annotations.notePlaceholderGeneral')
             }
@@ -294,7 +284,6 @@ const Annotations = () => {
           />
         </div>
 
-        {/* Link */}
         <div className="space-y-2">
           <Label htmlFor="link" className="flex items-center gap-2">
             <Link className="h-4 w-4" />
@@ -309,7 +298,6 @@ const Annotations = () => {
           />
         </div>
 
-        {/* Share with Community */}
         <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
           <div className="flex items-center gap-2">
             <Users className="h-5 w-5 text-primary" />
@@ -329,7 +317,6 @@ const Annotations = () => {
           />
         </div>
 
-        {/* Save Button */}
         <Button
           onClick={handleSaveAnnotation}
           className="w-full"
@@ -347,14 +334,8 @@ const Annotations = () => {
             </>
           )}
         </Button>
-        {!selectedLocation && (
-          <p className="text-xs text-muted-foreground text-center">
-            {t('annotations.selectLocationFirst')}
-          </p>
-        )}
       </Card>
 
-      {/* Cloud Integration */}
       <Card className="p-4 space-y-3">
         <h3 className="font-semibold text-foreground flex items-center gap-2">
           <Cloud className="h-5 w-5 text-primary" />
@@ -364,10 +345,6 @@ const Annotations = () => {
           {t('annotations.cloudStorageDesc')}
         </p>
         <div className="grid grid-cols-2 gap-2">
-          <Button variant="outline" size="sm" onClick={() => openCloudService('google-drive')} className="text-xs px-2">
-            <ExternalLink className="mr-1 h-3 w-3 shrink-0" />
-            <span className="truncate">Google Drive</span>
-          </Button>
           <Button variant="outline" size="sm" onClick={() => openCloudService('icloud')} className="text-xs px-2">
             <ExternalLink className="mr-1 h-3 w-3 shrink-0" />
             <span className="truncate">iCloud</span>
@@ -383,7 +360,6 @@ const Annotations = () => {
         </div>
       </Card>
 
-      {/* Annotations List */}
       <Tabs defaultValue="general" className="w-full">
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="general" className="gap-2">
@@ -415,9 +391,9 @@ const Annotations = () => {
                     <h4 className="font-semibold text-foreground">{annotation.title}</h4>
                     <p className="text-sm text-muted-foreground mt-1">{annotation.content}</p>
                     {annotation.link && (
-                      <a 
-                        href={annotation.link} 
-                        target="_blank" 
+                      <a
+                        href={annotation.link}
+                        target="_blank"
                         rel="noopener noreferrer"
                         className="text-sm text-primary hover:underline flex items-center gap-1 mt-2"
                       >
@@ -474,9 +450,9 @@ const Annotations = () => {
                     </div>
                     <p className="text-sm text-muted-foreground mt-1">{annotation.content}</p>
                     {annotation.link && (
-                      <a 
-                        href={annotation.link} 
-                        target="_blank" 
+                      <a
+                        href={annotation.link}
+                        target="_blank"
                         rel="noopener noreferrer"
                         className="text-sm text-primary hover:underline flex items-center gap-1 mt-2"
                       >

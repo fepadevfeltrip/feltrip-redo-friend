@@ -1,19 +1,11 @@
-/**
- * Apple In-App Purchase (IAP) stub for Capacitor.
- * Product IDs registered in App Store Connect.
- * 
- * This module replaces src/lib/stripe.ts for the Apple App Store build.
- * Actual IAP integration requires @capgo/capacitor-purchases or
- * cordova-plugin-purchase — this stub prepares the interface.
- */
-
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
+// Tipos base
 export type PriceKey = "personal_map" | "explorer";
-
 export type CheckoutResult = "purchased" | "auth_required" | "error" | "cancelled";
 
-/** Apple IAP Product IDs (must match App Store Connect) */
+// Os IDs exatos que você criará no App Store Connect
 export const APPLE_PRODUCTS = {
   personal_map: {
     productId: "com.feltrip.cult.roteiro",
@@ -25,34 +17,81 @@ export const APPLE_PRODUCTS = {
   },
 } as const;
 
-/**
- * Opens the Apple IAP purchase flow.
- * Currently a stub — will be wired to the Capacitor IAP plugin.
- */
-export async function openApplePurchase(priceKey: PriceKey): Promise<CheckoutResult> {
-  try {
-    const product = APPLE_PRODUCTS[priceKey];
-    if (!product) {
-      toast.error("Produto não encontrado.");
-      return "error";
+let storeInitialized = false;
+
+// AQUELA FUNÇÃO QUE FALTAVA ESTÁ AQUI! 👇
+export function initAppleStore() {
+  if (!window.CdvPurchase || storeInitialized) return;
+
+  const { store, Platform, ProductType } = window.CdvPurchase;
+
+  store.register([
+    {
+      id: APPLE_PRODUCTS.personal_map.productId,
+      type: ProductType.CONSUMABLE,
+      platform: Platform.APPLE_APPSTORE,
+    },
+    {
+      id: APPLE_PRODUCTS.explorer.productId,
+      type: ProductType.CONSUMABLE,
+      platform: Platform.APPLE_APPSTORE,
+    },
+  ]);
+
+  store.when().approved(async (transaction: any) => {
+    toast.loading("Validando compra com a Apple...", { id: "iap-validation" });
+
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Usuário não logado");
+
+      const receipt = transaction.transactionReceipt;
+
+      const { data, error } = await supabase.functions.invoke("verify-apple-receipt", {
+        body: { receipt, userId: user.id }
+      });
+
+      if (error || !data.success) throw new Error("Recibo recusado");
+
+      transaction.finish();
+      toast.success("Compra confirmada! Bem-vindo.", { id: "iap-validation" });
+      setTimeout(() => window.location.reload(), 1500);
+
+    } catch (err) {
+      console.error("Erro na validação:", err);
+      toast.error("Aviso: Houve uma lentidão na liberação. O suporte ajudará.", { id: "iap-validation" });
     }
+  });
 
-    // TODO: Integrate with @capgo/capacitor-purchases or cordova-plugin-purchase
-    // 1. Fetch product details from App Store
-    // 2. Present native purchase sheet
-    // 3. On success, validate receipt server-side
-    // 4. Update user tier in Supabase
+  store.initialize([Platform.APPLE_APPSTORE]);
+  storeInitialized = true;
+}
 
-    toast.info("Compra via Apple em breve! (Em desenvolvimento)");
-    console.log(`[IAP] Would purchase: ${product.productId} (${product.label})`);
+export async function openApplePurchase(priceKey: PriceKey): Promise<CheckoutResult> {
+  if (!window.CdvPurchase) {
+    toast.error("O sistema de pagamentos requer que você esteja usando o app no iPhone.");
+    return "error";
+  }
+
+  const productId = APPLE_PRODUCTS[priceKey].productId;
+  const { store } = window.CdvPurchase;
+
+  const product = store.get(productId);
+
+  if (!product) {
+    toast.error("Produto não configurado na Apple Store.");
+    return "error";
+  }
+
+  try {
+    store.order(product);
     return "cancelled";
   } catch (err: any) {
     console.error("IAP error:", err);
-    toast.error("Erro ao iniciar compra. Tente novamente.");
+    toast.error("Erro ao iniciar Apple Pay.");
     return "error";
   }
 }
 
-/** Compatibility shim — no pending checkout logic needed for IAP */
 export const getPendingCheckout = (): PriceKey | null => null;
-export const clearPendingCheckout = () => {};
+export const clearPendingCheckout = () => { };

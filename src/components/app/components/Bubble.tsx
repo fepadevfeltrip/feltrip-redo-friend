@@ -142,7 +142,6 @@ export const Bubble: React.FC<BubbleProps> = ({ message, lang, blurred = false, 
 
   const OTP_TEXTS: Record<string, any> = {
     pt: {
-      or: "ou entre com e-mail",
       placeholder: "seu@email.com",
       send: "Receber Código",
       codeSent: "Código enviado para",
@@ -151,7 +150,6 @@ export const Bubble: React.FC<BubbleProps> = ({ message, lang, blurred = false, 
       invalid: "Código inválido",
     },
     en: {
-      or: "or sign in with email",
       placeholder: "your@email.com",
       send: "Get Code",
       codeSent: "Code sent to",
@@ -160,7 +158,6 @@ export const Bubble: React.FC<BubbleProps> = ({ message, lang, blurred = false, 
       invalid: "Invalid code",
     },
     es: {
-      or: "o entra con email",
       placeholder: "tu@email.com",
       send: "Recibir Código",
       codeSent: "Código enviado a",
@@ -254,14 +251,7 @@ export const Bubble: React.FC<BubbleProps> = ({ message, lang, blurred = false, 
             <p>• {lang === "es" ? "24h de chat con Cult AI" : lang === "en" ? "24h chat with Cult AI" : "24h de chat com Cult AI"}</p>
           </div>
 
-          <div className="space-y-3 pt-2">
-
-            <div className="flex items-center gap-3">
-              <div className="h-px flex-1 bg-gray-200 dark:bg-white/10" />
-              <span className="text-[9px] font-bold uppercase tracking-widest text-gray-400">{ot.or}</span>
-              <div className="h-px flex-1 bg-gray-200 dark:bg-white/10" />
-            </div>
-
+          <div className="space-y-3 pt-4">
             {otpStep === "idle" ? (
               <button
                 onClick={() => setOtpStep("email")}
@@ -384,22 +374,22 @@ export const Bubble: React.FC<BubbleProps> = ({ message, lang, blurred = false, 
             <div className="grid gap-4">
               {hasRecognizedShifts
                 ? SHIFT_ORDER.flatMap((shift) => {
-                    const gemsForShift = safeGems.filter((gem) => normalizeShift((gem as any)?.shift) === shift);
+                  const gemsForShift = safeGems.filter((gem) => normalizeShift((gem as any)?.shift) === shift);
 
-                    if (gemsForShift.length === 0) {
-                      return (
-                        <div
-                          key={`empty-${shift}`}
-                          className="rounded-2xl border border-dashed border-border bg-muted/30 p-4 text-sm text-muted-foreground"
-                        >
-                          <span className="mr-2 font-bold">{SHIFT_LABELS[shift]}:</span>
-                          Sem atividade programada.
-                        </div>
-                      );
-                    }
+                  if (gemsForShift.length === 0) {
+                    return (
+                      <div
+                        key={`empty-${shift}`}
+                        className="rounded-2xl border border-dashed border-border bg-muted/30 p-4 text-sm text-muted-foreground"
+                      >
+                        <span className="mr-2 font-bold">{SHIFT_LABELS[shift]}:</span>
+                        Sem atividade programada.
+                      </div>
+                    );
+                  }
 
-                    return gemsForShift.map((gem, idx) => renderGemCard(gem, `gem-${shift}-${idx}`, SHIFT_LABELS[shift]));
-                  })
+                  return gemsForShift.map((gem, idx) => renderGemCard(gem, `gem-${shift}-${idx}`, SHIFT_LABELS[shift]));
+                })
                 : safeGems.map((gem, idx) => renderGemCard(gem, `gem-${idx}`))}
             </div>
 
@@ -420,11 +410,10 @@ export const Bubble: React.FC<BubbleProps> = ({ message, lang, blurred = false, 
   return (
     <div className={`mb-6 flex w-full animate-fade-in-up ${isUser ? "justify-end" : "justify-start"}`}>
       <div
-        className={`max-w-[92%] rounded-3xl px-6 py-5 text-sm font-sans shadow-md transition-all duration-300 sm:max-w-[85%] sm:text-base ${
-          isUser
+        className={`max-w-[92%] rounded-3xl px-6 py-5 text-sm font-sans shadow-md transition-all duration-300 sm:max-w-[85%] sm:text-base ${isUser
             ? "rounded-br-none bg-boba-coral text-white"
             : "rounded-bl-none border border-boba-teal/5 bg-white text-gray-700 dark:bg-boba-darkCard dark:text-gray-200"
-        }`}
+          }`}
       >
         {message.isGraph && message.graphData ? (
           <MRPChart data={message.graphData} lang={lang} />

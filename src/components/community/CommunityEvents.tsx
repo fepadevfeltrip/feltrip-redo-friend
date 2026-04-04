@@ -6,21 +6,21 @@ import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogHeader, 
-  DialogTitle, 
-  DialogTrigger 
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger
 } from '@/components/ui/dialog';
-import { 
-  Calendar, 
-  MapPin, 
-  Video, 
-  Users, 
-  Plus, 
-  Trash2, 
-  Check, 
+import {
+  Calendar,
+  MapPin,
+  Video,
+  Users,
+  Plus,
+  Trash2,
+  Check,
   X,
   Loader2,
   Link as LinkIcon
@@ -47,13 +47,13 @@ interface CommunityEventsProps {
   isLoading: boolean;
 }
 
-export function CommunityEvents({ 
-  events, 
-  onCreateEvent, 
-  onDeleteEvent, 
+export function CommunityEvents({
+  events,
+  onCreateEvent,
+  onDeleteEvent,
   onParticipate,
   onCancelParticipation,
-  isLoading 
+  isLoading
 }: CommunityEventsProps) {
   const { user } = useAuth();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -71,10 +71,10 @@ export function CommunityEvents({
 
   const handleSubmit = async () => {
     if (!formData.title.trim() || !formData.event_date || !formData.event_time) return;
-    
+
     setIsSubmitting(true);
     const eventDateTime = `${formData.event_date}T${formData.event_time}:00`;
-    
+
     const success = await onCreateEvent({
       title: formData.title.trim(),
       description: formData.description.trim() || undefined,
@@ -84,7 +84,7 @@ export function CommunityEvents({
       meeting_link: formData.is_online ? formData.meeting_link.trim() || undefined : undefined,
       max_participants: formData.max_participants ? parseInt(formData.max_participants) : undefined
     });
-    
+
     if (success) {
       setFormData({
         title: '',
@@ -137,7 +137,7 @@ export function CommunityEvents({
                 placeholder="Nome do evento"
               />
             </div>
-            
+
             <div>
               <Label htmlFor="description">Descrição</Label>
               <Textarea
@@ -186,7 +186,7 @@ export function CommunityEvents({
                   id="meeting_link"
                   value={formData.meeting_link}
                   onChange={(e) => setFormData({ ...formData, meeting_link: e.target.value })}
-                  placeholder="https://meet.google.com/..."
+                  placeholder="https://link-da-reuniao.com/..."
                 />
               </div>
             ) : (
@@ -212,8 +212,8 @@ export function CommunityEvents({
               />
             </div>
 
-            <Button 
-              onClick={handleSubmit} 
+            <Button
+              onClick={handleSubmit}
               disabled={!formData.title.trim() || !formData.event_date || !formData.event_time || isSubmitting}
               className="w-full"
             >
@@ -276,7 +276,7 @@ export function CommunityEvents({
                     <Calendar className="h-4 w-4" />
                     {format(new Date(event.event_date), "dd 'de' MMMM 'às' HH:mm", { locale: ptBR })}
                   </div>
-                  
+
                   {event.is_online ? (
                     <div className="flex items-center gap-1 text-muted-foreground">
                       <Video className="h-4 w-4" />
@@ -291,15 +291,15 @@ export function CommunityEvents({
 
                   <div className="flex items-center gap-1 text-muted-foreground">
                     <Users className="h-4 w-4" />
-                    {event.participants_count} 
+                    {event.participants_count}
                     {event.max_participants && ` / ${event.max_participants}`}
                   </div>
                 </div>
 
                 {event.is_online && event.meeting_link && (
-                  <a 
-                    href={event.meeting_link} 
-                    target="_blank" 
+                  <a
+                    href={event.meeting_link}
+                    target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center gap-1 text-sm text-primary hover:underline"
                   >

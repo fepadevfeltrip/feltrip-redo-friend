@@ -21,6 +21,13 @@ import PrivacyPage from "./pages/PrivacyPage";
 import TermsPage from "./pages/TermsPage";
 import { Loader2 } from "lucide-react";
 import { Capacitor } from "@capacitor/core";
+import { initAppleStore } from "@/lib/appleIAP";
+import { useEffect } from "react";
+
+// Dentro do seu function App() { ...
+useEffect(() => {
+  initAppleStore();
+}, []);
 
 const queryClient = new QueryClient();
 
@@ -47,7 +54,7 @@ function RoleBasedRedirect() {
 
   // Manager: only HR panel for their company
   if (role === "manager") {
-    return <ManagerDashboard onBack={() => {}} />;
+    return <ManagerDashboard onBack={() => { }} />;
   }
 
   // Community Member: only community access

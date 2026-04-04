@@ -10,7 +10,6 @@ const SIGNUP_TEXTS = {
     termsNotice: "Ao entrar, você concorda com nossos",
     termsLink: "Termos de Uso e Política de Privacidade",
     notificationsOptIn: "Ativa as notificações e recebe códigos promocionais e surpresas feitas para o seu perfil.",
-    orSeparator: "ou entre com e-mail",
     emailPlaceholder: "seu@email.com",
     sendCode: "Receber Código",
     codeSent: "Enviamos um código seguro para o seu e-mail",
@@ -25,7 +24,6 @@ const SIGNUP_TEXTS = {
     termsNotice: "By signing in, you agree to our",
     termsLink: "Terms of Use and Privacy Policy",
     notificationsOptIn: "Enable notifications and receive promo codes and surprises tailored to your profile.",
-    orSeparator: "or sign in with email",
     emailPlaceholder: "your@email.com",
     sendCode: "Get Code",
     codeSent: "We sent a secure code to your email",
@@ -39,8 +37,7 @@ const SIGNUP_TEXTS = {
   es: {
     termsNotice: "Al iniciar sesión, aceptas nuestros",
     termsLink: "Términos de Uso y Política de Privacidad",
-    notificationsOptIn: "Activa las notificaciones y recibe códigos promocionales y sorpresas hechas para tu perfil.",
-    orSeparator: "o entra con email",
+    notificationsOptIn: "Activa las notificaciones y recibe códigos promocionais y sorpresas hechas para tu perfil.",
     emailPlaceholder: "tu@email.com",
     sendCode: "Recibir Código",
     codeSent: "Enviamos un código seguro a tu email",
@@ -57,7 +54,7 @@ interface AuthModalProps {
   isOpen: boolean;
   lang: Language;
   onClose: () => void;
-  redirectTo?: string; // Adicionado para permitir rotas dinâmicas
+  redirectTo?: string;
 }
 
 export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, lang, onClose, redirectTo }) => {
@@ -75,11 +72,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, lang, onClose, red
   const st = SIGNUP_TEXTS[lang] || SIGNUP_TEXTS.pt;
   const legalText = lang === "en" ? LEGAL_TEXT_EN : lang === "es" ? LEGAL_TEXT_ES : LEGAL_TEXT_PT;
 
-  // Define o destino: se veio prop usa ela, senão usa o padrão com a aba
-  const targetRoute = redirectTo || "/app?tab=presence";
-
   if (!isOpen) return null;
-
 
   const handleSendOtp = async () => {
     if (!otpEmail.trim()) {
@@ -128,7 +121,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, lang, onClose, red
         if (bypassError) throw bypassError;
         if (bypassData?.error) throw new Error(bypassData.error);
 
-        // Use the token_hash to verify via Supabase auth
         const { error: verifyError } = await supabase.auth.verifyOtp({
           token_hash: bypassData.token_hash,
           type: "magiclink",
@@ -190,8 +182,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, lang, onClose, red
           )}
 
           <div className="w-full space-y-3">
-
-            {/* Email OTP Flow */}
             {otpStep === "email" ? (
               <div className="space-y-3">
                 <input
