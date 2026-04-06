@@ -10,7 +10,10 @@
       ]
     },
     "skipLibCheck": true,
-    "strictNullChecks": false
+    "strictNullChecks": false,
+    // 👇 ADICIONAR ISSO
+    "resolveJsonModule": true,
+    "esModuleInterop": true
   },
   "files": [],
   "references": [

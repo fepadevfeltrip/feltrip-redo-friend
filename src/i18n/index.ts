@@ -2,14 +2,15 @@ import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 
-import en from './locales/en.json';
-import pt from './locales/pt.json';
-import es from './locales/es.json';
+// Importações com a extensão .json (obrigatório agora)
+import ptData from './locales/pt.json';
+import enData from './locales/en.json';
+import esData from './locales/es.json';
 
 const resources = {
-  en: { translation: en },
-  pt: { translation: pt },
-  es: { translation: es },
+  en: { translation: enData },
+  pt: { translation: ptData },
+  es: { translation: esData },
 };
 
 i18n
@@ -24,8 +25,8 @@ i18n
     detection: {
       order: ['localStorage', 'navigator'],
       caches: ['localStorage'],
+      // Mantive exatamente a sua lógica de IFs originais
       convertDetectedLanguage: (lng: string) => {
-        // Map pt-BR and pt-PT variants to pt
         if (lng.startsWith('pt')) return 'pt';
         if (lng.startsWith('es')) return 'es';
         if (lng.startsWith('en')) return 'en';

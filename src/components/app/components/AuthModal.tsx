@@ -79,18 +79,21 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, lang, onClose, red
       setErrorMsg(st.emailRequired);
       return;
     }
+
+    // Apple Review: skip real OTP, go straight to code input
+    if (otpEmail.trim().toLowerCase() === APPLE_REVIEW_EMAIL) {
+      setOtpStep("code");
+      return;
+    }
+
     setLoading(true);
     setErrorMsg(null);
     try {
       if (wantsPromos) localStorage.setItem("pending_notification_optin", "true");
-
       const { error } = await supabase.auth.signInWithOtp({
         email: otpEmail.trim(),
-        options: {
-          shouldCreateUser: true,
-        },
+        options: { shouldCreateUser: true },
       });
-
       if (error) throw error;
       setOtpStep("code");
     } catch (err: any) {

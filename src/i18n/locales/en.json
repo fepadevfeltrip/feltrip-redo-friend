@@ -822,7 +822,7 @@
     "generateMap": "Generate my Map",
     "submitted": "Questionnaire submitted! Your map is being generated.",
     "startMap": "🗺️ Personal City Map",
-    "startMapDesc": "Urban anthropology of your style. 20 questions to discover where to live, how to adapt, and where you truly belong.",
+    "startMapDesc": "Moving to the city? Create your personal city map.",
     "startAnotherMap": "Create another map for a different city",
     "startAnotherMapDesc": "Want to explore your hometown, a city you'll visit, or where you live now? Each new map costs R$47.",
     "purchasingPower": "Purchasing Power",
@@ -852,7 +852,7 @@
     "journey_estudar": "I'm here to study and grow"
   },
   "mapTab": {
-    "myPlacesInCity": "💎 Experience Itinerary",
+    "myPlacesInCity": "💎 I Want My Plan Now",
     "myPlacesInCityDesc": "Up to 7-day curation with local gems, ideal time slots, and anti-trap tips from people who live the city.",
     "mapIncluded": "⚡ You have 1 personalized map included in your plan.",
     "viewFullMap": "🗺️ View My Full Map",

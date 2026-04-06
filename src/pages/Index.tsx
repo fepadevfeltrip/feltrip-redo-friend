@@ -26,7 +26,11 @@ const Index = () => {
   const [showLegalDialog, setShowLegalDialog] = useState(false);
   const { toast } = useToast();
   const { i18n } = useTranslation();
-  const lang = (i18n.language?.substring(0, 2) || "pt") as keyof typeof CONTENT;
+  const [lang, setLang] = useState<keyof typeof CONTENT>((i18n.language?.substring(0, 2) || "pt") as keyof typeof CONTENT);
+
+  useEffect(() => {
+    setLang((i18n.language?.substring(0, 2) || "pt") as keyof typeof CONTENT);
+  }, [i18n.language]);
   const t = CONTENT[lang] || CONTENT.pt;
 
   // Handle payment success/cancel query params
@@ -72,7 +76,7 @@ const Index = () => {
           if (processed) {
             clearInterval(pollInterval);
             await refreshProfile();
-            
+
             if (plan === "explorer") {
               navigate("/app", { replace: true });
             }
@@ -101,7 +105,7 @@ const Index = () => {
   const handleDevLogin = async () => {
     setDevLoading(true);
     const pwd = prompt("Senha do talkawaylanguage@gmail.com:");
-    if (!pwd) {setDevLoading(false);return;}
+    if (!pwd) { setDevLoading(false); return; }
     const { error } = await supabase.auth.signInWithPassword({
       email: "talkawaylanguage@gmail.com",
       password: pwd

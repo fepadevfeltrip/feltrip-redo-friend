@@ -22,12 +22,7 @@ import TermsPage from "./pages/TermsPage";
 import { Loader2 } from "lucide-react";
 import { Capacitor } from "@capacitor/core";
 import { initAppleStore } from "@/lib/appleIAP";
-import { useEffect } from "react";
-
-// Dentro do seu function App() { ...
-useEffect(() => {
-  initAppleStore();
-}, []);
+import MeuMapaTab from "@/components/app/MeuMapaTab";
 
 const queryClient = new QueryClient();
 
@@ -127,6 +122,7 @@ const AppRoutes = () => (
       <Route path="/" element={<RootRoute />} />
       <Route path="/app" element={<ExpatApp />} />
       <Route path="/community" element={<ExpatApp initialTab="community" />} />
+      <Route path="/presence-map" element={<MeuMapaTab />} />
       <Route path="/auth" element={<AuthRoute />} />
       <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/join/:slug" element={<JoinCommunityPage />} />
@@ -140,18 +136,24 @@ const AppRoutes = () => (
   </>
 );
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider delayDuration={0}>
-      <BrowserRouter>
-        <AuthProvider>
-          <Toaster />
-          <Sonner />
-          <AppRoutes />
-        </AuthProvider>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+const App = () => {
+  // O initAppleStore agora está no lugar correto: dentro do componente App!
+  useEffect(() => {
+    initAppleStore();
+  }, []);
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider delayDuration={0}>
+        <BrowserRouter>
+          <AuthProvider>
+            <Toaster />
+            <Sonner />
+            <AppRoutes />
+          </AuthProvider>
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
+  );
+};
 
 export default App;

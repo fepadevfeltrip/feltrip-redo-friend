@@ -212,8 +212,8 @@ const ExpatApp = ({ onBack, initialTab = "cult" }: ExpatAppProps) => {
           redirectTo={authRedirectPath}
         />
         <div className="flex flex-col h-full bg-background">
-          {/* HEADER */}
-          <div className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
+          {/* HEADER COM RESPIRO DA APPLE (SAFE AREA TOP) */}
+          <div className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b border-border pt-[env(safe-area-inset-top)]">
             <div className="px-4 py-3 flex items-center justify-between">
               <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
                 <SheetTrigger asChild>
@@ -224,11 +224,11 @@ const ExpatApp = ({ onBack, initialTab = "cult" }: ExpatAppProps) => {
                 <SheetContent side="left" className="w-80 p-0 bg-background border-border">
                   <div className="flex flex-col h-full">
                     {/* Sidebar header */}
-                     <div className="p-6 relative border-b border-border bg-gradient-to-br from-muted/30 to-transparent">
+                    <div className="p-6 relative border-b border-border bg-gradient-to-br from-muted/30 to-transparent">
                       <Button
                         variant="ghost"
                         size="icon"
-                         className="absolute top-4 right-4 text-foreground/30"
+                        className="absolute top-4 right-4 text-foreground/30"
                         onClick={() => setIsMenuOpen(false)}
                       >
                         <X className="h-5 w-5" />
@@ -240,7 +240,7 @@ const ExpatApp = ({ onBack, initialTab = "cult" }: ExpatAppProps) => {
                             {profileLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : initials}
                           </AvatarFallback>
                         </Avatar>
-                         <div>
+                        <div>
                           <h3 className="font-display font-semibold text-foreground">
                             {profileLoading ? t("common.loading") : displayName}
                           </h3>
@@ -250,7 +250,7 @@ const ExpatApp = ({ onBack, initialTab = "cult" }: ExpatAppProps) => {
                     </div>
 
                     <nav className="flex-1 p-4 space-y-1 overflow-auto">
-                       <p className="text-[10px] font-bold text-accent uppercase tracking-[0.15em] px-3 pt-2 pb-2">
+                      <p className="text-[10px] font-bold text-accent uppercase tracking-[0.15em] px-3 pt-2 pb-2">
                         {currentLang === "en" ? "My Journey" : currentLang === "es" ? "Mi Viaje" : "Minha Jornada Cult"}
                       </p>
 
@@ -308,9 +308,9 @@ const ExpatApp = ({ onBack, initialTab = "cult" }: ExpatAppProps) => {
                         >
                           <Icon className={`h-4 w-4 ${activeTab === tab ? "text-accent" : ""}`} />
                           <div className="flex items-center gap-2">
-                             <span className={activeTab === tab ? "font-semibold text-foreground text-sm" : "text-sm"}>{label}</span>
-                             {locked && <Lock className="h-3 w-3 text-muted-foreground/40" />}
-                           </div>
+                            <span className={activeTab === tab ? "font-semibold text-foreground text-sm" : "text-sm"}>{label}</span>
+                            {locked && <Lock className="h-3 w-3 text-muted-foreground/40" />}
+                          </div>
                         </Button>
                       ))}
 
@@ -400,7 +400,7 @@ const ExpatApp = ({ onBack, initialTab = "cult" }: ExpatAppProps) => {
                       </Button>
 
                       <Separator className="my-3 bg-border" />
-                       <Button
+                      <Button
                         variant="ghost"
                         className="w-full justify-start gap-3 h-11 rounded-xl text-destructive hover:text-destructive"
                         onClick={async () => {
@@ -473,8 +473,8 @@ const ExpatApp = ({ onBack, initialTab = "cult" }: ExpatAppProps) => {
             />
           )}
 
-          {/* BARRA INFERIOR DE NAVEGAÇÃO */}
-          <div className="border-t border-foreground/10 bg-background/90 backdrop-blur-md shrink-0">
+          {/* BARRA INFERIOR DE NAVEGAÇÃO COM RESPIRO DA APPLE (SAFE AREA BOTTOM) */}
+          <div className="border-t border-foreground/10 bg-background/90 backdrop-blur-md shrink-0 pb-[env(safe-area-inset-bottom)]">
             <div className="flex justify-around items-center h-14 px-1">
               {[
                 { tab: "cult" as TabType, icon: Sparkles, label: currentLang === "en" ? "Archetype" : "Arquétipo", activeColor: "text-accent" },
@@ -500,11 +500,10 @@ const ExpatApp = ({ onBack, initialTab = "cult" }: ExpatAppProps) => {
                   <button
                     key={tab}
                     onClick={() => (onClick ? onClick() : setActiveTab(tab))}
-                    className={`flex flex-col items-center justify-center gap-0.5 py-1.5 transition-all duration-200 flex-1 min-w-0 ${
-                      isActive
-                        ? activeColor
-                        : "text-foreground/30 hover:text-foreground/50"
-                    }`}
+                    className={`flex flex-col items-center justify-center gap-0.5 py-1.5 transition-all duration-200 flex-1 min-w-0 ${isActive
+                      ? activeColor
+                      : "text-foreground/30 hover:text-foreground/50"
+                      }`}
                   >
                     <div
                       className={`relative p-1.5 rounded-xl transition-all duration-200 ${isActive ? "bg-current/10" : ""}`}

@@ -26,14 +26,23 @@ interface MapItem {
   created_at: string;
 }
 
+interface SessionItem {
+  id: string;
+  city: string | null;
+  emotional_status: string | null;
+  poetic_proposition: string | null;
+  language: string | null;
+  created_at: string;
+}
+
 export default function Profile() {
   const { t, i18n } = useTranslation();
   const { toast } = useToast();
   const { user } = useAuth();
   const { profile, isLoading, updateProfile, uploadAvatar } = useProfile();
-  
+
   const lang = i18n.language?.substring(0, 2) || "pt";
-  
+
   const [isEditing, setIsEditing] = useState(false);
   const [editName, setEditName] = useState("");
   const [editCity, setEditCity] = useState("");
@@ -48,17 +57,20 @@ export default function Profile() {
 
   const [gems, setGems] = useState<GemItem[]>([]);
   const [maps, setMaps] = useState<MapItem[]>([]);
+  const [sessions, setSessions] = useState<SessionItem[]>([]);
   const [loadingExtras, setLoadingExtras] = useState(true);
 
   useEffect(() => {
     if (!user) return;
     const fetchExtras = async () => {
-      const [gemsRes, mapsRes] = await Promise.all([
+      const [gemsRes, mapsRes, sessionsRes] = await Promise.all([
         supabase.from('mrp_gems').select('id, name, cidade, categoria_principal, created_at').eq('user_id', user.id).order('created_at', { ascending: false }).limit(50),
         supabase.from('city_questionnaires').select('id, city, map_status, created_at').eq('user_id', user.id).order('created_at', { ascending: false }).limit(20),
+        supabase.from('mrp_sessions').select('id, city, emotional_status, poetic_proposition, language, created_at').eq('user_id', user.id).order('created_at', { ascending: false }).limit(20),
       ]);
       setGems((gemsRes.data as GemItem[]) || []);
       setMaps((mapsRes.data as MapItem[]) || []);
+      setSessions((sessionsRes.data as SessionItem[]) || []);
       setLoadingExtras(false);
     };
     fetchExtras();
@@ -142,12 +154,12 @@ export default function Profile() {
   };
 
   const getInitials = (name: string) => name.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2);
-  
+
   const formatDate = (dateString: string) => {
     const locale = lang === "es" ? "es-ES" : lang === "en" ? "en-US" : "pt-BR";
     return new Date(dateString).toLocaleDateString(locale, { day: '2-digit', month: 'short', year: 'numeric' });
   };
-  
+
   const formatJoinDate = (dateString: string) => {
     const locale = lang === "es" ? "es-ES" : lang === "en" ? "en-US" : "pt-BR";
     return new Date(dateString).toLocaleDateString(locale, { month: 'long', year: 'numeric' });
@@ -249,6 +261,52 @@ export default function Profile() {
             {displayOriginCity && <div className="flex items-center gap-2 text-muted-foreground"><MapPin className="h-4 w-4" /><span>{t('profile.origin')}: {displayOriginCity}</span></div>}
           </div>
         </Card>
+
+        {/* My Archetypes / Sessions */}
+        {sessions.length > 0 && (
+          <div className="space-y-4">
+            <h3 className="font-semibold text-foreground flex items-center gap-2 px-1">
+              <Gem className="h-4 w-4 text-primary" />
+              {lang === "en" ? "My Archetypes" : lang === "es" ? "Mis Arquetipos" : "Meus Arquétipos"} ({sessions.length})
+            </h3>
+            {sessions.map(session => (
+              <div
+                key={session.id}
+                className="w-full rounded-3xl overflow-hidden shadow-xl"
+                style={{ background: "linear-gradient(160deg, #0D1F1A 0%, #1A1A2E 60%, #0D1F1A 100%)" }}
+              >
+                <div className="relative px-6 py-10 flex flex-col items-center text-center">
+                  <div
+                    className="absolute inset-0 opacity-[0.04] pointer-events-none"
+                    style={{
+                      backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
+                    }}
+                  />
+                  <p className="text-[11px] font-bold tracking-[0.3em] uppercase text-[#E8896A] mb-1">✦ CULT AI</p>
+                  {session.city && (
+                    <p className="text-[11px] font-bold tracking-[0.2em] uppercase text-[#C4B8A0] mb-6">
+                      {session.city.toUpperCase()}
+                    </p>
+                  )}
+                  <h2
+                    className="font-serif font-bold text-[#F5EFE0] leading-[1.05] tracking-tight mb-3"
+                    style={{ fontSize: "clamp(1.75rem, 7vw, 3rem)" }}
+                  >
+                    {session.emotional_status || "—"}
+                  </h2>
+                  {session.poetic_proposition && (
+                    <p className="font-serif italic text-[#C4B8A0] text-sm max-w-xs leading-relaxed">
+                      "{session.poetic_proposition}"
+                    </p>
+                  )}
+                  <p className="mt-4 text-[10px] tracking-[0.15em] uppercase text-[#C4B8A0]/50">
+                    {formatDate(session.created_at)}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
 
         {/* My Gems */}
         <Card className="p-4 space-y-3">

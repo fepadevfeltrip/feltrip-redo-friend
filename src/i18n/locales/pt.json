@@ -192,10 +192,8 @@
     "subtitle": "Compartilhe sua localização e acesse ajuda imediata",
     "privacyTitle": "Seus dados, sua escolha:",
     "privacyDescription": "Por padrão, os pins são salvos apenas no seu mapa pessoal. Você decide se quer compartilhar com o RH, a comunidade ou manter privado.",
-    "privacyDesc": "Por padrão, os pins são salvos apenas no seu mapa pessoal. Você decide se quer compartilhar com o RH, a comunidade ou manter privado.",
     "emergencyCall": "Chamada de Emergência",
     "emergencyDescription": "Em emergência? Ative sua rede de segurança instantaneamente. Notificará RH, família e contatos de confiança.",
-    "emergencyDesc": "Em emergência? Ative sua rede de segurança instantaneamente. Notificará RH, família e contatos de confiança.",
     "triggerEmergency": "Acionar Emergência",
     "reportLocation": "Reportar Localização",
     "howDoYouFeel": "Como você se sente neste local?",
@@ -240,9 +238,7 @@
     "title": "Documentos de Viagem",
     "subtitle": "Salve links dos seus documentos armazenados na nuvem",
     "cloudInfo": "Armazene seus documentos no Google Drive, Dropbox, OneDrive ou qualquer serviço de nuvem, depois salve o link aqui para fácil acesso.",
-    "infoText": "Armazene seus documentos no Google Drive, Dropbox, OneDrive ou qualquer serviço de nuvem, depois salve o link aqui para fácil acesso.",
     "addDocument": "Adicionar Link de Documento",
-    "addDocumentLink": "Adicionar Link de Documento",
     "documentName": "Nome do Documento",
     "documentType": "Tipo de Documento",
     "saveDocument": "Salvar Documento",
@@ -271,7 +267,6 @@
     "title": "Meu Diário de Bordo",
     "subtitle": "Busque um endereço ou toque no mapa para adicionar notas privadas",
     "privateNotes": "Suas notas são completamente privadas",
-    "privateNotice": "Suas notas são completamente privadas",
     "searchOrTap": "Buscar ou Tocar para Adicionar Nota",
     "newAnnotation": "Nova Anotação",
     "generalNote": "Nota Geral",
@@ -346,9 +341,9 @@
     "helpExpandNetwork": "Ajude-nos a expandir nossa rede indicando profissionais de confiança com quem você trabalhou.",
     "professionalName": "Nome do Profissional/Empresa",
     "enterName": "Digite o nome",
-    "city": "Cidade",
+    "professionalCity": "Cidade",
     "enterCity": "Digite a cidade",
-    "contactInfo": "Informações de Contato",
+    "professionalContact": "Informações de Contato",
     "emailPhoneWebsite": "Email, telefone ou website",
     "additionalNotes": "Notas Adicionais",
     "whyRecommend": "Por que você recomenda este parceiro?",
@@ -433,7 +428,7 @@
     "cultCompassTitle": "Sua Bússola Local",
     "cultCompassDesc": "Acesse insights reais e camadas ocultas das cidades — Rio de Janeiro, São Paulo e Florianópolis. Use este espaço para pedir gemas, lugares e dicas práticas calibradas com a sua vibe de hoje.",
     "cultNotGenericAI": "A Cult não é uma IA genérica; é uma curadoria viva da Feltrip, nutrida por pesquisas acadêmicas e experiência vivida nos territórios para que você saiba exatamente onde ir e como pertencer.",
-    "cultCredits": "Você tem <bold>10</bold> conversas/mês com a Cult AI disponíveis",
+    "cultCredits": "Você tem 10 conversas/mês com a Cult AI disponíveis",
     "connectingToBoba": "Conectando com a Boba...",
     "yourConfidentialCompanion": "Sua companheira confidencial",
     "presenceMap": "Mapa de Presença",
@@ -652,7 +647,7 @@
       ],
       "identity": [
         "Sinto-me autêntico(a) em como me apresento aqui.",
-        "Esta experiência está me ajudando a me conhecer melhor.",
+        "Esta experiéncia está me ajudando a me conhecer melhor.",
         "Mantenho minha identidade essencial enquanto abraço o crescimento."
       ]
     },
@@ -720,7 +715,7 @@
     "responsibility": [
       "Reflito ativamente sobre como minhas ações impactam minha equipe e ambiente de trabalho.",
       "Reconheço áreas onde posso melhorar e tomo medidas para isso.",
-      "Dou o meu melhor no trabalho, mesmo enfrentando dificuldades ou desconforto.",
+      "Give meu melhor no trabalho, mesmo enfrentando dificuldades ou desconforto.",
       "Assumo responsabilidade pelo meu comportamento em vez de colocar a culpa nos outros.",
       "Estou aberto(a) a feedback e o uso construtivamente para evoluir."
     ]
@@ -822,7 +817,7 @@
     "generateMap": "Gerar meu Mapa",
     "submitted": "Questionário enviado! Seu mapa está sendo gerado.",
     "startMap": "🗺️ Mapa Pessoal da Cidade",
-    "startMapDesc": "Antropologia urbana do seu estilo. 20 perguntas para descobrir onde morar, como se adaptar e onde você realmente pertence.",
+    "startMapDesc": "Vai se mudar para a cidade? Faça seu mapa personalizado.",
     "startAnotherMap": "Fazer outro Mapa de outra cidade",
     "startAnotherMapDesc": "Quer explorar sua cidade natal, uma que vai visitar ou onde mora agora? Cada mapa novo custa R$47.",
     "purchasingPower": "Poder aquisitivo",
@@ -852,7 +847,7 @@
     "journey_estudar": "Estou aqui para estudar e crescer"
   },
   "mapTab": {
-    "myPlacesInCity": "💎 Roteiro de Experiências",
+    "myPlacesInCity": "💎 Quero Meu Roteiro Agora",
     "myPlacesInCityDesc": "Curadoria de até 7 dias com gemas locais, turnos ideais e dicas anti-cilada por quem vive a cidade.",
     "mapIncluded": "⚡ Você tem direito a 1 mapa personalizado incluído no seu plano.",
     "viewFullMap": "🗺️ Ver Meu Mapa Completo",

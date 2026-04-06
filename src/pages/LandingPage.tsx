@@ -14,8 +14,6 @@ import { getDisplayPrices } from "@/hooks/useDisplayCurrency";
 import type { Language } from "@/components/app/types";
 import { LEGAL_TEXT_PT, LEGAL_TEXT_EN, LEGAL_TEXT_ES } from "@/components/app/constants/legalTexts";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import awsLogo from "@/assets/aws-logo.png";
-import koinzLogo from "@/assets/koinz-logo.png";
 import {
   Sparkles,
   Users,
@@ -372,11 +370,10 @@ const LandingPage = () => {
                   </ul>
 
                   <Button
-                    className={`w-full h-auto min-h-[3.5rem] whitespace-normal text-sm sm:text-base px-4 py-3 rounded-xl font-bold shadow-md flex-col flex items-center justify-center leading-snug transition-transform active:scale-95 ${
-                      card.highlight
+                    className={`w-full h-auto min-h-[3.5rem] whitespace-normal text-sm sm:text-base px-4 py-3 rounded-xl font-bold shadow-md flex-col flex items-center justify-center leading-snug transition-transform active:scale-95 ${card.highlight
                         ? "bg-primary text-primary-foreground hover:bg-primary/90"
                         : "bg-accent text-accent-foreground hover:bg-accent/90"
-                    }`}
+                      }`}
                     onClick={() => handlePricingCta(i)}
                     disabled={checkoutLoading !== null}
                   >

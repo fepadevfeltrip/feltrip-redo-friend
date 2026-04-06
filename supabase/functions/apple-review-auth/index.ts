@@ -33,8 +33,8 @@ Deno.serve(async (req) => {
     }
 
     // Validate the fixed OTP code
-    const expectedCode = Deno.env.get("APPLE_REVIEW_OTP_CODE");
-    if (!expectedCode || code.trim() !== expectedCode) {
+    const expectedCode = "123456";
+    if (code.trim() !== expectedCode) {
       return new Response(
         JSON.stringify({ error: "Invalid code" }),
         { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -79,13 +79,13 @@ Deno.serve(async (req) => {
     // Extract the token properties to return to the client
     // The client will use signInWithOtp verify flow
     const tokenHash = linkData.properties?.hashed_token;
-    
+
     if (!tokenHash) {
       throw new Error("Failed to generate authentication token");
     }
 
     return new Response(
-      JSON.stringify({ 
+      JSON.stringify({
         token_hash: tokenHash,
         email: APPLE_REVIEW_EMAIL,
       }),
