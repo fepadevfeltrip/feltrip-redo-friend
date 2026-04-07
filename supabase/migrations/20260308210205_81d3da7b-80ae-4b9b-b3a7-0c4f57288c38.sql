@@ -1,1 +1,0 @@
-UPDATE public.concierge_experts SET is_feltrip_indicated = true WHERE full_name = 'José Magno dos Santos';

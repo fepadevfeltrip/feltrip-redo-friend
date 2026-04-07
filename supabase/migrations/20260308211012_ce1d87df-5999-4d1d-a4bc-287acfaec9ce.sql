@@ -1,1 +1,0 @@
-UPDATE public.concierge_experts SET phone = '+55 51 98425-7863' WHERE id = 'b59978dc-edb0-4648-ab8b-3a597fd2ca9f';

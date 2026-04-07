@@ -1,4 +1,0 @@
-project_id = "udpesustqkrbeijgymqh"
-
-[functions.housing-agent]
-verify_jwt = false

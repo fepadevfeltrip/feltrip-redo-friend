@@ -1,1 +1,0 @@
-UPDATE concierge_experts SET is_feltrip_indicated = true WHERE full_name IN ('Rafaela Rocha', 'Luiz Araújo');

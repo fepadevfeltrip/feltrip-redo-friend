@@ -1,1 +1,0 @@
-ALTER TABLE public.city_questionnaires ADD COLUMN purchasing_power text NOT NULL DEFAULT 'moderate';

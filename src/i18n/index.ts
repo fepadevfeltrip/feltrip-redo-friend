@@ -19,19 +19,14 @@ i18n
   .init({
     resources,
     fallbackLng: 'pt',
+    supportedLngs: ['pt', 'en', 'es'], // <-- ADICIONE ISSO PARA BLINDAR
     interpolation: {
       escapeValue: false,
     },
     detection: {
       order: ['localStorage', 'navigator'],
       caches: ['localStorage'],
-      // Mantive exatamente a sua lógica de IFs originais
-      convertDetectedLanguage: (lng: string) => {
-        if (lng.startsWith('pt')) return 'pt';
-        if (lng.startsWith('es')) return 'es';
-        if (lng.startsWith('en')) return 'en';
-        return lng.substring(0, 2);
-      },
+      // APAGUE A FUNÇÃO convertDetectedLanguage
     },
   });
 

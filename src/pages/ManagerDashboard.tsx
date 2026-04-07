@@ -15,7 +15,7 @@ import { ManagerCommunityView } from "@/components/hr/ManagerCommunityView";
 import { InternalRequestsPanel } from "@/components/hr/InternalRequestsPanel";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { Separator } from "@/components/ui/separator";
-import { 
+import {
   ResponsiveContainer,
   BarChart,
   Bar,
@@ -123,7 +123,7 @@ const ManagerDashboard = ({ onBack }: ManagerDashboardProps) => {
                 <Menu className="h-6 w-6" />
               </Button>
             </SheetTrigger>
-            <SheetContent side="right" className="w-72 p-0">
+            <SheetContent side="left" className="w-80 p-0 pt-[env(safe-area-inset-top,3rem)] bg-background border-border flex flex-col">
               <div className="flex flex-col h-full">
                 <div className="p-6 bg-muted/40 relative">
                   <Button
@@ -215,7 +215,7 @@ const ManagerDashboard = ({ onBack }: ManagerDashboardProps) => {
                       <p className="text-xs text-muted-foreground">{t('manager.sharingData')}</p>
                     </CardContent>
                   </Card>
-                  
+
                   <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                       <CardTitle className="text-sm font-medium">{t('manager.totalEngagement')}</CardTitle>
@@ -226,7 +226,7 @@ const ManagerDashboard = ({ onBack }: ManagerDashboardProps) => {
                       <p className="text-xs text-muted-foreground">{t('manager.interactionsRecorded')}</p>
                     </CardContent>
                   </Card>
-                  
+
                   <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                       <CardTitle className="text-sm font-medium">{t('manager.languageEngagement')}</CardTitle>
@@ -239,7 +239,7 @@ const ManagerDashboard = ({ onBack }: ManagerDashboardProps) => {
                       <p className="text-xs text-muted-foreground">{t('manager.ofUsersPracticing')}</p>
                     </CardContent>
                   </Card>
-                  
+
                   <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                       <CardTitle className="text-sm font-medium">{t('manager.safetyMapPins')}</CardTitle>
@@ -267,12 +267,12 @@ const ManagerDashboard = ({ onBack }: ManagerDashboardProps) => {
                             <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                             <XAxis dataKey="name" stroke="hsl(var(--foreground))" />
                             <YAxis stroke="hsl(var(--foreground))" />
-                            <Tooltip 
-                              contentStyle={{ 
-                                backgroundColor: "hsl(var(--card))", 
+                            <Tooltip
+                              contentStyle={{
+                                backgroundColor: "hsl(var(--card))",
                                 border: "1px solid hsl(var(--border))",
                                 borderRadius: "8px"
-                              }} 
+                              }}
                             />
                             <Legend />
                             <Bar dataKey={t('manager.language')} fill="hsl(var(--chart-1))" />
@@ -304,12 +304,12 @@ const ManagerDashboard = ({ onBack }: ManagerDashboardProps) => {
                           <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                           <XAxis dataKey="name" stroke="hsl(var(--foreground))" />
                           <YAxis stroke="hsl(var(--foreground))" domain={[0, 100]} />
-                          <Tooltip 
-                            contentStyle={{ 
-                              backgroundColor: "hsl(var(--card))", 
+                          <Tooltip
+                            contentStyle={{
+                              backgroundColor: "hsl(var(--card))",
                               border: "1px solid hsl(var(--border))",
                               borderRadius: "8px"
-                            }} 
+                            }}
                           />
                           <Legend />
                           <Bar dataKey={t('manager.workplaceSpace', 'Space')} fill="hsl(var(--chart-1))" />

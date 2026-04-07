@@ -1111,7 +1111,7 @@ IDIOMA: ${language}`;
                             type="button"
                             onClick={handleNextCycle}
                             disabled={cycleLoading}
-                            className="w-full sm:w-auto px-8 py-4 rounded-xl font-bold uppercase tracking-widest shadow-lg"
+                            className="w-full h-auto min-h-[56px] px-4 py-4 sm:px-8 sm:py-4 rounded-xl font-bold uppercase tracking-widest text-[10px] sm:text-xs whitespace-normal break-words shadow-lg leading-relaxed"
                           >
                             {cycleLoading ? (
                               <span className="flex items-center gap-2">
@@ -1147,53 +1147,53 @@ IDIOMA: ${language}`;
 
             {/* INPUT DO ORÁCULO (FIXO NO RODAPÉ) — only when unlocked */}
             {gemsUnlocked && (
-            <div className="p-4 border-t border-border bg-background/90 backdrop-blur-md">
-              <div className="max-w-2xl mx-auto">
-                {isLoading && (
-                  <div className="flex items-center gap-3 mb-3 px-2">
-                    <div className="w-5 h-5 border-2 border-accent border-t-transparent rounded-full animate-spin shrink-0" />
-                    <p className="text-sm text-foreground/50 font-serif animate-pulse">{loadingText}</p>
-                  </div>
-                )}
-                <div className="flex gap-2 items-center">
-                  <input
-                    type="text"
-                    value={inputValue}
-                    onChange={(e) => setInputValue(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") {
-                        e.preventDefault();
-                        handleSendMessage();
+              <div className="p-4 border-t border-border bg-background/90 backdrop-blur-md">
+                <div className="max-w-2xl mx-auto">
+                  {isLoading && (
+                    <div className="flex items-center gap-3 mb-3 px-2">
+                      <div className="w-5 h-5 border-2 border-accent border-t-transparent rounded-full animate-spin shrink-0" />
+                      <p className="text-sm text-foreground/50 font-serif animate-pulse">{loadingText}</p>
+                    </div>
+                  )}
+                  <div className="flex gap-2 items-center">
+                    <input
+                      type="text"
+                      value={inputValue}
+                      onChange={(e) => setInputValue(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          handleSendMessage();
+                        }
+                      }}
+                      placeholder={
+                        isFree && messages.filter((m) => m.role === "user").length >= 1
+                          ? "Limite do plano grátis atingido..."
+                          : "Pergunte ao Oráculo..."
                       }
-                    }}
-                    placeholder={
-                      isFree && messages.filter((m) => m.role === "user").length >= 1
-                        ? "Limite do plano grátis atingido..."
-                        : "Pergunte ao Oráculo..."
-                    }
-                    disabled={isLoading || (isFree && messages.filter((m) => m.role === "user").length >= 1)}
-                    className="flex-1 p-3 rounded-2xl border border-border bg-muted/30 text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-accent disabled:opacity-40"
-                  />
-                  <Button
-                    type="button"
-                    onClick={handleSendMessage}
-                    disabled={
-                      isLoading ||
-                      !inputValue.trim() ||
-                      (isFree && messages.filter((m) => m.role === "user").length >= 1)
-                    }
-                    className="h-11 w-11 rounded-full p-0 bg-accent flex items-center justify-center hover:bg-accent/80"
-                  >
-                    <Send className="h-5 w-5 text-accent-foreground" />
-                  </Button>
+                      disabled={isLoading || (isFree && messages.filter((m) => m.role === "user").length >= 1)}
+                      className="flex-1 p-3 rounded-2xl border border-border bg-muted/30 text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-accent disabled:opacity-40"
+                    />
+                    <Button
+                      type="button"
+                      onClick={handleSendMessage}
+                      disabled={
+                        isLoading ||
+                        !inputValue.trim() ||
+                        (isFree && messages.filter((m) => m.role === "user").length >= 1)
+                      }
+                      className="h-11 w-11 rounded-full p-0 bg-accent flex items-center justify-center hover:bg-accent/80"
+                    >
+                      <Send className="h-5 w-5 text-accent-foreground" />
+                    </Button>
+                  </div>
+                  {isFree && messages.filter((m) => m.role === "user").length >= 1 && (
+                    <p className="text-[10px] text-center mt-2 text-accent font-bold uppercase tracking-tighter">
+                      Libere chat ilimitado 24h + roteiro até 7 dias por R$ 29,90!
+                    </p>
+                  )}
                 </div>
-                {isFree && messages.filter((m) => m.role === "user").length >= 1 && (
-                  <p className="text-[10px] text-center mt-2 text-accent font-bold uppercase tracking-tighter">
-                    Libere chat ilimitado 24h + roteiro até 7 dias por R$ 29,90!
-                  </p>
-                )}
               </div>
-            </div>
             )}
           </div>
         )}

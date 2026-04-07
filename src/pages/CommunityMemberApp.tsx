@@ -49,7 +49,7 @@ const CommunityMemberApp = () => {
                 <Menu className="h-6 w-6" />
               </Button>
             </SheetTrigger>
-            <SheetContent side="left" className="w-80 p-0">
+            <SheetContent side="left" className="w-80 p-0 pt-[env(safe-area-inset-top,3rem)] bg-background border-border flex flex-col">
               <div className="flex flex-col h-full">
                 {/* User Info */}
                 <div className="p-6 bg-gradient-to-br from-primary/10 to-primary/5 relative">
@@ -121,9 +121,9 @@ const CommunityMemberApp = () => {
                   <div className="px-2 py-2">
                     <LanguageSelector />
                   </div>
-                  
+
                   <Separator className="my-2" />
-                  
+
                   <Button
                     variant="ghost"
                     className="w-full justify-start gap-3 h-12 text-destructive hover:text-destructive"
@@ -138,7 +138,7 @@ const CommunityMemberApp = () => {
           </Sheet>
 
           <h1 className="text-xl font-bold text-primary">Feltrip Community</h1>
-          
+
           <div className="flex items-center gap-1">
             <LanguageSelector />
             <NotificationBell />
@@ -162,19 +162,17 @@ const CommunityMemberApp = () => {
           <div className="flex justify-around items-center h-16 px-2">
             <button
               onClick={() => setActiveTab("community")}
-              className={`flex flex-col items-center justify-center gap-0.5 py-2 transition-colors flex-1 min-w-0 ${
-                activeTab === "community" ? "text-primary" : "text-muted-foreground"
-              }`}
+              className={`flex flex-col items-center justify-center gap-0.5 py-2 transition-colors flex-1 min-w-0 ${activeTab === "community" ? "text-primary" : "text-muted-foreground"
+                }`}
             >
               <Heart className="h-5 w-5 shrink-0" />
               <span className="text-[10px] font-medium truncate">{t('expatApp.community')}</span>
             </button>
-            
+
             <button
               onClick={() => setActiveTab("profile")}
-              className={`flex flex-col items-center justify-center gap-0.5 py-2 transition-colors flex-1 min-w-0 ${
-                activeTab === "profile" ? "text-primary" : "text-muted-foreground"
-              }`}
+              className={`flex flex-col items-center justify-center gap-0.5 py-2 transition-colors flex-1 min-w-0 ${activeTab === "profile" ? "text-primary" : "text-muted-foreground"
+                }`}
             >
               <User className="h-5 w-5 shrink-0" />
               <span className="text-[10px] font-medium truncate">{t('expatApp.myProfile')}</span>

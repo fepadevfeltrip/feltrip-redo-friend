@@ -13,12 +13,21 @@ const languages = [
   { code: 'en', name: 'EN' },
   { code: 'es', name: 'ES' },
 ];
-
 export function LanguageSelector() {
   const { i18n } = useTranslation();
 
+  const handleLanguageChange = (value: string) => {
+    // 1. Muda a língua no i18n
+    i18n.changeLanguage(value);
+    // 2. Grava na memória forçadamente
+    localStorage.setItem('i18nextLng', value);
+    // 3. (OPCIONAL MAS RECOMENDADO) Dispara um evento global para os componentes teimosos
+    window.dispatchEvent(new Event('language-changed'));
+  };
+
   return (
-    <Select value={i18n.language} onValueChange={(value) => i18n.changeLanguage(value)}>
+    <Select value={i18n.language?.substring(0, 2) || 'pt'} onValueChange={handleLanguageChange}>
+      {/* ... resto do código igual */}
       <SelectTrigger className="w-auto gap-1.5 bg-transparent border-none shadow-none text-muted-foreground hover:text-foreground px-2 h-9">
         <Globe className="h-4 w-4" />
         <SelectValue />

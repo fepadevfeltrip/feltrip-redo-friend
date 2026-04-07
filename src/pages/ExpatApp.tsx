@@ -221,7 +221,7 @@ const ExpatApp = ({ onBack, initialTab = "cult" }: ExpatAppProps) => {
                     <Menu className="h-5 w-5" />
                   </Button>
                 </SheetTrigger>
-                <SheetContent side="left" className="w-80 p-0 bg-background border-border">
+                <SheetContent side="left" className="w-80 p-0 pt-[env(safe-area-inset-top,3rem)] bg-background border-border flex flex-col">
                   <div className="flex flex-col h-full">
                     {/* Sidebar header */}
                     <div className="p-6 relative border-b border-border bg-gradient-to-br from-muted/30 to-transparent">
