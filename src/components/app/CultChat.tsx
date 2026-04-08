@@ -137,7 +137,7 @@ interface CultChatProps {
 export default function App({ embedded = false, initialFlow = "city_selection" }: CultChatProps) {
   const { user } = useAuth();
   const { isPremium, isFree } = useUserTier();
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   const mapI18nLang = (lng: string): Language => {
     const mapped = lng?.substring(0, 2) as Language;
@@ -177,7 +177,6 @@ export default function App({ embedded = false, initialFlow = "city_selection" }
   const [gemsUnlocked, setGemsUnlocked] = useState(false);
 
   const isAnonymous = !!user && ((user as any).is_anonymous === true || !user.email);
-  const t = CONTENT[language];
 
   // FREE: Verifica se o usuário já usou seu roteiro gratuito (lifetime)
   useEffect(() => {
@@ -754,7 +753,7 @@ IDIOMA: ${language}`;
           cycleMessages.push({
             id: `daytrip-c${nextCycleNum}-${ts}`,
             role: "model",
-            text: `### 🎒 Viagem Curta\n\n${aiData.day_trip || "Sem viagem curta sugerida por enquanto."}`,
+            text: `### 🎒 Viagem Curta\n\n${aiData.day_trip || "Sem viagem curta sugerida por mientras."}`,
             timestamp: ts++,
           });
         }
@@ -811,15 +810,15 @@ IDIOMA: ${language}`;
   const getQuestionLabel = (index: number) => {
     switch (index) {
       case 2:
-        return { label: "Caos: Qual seu nível de tolerância para o caos hoje?", min: "Paz absoluta", max: "Quero me perder" };
+        return { label: t('cultChat.chaos_q'), min: t('cultChat.chaos_min'), max: t('cultChat.chaos_max') };
       case 3:
-        return { label: "Território: Sensação de pertencimento?", min: "Estranha", max: "Em Casa" };
+        return { label: t('cultChat.territory_q'), min: t('cultChat.territory_min'), max: t('cultChat.territory_max') };
       case 4:
-        return { label: "Identidade: Visibilidade hoje?", min: "Incógnito", max: "Ver e ser visto" };
+        return { label: t('cultChat.identity_q'), min: t('cultChat.identity_min'), max: t('cultChat.identity_max') };
       case 5:
-        return { label: "O Outro: Disposição social?", min: "Zero", max: "Muita" };
+        return { label: t('cultChat.other_q'), min: t('cultChat.other_min'), max: t('cultChat.other_max') };
       case 6:
-        return { label: "Espaço: Som ambiente ideal?", min: "Silêncio", max: "Batida Alta" };
+        return { label: t('cultChat.space_q'), min: t('cultChat.space_min'), max: t('cultChat.space_max') };
       default:
         return { label: "", min: "", max: "" };
     }
@@ -863,23 +862,23 @@ IDIOMA: ${language}`;
             {isFree && freeAlreadyUsed ? (
               <div className="text-center space-y-6 max-w-sm">
                 <CultCharacter variant="guide" size="lg" />
-                <h3 className="font-serif text-xl font-bold text-foreground">Você já usou seu roteiro gratuito</h3>
+                <h3 className="font-serif text-xl font-bold text-foreground">{t('cultChat.freeLimitTitle')}</h3>
                 <p className="text-sm text-muted-foreground">
-                  Desbloqueie o roteiro completo com todos os dias e 24h de chat ilimitado.
+                  {t('cultChat.freeLimitDesc')}
                 </p>
                 <Button
                   type="button"
                   onClick={() => openCheckout("personal_map")}
                   className="w-full h-12 bg-gradient-to-r from-accent to-secondary text-accent-foreground rounded-xl font-bold uppercase"
                 >
-                  Roteiro até 7 dias — R$ 29,90
+                  {t('cultChat.itineraryPriceButton')}
                 </Button>
               </div>
             ) : (
               <>
                 <CultCharacter variant="explorer" size="lg" />
                 <h3 className="font-serif text-2xl sm:text-3xl font-bold text-foreground text-center">
-                  Qual é o seu território hoje?
+                  {t('cultChat.territoryQuestion')}
                 </h3>
                 <div className="grid gap-3 w-full max-w-xs">
                   {["Rio de Janeiro", "São Paulo", "Florianópolis"].map((city) => (
@@ -919,7 +918,7 @@ IDIOMA: ${language}`;
                     className="mt-4 text-sm font-bold text-accent underline underline-offset-4 hover:text-foreground transition-colors flex items-center gap-2"
                   >
                     <MessageCircle size={16} />
-                    {language === "en" ? "Skip quiz — just chat" : language === "es" ? "Saltar quiz — solo chatear" : "Pular quiz — ir direto ao chat"}
+                    {t('cultChat.skipQuiz')}
                   </button>
                 )}
               </>
@@ -933,7 +932,7 @@ IDIOMA: ${language}`;
               onClick={handleBack}
               className="self-start mb-6 text-muted-foreground font-bold uppercase text-xs flex items-center gap-1 hover:text-foreground/70 transition-colors"
             >
-              <ArrowLeft size={14} /> Voltar
+              <ArrowLeft size={14} /> {t('cultChat.backButton')}
             </button>
 
             {/* Character reacting in corner */}
@@ -947,7 +946,7 @@ IDIOMA: ${language}`;
 
             {quizIndex === 0 && (
               <div className="w-full max-w-md space-y-6">
-                <h3 className="font-serif text-xl font-bold text-center text-foreground">Quantos dias a cidade terá você?</h3>
+                <h3 className="font-serif text-xl font-bold text-center text-foreground">{t('cultChat.stayQuestion')}</h3>
                 <input
                   type="text"
                   value={daysText}
@@ -955,7 +954,7 @@ IDIOMA: ${language}`;
                     setDaysText(e.target.value);
                     setDaysLimitMessage(null);
                   }}
-                  placeholder="Ex: 3 dias, um fim de semana..."
+                  placeholder={t('cultChat.stayPlaceholder')}
                   className="w-full p-4 rounded-xl border border-border bg-muted/30 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-accent text-center text-foreground placeholder:text-muted-foreground/60"
                 />
                 <p className="text-xs text-center text-muted-foreground/60">
@@ -968,19 +967,19 @@ IDIOMA: ${language}`;
                   disabled={!daysText.trim()}
                   className="w-full h-12 bg-gradient-to-r from-accent to-secondary text-accent-foreground rounded-xl font-bold uppercase tracking-widest"
                 >
-                  Avançar
+                  {t('cultChat.nextButton')}
                 </Button>
               </div>
             )}
 
             {quizIndex === 1 && (
               <div className="w-full max-w-md space-y-6">
-                <h3 className="font-serif text-xl font-bold text-center text-foreground">Alguma restrição ou desejo inegociável?</h3>
+                <h3 className="font-serif text-xl font-bold text-center text-foreground">{t('cultChat.restrictionsQuestion')}</h3>
                 <input
                   type="text"
                   value={needsText}
                   onChange={(e) => setNeedsText(e.target.value)}
-                  placeholder="Ex: vegetariano, pet friendly..."
+                  placeholder={t('cultChat.restrictionsPlaceholder')}
                   className="w-full p-4 rounded-xl border border-border bg-muted/30 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-accent text-center text-foreground placeholder:text-muted-foreground/60"
                 />
                 <Button
@@ -989,7 +988,7 @@ IDIOMA: ${language}`;
                   disabled={!needsText.trim()}
                   className="w-full h-12 bg-gradient-to-r from-accent to-secondary text-accent-foreground rounded-xl font-bold uppercase tracking-widest"
                 >
-                  Avançar
+                  {t('cultChat.nextButton')}
                 </Button>
               </div>
             )}
@@ -1047,7 +1046,7 @@ IDIOMA: ${language}`;
                       }}
                       className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground hover:text-accent transition-colors flex items-center gap-1"
                     >
-                      <ArrowLeft size={12} /> Novo Roteiro
+                      <ArrowLeft size={12} /> {t('cultChat.newItinerary')}
                     </button>
                   </div>
                 )}

@@ -122,11 +122,11 @@ const trackHousingCompletion = async (result: RefugeResult, city: City, answers:
 };
 
 const HousingTab = () => {
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const lang = (i18n.language?.substring(0, 2) || "pt") as Language;
-  const t = TRANSLATIONS[lang] || TRANSLATIONS.pt;
+  const localT = TRANSLATIONS[lang] || TRANSLATIONS.pt;
   const lt = LOGIN_TEXTS[lang as keyof typeof LOGIN_TEXTS] || LOGIN_TEXTS.pt;
-  const QUESTIONS = t.questions;
+  const QUESTIONS = localT.questions;
 
   const { user } = useAuth();
   const isAnonymous = !user || (user as any).is_anonymous === true || !user.email;
@@ -311,21 +311,17 @@ const HousingTab = () => {
         </div>
         <div className="space-y-4 max-w-md">
           <h2 className="text-2xl font-bold text-foreground font-serif leading-tight">
-            {lang === "en" ? "You've already used your free Housing Investigation" : lang === "es" ? "Ya usaste tu Investigación de Vivienda gratuita" : "Você já usou sua Investigação de Moradia gratuita"}
+            {t('housing.alreadyUsedTitle')}
           </h2>
           <p className="text-sm text-muted-foreground leading-relaxed">
-            {lang === "en"
-              ? "Upgrade to the Full Immersion plan for unlimited Housing Investigations."
-              : lang === "es"
-                ? "Actualiza al plan de Inmersión Completa para investigaciones ilimitadas."
-                : "Faça upgrade para o plano de Imersão Completa para investigações ilimitadas."}
+            {t('housing.upgradeDesc')}
           </p>
         </div>
         <Button
           onClick={() => openCheckout("explorer")}
           className="rounded-full px-10 py-6 text-sm font-bold tracking-widest uppercase shadow-xl hover:scale-105 transition-all"
         >
-          {lang === "en" ? "UNLOCK FULL IMMERSION" : lang === "es" ? "DESBLOQUEAR INMERSIÓN" : "DESBLOQUEAR IMERSÃO"}
+          {t('housing.unlockImmersion')}
         </Button>
       </div>
     );
@@ -340,20 +336,19 @@ const HousingTab = () => {
         </div>
         <div className="space-y-4 max-w-md">
           <h2 className="text-3xl sm:text-4xl font-bold text-foreground font-serif leading-tight">
-            Descubra o seu
+            {t('housing.title')}
             <br />
-            <span className="text-primary italic">Refúgio Urbano</span>
+            <span className="text-primary italic">{t('housing.subtitle')}</span>
           </h2>
           <p className="text-sm text-muted-foreground leading-relaxed">
-            Uma investigação profunda sobre como você se relaciona com a luz, os espaços e as pessoas, para encontrarmos
-            o bairro que nasceu para ser o seu lar.
+            {t('housing.description')}
           </p>
         </div>
         <Button
           onClick={handleStart}
           className="rounded-full px-10 py-6 text-sm font-bold tracking-widest uppercase shadow-xl hover:scale-105 transition-all"
         >
-          Iniciar Mapeamento
+          {t('housing.startButton')}
         </Button>
       </div>
     );
@@ -389,7 +384,7 @@ const HousingTab = () => {
       <div className="flex flex-col items-center justify-center h-full px-6 gap-6 bg-background">
         <div className="w-16 h-16 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
         <p className="text-base text-primary font-serif italic animate-pulse">
-          Desenhando seu dossiê de arquitetura...
+          {t('housing.loadingDossier')}
         </p>
       </div>
     );
@@ -403,7 +398,7 @@ const HousingTab = () => {
 
           <div className="text-center space-y-4 pt-4">
             <div className="inline-block bg-primary/10 text-primary border border-primary/20 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-[0.2em] mb-2">
-              Dossiê de Moradia
+              {t('housing.dossierBadge')}
             </div>
             <h2 className="text-4xl sm:text-5xl font-bold font-serif text-foreground leading-tight">
               {result.perfilResumido}
@@ -429,7 +424,7 @@ const HousingTab = () => {
             >
               <div className="space-y-6">
                 <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-center text-muted-foreground">
-                  Seus Refúgios Ideais
+                  {t('housing.idealRefuges')}
                 </h3>
 
                 <div className="grid gap-6">
@@ -453,11 +448,7 @@ const HousingTab = () => {
                             onClick={() => window.open(getWaLink(s.bairro), "_blank")}
                           >
                             <Home className="w-4 h-4 mr-2" />
-                            {lang === "en"
-                              ? "Talk to a Curator about this area"
-                              : lang === "es"
-                                ? "Hablar con un Curador sobre esta zona"
-                                : `Falar com um Curador sobre ${s.bairro}`}
+                            {t('housing.talkToCurator')} {s.bairro}
                           </Button>
                         </div>
                       </div>
@@ -504,7 +495,7 @@ const HousingTab = () => {
                 className="gap-2 text-muted-foreground hover:text-foreground uppercase tracking-widest text-[10px] font-bold"
               >
                 <RotateCcw className="w-4 h-4" />
-                Refazer Investigação
+                {t('housing.redo')}
               </Button>
             </div>
           )}
@@ -530,7 +521,7 @@ const HousingTab = () => {
             <ArrowLeft className="w-4 h-4" />
           </button>
           <span className="flex-1">
-            Pilar {currentQuestionIndex + 1} de {QUESTIONS.length}
+            {t('cultChat.pillar')} {currentQuestionIndex + 1} {t('cultChat.of')} {QUESTIONS.length}
           </span>
           <span className="text-primary bg-primary/10 px-3 py-1 rounded-full">
             {QUESTIONS[currentQuestionIndex]?.pillar}
@@ -550,8 +541,8 @@ const HousingTab = () => {
             <div key={i} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
               <div
                 className={`max-w-[85%] rounded-2xl px-5 py-4 text-sm sm:text-base leading-relaxed shadow-sm ${msg.role === "user"
-                    ? "bg-primary text-primary-foreground rounded-br-none"
-                    : "bg-card border border-border text-foreground rounded-bl-none"
+                  ? "bg-primary text-primary-foreground rounded-br-none"
+                  : "bg-card border border-border text-foreground rounded-bl-none"
                   }`}
               >
                 {msg.content}
@@ -579,7 +570,7 @@ const HousingTab = () => {
           <Input
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
-            placeholder={t.inputPlaceholder}
+            placeholder={localT.inputPlaceholder}
             disabled={isTyping}
             className="flex-1 rounded-full h-14 px-6 text-sm bg-muted/50 border-border focus:ring-2 focus:ring-primary/20 transition-all"
           />

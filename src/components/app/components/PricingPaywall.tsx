@@ -44,6 +44,8 @@ const TEXTS = {
         badge: "Recomendado para Expats",
       },
     ],
+    squadLink: "Cult Squad (50% OFF para grupos)",
+    disclaimer: "* O valor e a moeda podem variar de acordo com a sua região na hora do pagamento."
   },
   en: {
     title: "Restricted Access",
@@ -73,6 +75,8 @@ const TEXTS = {
         badge: "Recommended for Expats",
       },
     ],
+    squadLink: "Cult Squad (50% OFF for groups)",
+    disclaimer: "* Price and currency may vary depending on your region at checkout."
   },
   es: {
     title: "Acceso Restringido",
@@ -102,6 +106,8 @@ const TEXTS = {
         badge: "Recomendado para Expats",
       },
     ],
+    squadLink: "Cult Squad (50% OFF para grupos)",
+    disclaimer: "* El precio y la moneda pueden variar según tu región al momento del pago."
   },
 };
 
@@ -199,9 +205,12 @@ const PricingPaywall: React.FC<PricingPaywallProps> = ({ onClose, lang }) => {
             })}
           </div>
 
-          <div className="pt-2 text-center">
-            <button onClick={() => setShowSquad(true)} className="text-xs text-muted-foreground underline">
-              Cult Squad (50% OFF para grupos)
+          <div className="pt-2 text-center flex flex-col items-center gap-3">
+            <p className="text-[10px] text-muted-foreground/60 italic px-4 leading-tight">
+              {t.disclaimer}
+            </p>
+            <button onClick={() => setShowSquad(true)} className="text-xs text-muted-foreground underline hover:text-foreground transition-colors">
+              {t.squadLink}
             </button>
           </div>
         </div>

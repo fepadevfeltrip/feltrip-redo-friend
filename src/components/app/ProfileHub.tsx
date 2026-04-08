@@ -9,9 +9,9 @@ import CultChat from "./CultChat";
 type SubView = "profile" | "cartography";
 
 const TEXTS = {
-  pt: { cartography: "Minhas Cartografias", cartographyDesc: "Histórico das suas descobertas com a Cult AI", back: "Voltar" },
-  en: { cartography: "My Cartographies", cartographyDesc: "History of your discoveries with Cult AI", back: "Back" },
-  es: { cartography: "Mis Cartografías", cartographyDesc: "Historial de tus descubrimientos con Cult AI", back: "Volver" },
+  pt: { cartography: "Minhas Cartografias", cartographyDesc: "Histórico das suas descobertas com a Culti AI", back: "Voltar" },
+  en: { cartography: "My Cartographies", cartographyDesc: "History of your discoveries with Culti AI", back: "Back" },
+  es: { cartography: "Mis Cartografías", cartographyDesc: "Historial de tus descubrimientos con Culti AI", back: "Volver" },
 };
 
 export default function ProfileHub() {

@@ -109,7 +109,7 @@ const TEXTS = {
       "Personalized poetic proposition",
       "Permanent access to this city",
     ],
-    price: "R$ 29.90",
+    price: "US$9,00",
     priceSquad: "or R$ 14.95 with Squad discount (5+ people)",
     cta: "Unlock Now",
     social: "280 people transformed their urban experience",
@@ -127,8 +127,8 @@ const TEXTS = {
       "Proposición poética personalizada",
       "Acceso permanente a esta ciudad",
     ],
-    price: "R$ 29,90",
-    priceSquad: "o R$ 14,95 con descuento Squad (5+ personas)",
+    price: "US$9,00",
+    priceSquad: "o con descuento Squad (5+ personas)",
     cta: "Desbloquear Ahora",
     social: "280 personas transformaron su experiencia urbana",
     rating: "4.9/5 tasa de satisfacción",
@@ -281,17 +281,17 @@ export const PresenceMapPreview = ({ scores, city, content, userName, onUnlocked
               <div className="text-4xl">🔮</div>
               <h3 className="text-primary-foreground font-bold text-lg leading-tight">
                 {lang === "pt" ? "Seu mapa interior está quase revelado..." :
-                 lang === "es" ? "Tu mapa interior está casi revelado..." :
-                 lang === "fr" ? "Votre carte intérieure est presque révélée..." :
-                 "Your inner map is almost revealed..."}
+                  lang === "es" ? "Tu mapa interior está casi revelado..." :
+                    lang === "fr" ? "Votre carte intérieure est presque révélée..." :
+                      "Your inner map is almost revealed..."}
               </h3>
               <p className="text-primary-foreground/80 text-sm leading-relaxed">
                 {lang === "pt" ? "Cada pilar guarda segredos sobre como você habita o mundo. Desbloqueie a análise completa e descubra padrões que você nem sabia que existiam." :
-                 lang === "es" ? "Cada pilar guarda secretos sobre cómo habitas el mundo. Desbloquea el análisis completo y descubre patrones que no sabías que existían." :
-                 lang === "fr" ? "Chaque pilier cache des secrets sur votre façon d'habiter le monde. Débloquez l'analyse complète." :
-                 "Each pillar holds secrets about how you inhabit the world. Unlock the full analysis and discover patterns you didn't know existed."}
+                  lang === "es" ? "Cada pilar guarda secretos sobre cómo habitas el mundo. Desbloquea el análisis completo y descubre patrones que no sabías que existían." :
+                    lang === "fr" ? "Chaque pilier cache des secrets sur votre façon d'habiter le monde. Débloquez l'analyse complète." :
+                      "Each pillar holds secrets about how you inhabit the world. Unlock the full analysis and discover patterns you didn't know existed."}
               </p>
-              <Button 
+              <Button
                 onClick={() => openCheckout("personal_map")}
                 className="w-full h-12 text-base font-bold bg-primary-foreground text-primary hover:bg-primary-foreground/90 shadow-lg"
               >
@@ -308,15 +308,15 @@ export const PresenceMapPreview = ({ scores, city, content, userName, onUnlocked
             <div className="text-3xl">💎</div>
             <h3 className="font-bold text-primary text-lg">
               {lang === "pt" ? "Transforme curiosidade em autoconhecimento" :
-               lang === "es" ? "Transforma curiosidad en autoconocimiento" :
-               lang === "fr" ? "Transformez la curiosité en connaissance de soi" :
-               "Transform curiosity into self-knowledge"}
+                lang === "es" ? "Transforma curiosidad en autoconocimiento" :
+                  lang === "fr" ? "Transformez la curiosité en connaissance de soi" :
+                    "Transform curiosity into self-knowledge"}
             </h3>
             <p className="text-sm text-muted-foreground leading-relaxed">
               {lang === "pt" ? "Mais de 280 pessoas já desbloquearam seus mapas e mudaram a forma como vivem suas cidades. Sua vez." :
-               lang === "es" ? "Más de 280 personas ya desbloquearon sus mapas y cambiaron la forma en que viven sus ciudades. Tu turno." :
-               lang === "fr" ? "Plus de 280 personnes ont déjà débloqué leurs cartes. À votre tour." :
-               "Over 280 people have already unlocked their maps and changed how they experience their cities. Your turn."}
+                lang === "es" ? "Más de 280 personas ya desbloquearon sus mapas y cambiaron la forma en que viven sus ciudades. Tu turno." :
+                  lang === "fr" ? "Plus de 280 personnes ont déjà débloqué leurs cartes. À votre tour." :
+                    "Over 280 people have already unlocked their maps and changed how they experience their cities. Your turn."}
             </p>
             <div className="text-left space-y-2 px-2">
               {t.features.map((feat, i) => (

@@ -4,6 +4,8 @@ import { Language } from "../types";
 import { CONTENT } from "../constants";
 import { LEGAL_TEXT_PT, LEGAL_TEXT_EN, LEGAL_TEXT_ES } from "../constants/legalTexts";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
+import { Capacitor } from "@capacitor/core";
+import OneSignal from "onesignal-cordova-plugin";
 
 const SIGNUP_TEXTS = {
   pt: {
@@ -31,7 +33,7 @@ const SIGNUP_TEXTS = {
     invalidCode: "Invalid code. Please check and try again.",
     emailRequired: "Enter your email",
     sending: "Sending...",
-    verifying: "Verifying...",
+    verifying: "Verificando...",
     backToEmail: "← Change email",
   },
   es: {
@@ -40,7 +42,7 @@ const SIGNUP_TEXTS = {
     notificationsOptIn: "Activa las notificaciones y recibe códigos promocionais y sorpresas hechas para tu perfil.",
     emailPlaceholder: "tu@email.com",
     sendCode: "Recibir Código",
-    codeSent: "Enviamos un código seguro a tu email",
+    codeSent: "Enviamos um código seguro a tu email",
     enterCode: "Entrar",
     invalidCode: "Código inválido. Verifica e intenta de nuevo.",
     emailRequired: "Escribe tu email",
@@ -124,24 +126,37 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, lang, onClose, red
         if (bypassError) throw bypassError;
         if (bypassData?.error) throw new Error(bypassData.error);
 
-        const { error: verifyError } = await supabase.auth.verifyOtp({
+        const { data: verifyData, error: verifyError } = await supabase.auth.verifyOtp({
           token_hash: bypassData.token_hash,
           type: "magiclink",
         });
 
         if (verifyError) throw verifyError;
+
+        // OneSignal Login for Apple Review User
+        if (Capacitor.isNativePlatform() && verifyData?.user?.id) {
+          OneSignal.login(verifyData.user.id);
+        }
+
         onClose();
         return;
       }
 
       // Normal OTP verification
-      const { error } = await supabase.auth.verifyOtp({
+      const { data, error } = await supabase.auth.verifyOtp({
         email: otpEmail.trim(),
         token: cleanCode,
         type: "email",
       });
 
       if (error) throw error;
+
+      // CONEXÃO COM ONESIGNAL: Atrela o ID do usuário logado ao aparelho
+      if (Capacitor.isNativePlatform() && data?.user?.id) {
+        OneSignal.login(data.user.id);
+        console.log("✅ OneSignal vinculado ao usuário:", data.user.id);
+      }
+
       onClose();
     } catch (err: any) {
       console.error("Erro de validação OTP:", err);

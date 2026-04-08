@@ -26,11 +26,8 @@ const Index = () => {
   const [showLegalDialog, setShowLegalDialog] = useState(false);
   const { toast } = useToast();
   const { i18n } = useTranslation();
-  const [lang, setLang] = useState<keyof typeof CONTENT>((i18n.language?.substring(0, 2) || "pt") as keyof typeof CONTENT);
 
-  useEffect(() => {
-    setLang((i18n.language?.substring(0, 2) || "pt") as keyof typeof CONTENT);
-  }, [i18n.language]);
+  const lang = (i18n.language?.substring(0, 2) || "pt") as keyof typeof CONTENT;
   const t = CONTENT[lang] || CONTENT.pt;
 
   // Handle payment success/cancel query params

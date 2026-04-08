@@ -17,6 +17,8 @@ const TEXTS = {
     activeSub: "Você tem acesso completo à Imersão. Aproveite!",
     currentPlan: "Seu plano atual",
     manageTeam: "Gerenciar Equipe",
+    redirecting: "Redirecionando...",
+    disclaimer: "* O valor e a moeda podem variar de acordo com a sua região na hora do pagamento.",
     plans: [
       {
         name: "Free — Degustação",
@@ -68,6 +70,8 @@ const TEXTS = {
     activeSub: "You have full Immersion access. Enjoy!",
     currentPlan: "Your current plan",
     manageTeam: "Manage Team",
+    redirecting: "Redirecting...",
+    disclaimer: "* Price and currency may vary depending on your region at checkout.",
     plans: [
       {
         name: "Free — Tasting",
@@ -119,6 +123,8 @@ const TEXTS = {
     activeSub: "Tienes acceso completo a la Inmersión. ¡Disfruta!",
     currentPlan: "Tu plan actual",
     manageTeam: "Administrar Equipo",
+    redirecting: "Redirigiendo...",
+    disclaimer: "* El precio y la moneda pueden variar según tu región al momento del pago.",
     plans: [
       {
         name: "Free — Degustación",
@@ -263,25 +269,30 @@ const PricingTab = () => {
                 </ul>
 
                 {isPaidCard && (
-                  <Button
-                    className="w-full flex items-center justify-center text-center text-xs sm:text-sm font-bold uppercase tracking-widest h-auto min-h-[3.5rem] py-3 px-4 rounded-xl shadow-md whitespace-normal break-words leading-tight"
-                    variant={isHighlight ? "default" : "secondary"}
-                    onClick={() => handlePlanClick(key)}
-                    disabled={checkoutLoading !== null}
-                  >
-                    {checkoutLoading === key ? (
-                      <span className="flex items-center gap-2">
-                        <span className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                        Redirecionando...
-                      </span>
-                    ) : isPremiumCompany && isPremiumCompanyPlan ? (
-                      t.manageTeam
-                    ) : isCurrentPlan ? (
-                      t.currentPlan
-                    ) : (
-                      plan.cta
-                    )}
-                  </Button>
+                  <div className="space-y-3">
+                    <Button
+                      className="w-full flex items-center justify-center text-center text-xs sm:text-sm font-bold uppercase tracking-widest h-auto min-h-[3.5rem] py-3 px-4 rounded-xl shadow-md whitespace-normal break-words leading-tight"
+                      variant={isHighlight ? "default" : "secondary"}
+                      onClick={() => handlePlanClick(key)}
+                      disabled={checkoutLoading !== null}
+                    >
+                      {checkoutLoading === key ? (
+                        <span className="flex items-center gap-2">
+                          <span className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                          {t.redirecting}
+                        </span>
+                      ) : isPremiumCompany && isPremiumCompanyPlan ? (
+                        t.manageTeam
+                      ) : isCurrentPlan ? (
+                        t.currentPlan
+                      ) : (
+                        plan.cta
+                      )}
+                    </Button>
+                    <p className="text-[10px] text-center text-muted-foreground/60 italic leading-tight px-2">
+                      {t.disclaimer}
+                    </p>
+                  </div>
                 )}
 
                 {isFreeCard && isFree && (

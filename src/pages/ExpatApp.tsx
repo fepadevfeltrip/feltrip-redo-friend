@@ -53,9 +53,10 @@ interface ExpatAppProps {
   initialTab?: TabType;
 }
 
+// Mantemos "cult" internamente para não quebrar referências de arquivos e rotas
 type TabType = "presence" | "map" | "cult" | "concierge" | "language" | "profile" | "logbook" | "pricing" | "housing" | "community";
 
-const ExpatApp = ({ onBack, initialTab = "cult" }: ExpatAppProps) => {
+const ExpatApp = ({ onBack, initialTab = "presence" }: ExpatAppProps) => {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<TabType>(initialTab);
@@ -66,7 +67,23 @@ const ExpatApp = ({ onBack, initialTab = "cult" }: ExpatAppProps) => {
   const [showRenewalPopup, setShowRenewalPopup] = useState(false);
   const [authRedirectPath, setAuthRedirectPath] = useState(`/app?tab=${initialTab}`);
 
-  // Show renewal popup when user has an expired plan
+  const [showConciergePaywall, setShowConciergePaywall] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [showLegalDialog, setShowLegalDialog] = useState(false);
+  const [legalTab, setLegalTab] = useState<"terms" | "privacy">("terms");
+  const currentLang = (i18n.language?.substring(0, 2) as "pt" | "en" | "es") || "pt";
+  const isIOS = isIOSDevice();
+
+  // 1. TRAVA DE LOGIN (O Cão de Guarda):
+  // Se não tem usuário, o modal abre imediatamente.
+  useEffect(() => {
+    if (!user) {
+      setIsAuthModalOpen(true);
+    } else {
+      setIsAuthModalOpen(false);
+    }
+  }, [user]);
+
   useEffect(() => {
     if (isExpired && previousTier && previousTier !== "free") {
       const dismissed = sessionStorage.getItem("renewal_popup_dismissed");
@@ -76,17 +93,9 @@ const ExpatApp = ({ onBack, initialTab = "cult" }: ExpatAppProps) => {
     }
   }, [isExpired, previousTier]);
 
-  const [showConciergePaywall, setShowConciergePaywall] = useState(false);
-  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-  const [showLegalDialog, setShowLegalDialog] = useState(false);
-  const [legalTab, setLegalTab] = useState<"terms" | "privacy">("terms");
-  const currentLang = (i18n.language?.substring(0, 2) as "pt" | "en" | "es") || "pt";
-  const isIOS = isIOSDevice();
-
-  // Nova lógica de redirecionamento após pagamento (Roteiro vs Pacote Premium)
   const getCheckoutRedirectPath = (priceKey: string) => {
-    if (priceKey === "gem_single" || priceKey === "personal_map") return "/app?tab=cult"; // Comprou o Roteiro B2C
-    if (priceKey === "price_1TEHNdA1KiGIrxAcq0vPMV7s") return "/app?tab=presence"; // Comprou o Pacote Premium (Mapão + Idioma)
+    if (priceKey === "gem_single" || priceKey === "personal_map") return "/app?tab=cult";
+    if (priceKey === "price_1TEHNdA1KiGIrxAcq0vPMV7s") return "/app?tab=presence";
     return "/app?tab=pricing";
   };
 
@@ -98,7 +107,6 @@ const ExpatApp = ({ onBack, initialTab = "cult" }: ExpatAppProps) => {
     return () => window.removeEventListener("navigate-tab", handler as EventListener);
   }, []);
 
-  // Resume pending checkout after OAuth redirect
   useEffect(() => {
     if (!user || user.is_anonymous || !user.email) return;
     const pending = getPendingCheckout();
@@ -164,7 +172,7 @@ const ExpatApp = ({ onBack, initialTab = "cult" }: ExpatAppProps) => {
 
   const rawName = profile?.full_name;
   const displayName = (!rawName || rawName === "Anonymous" || rawName === "Anônimo")
-    ? (currentLang === "en" ? "Curious Visitor" : "Visitante Curioso")
+    ? (currentLang === "en" ? "Curious Visitor" : currentLang === "es" ? "Visitante Curioso" : "Visitante Curioso")
     : rawName;
   const displayCity = profile?.city || t("profile.locationNotSet");
   const initials = getInitials(displayName);
@@ -208,11 +216,15 @@ const ExpatApp = ({ onBack, initialTab = "cult" }: ExpatAppProps) => {
         <AuthModal
           isOpen={isAuthModalOpen}
           lang={currentLang}
-          onClose={() => setIsAuthModalOpen(false)}
+          onClose={() => {
+            // 2. O CADEADO: O modal só fecha se houver um usuário logado.
+            if (user) {
+              setIsAuthModalOpen(false);
+            }
+          }}
           redirectTo={authRedirectPath}
         />
         <div className="flex flex-col h-full bg-background">
-          {/* HEADER COM RESPIRO DA APPLE (SAFE AREA TOP) */}
           <div className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b border-border pt-[env(safe-area-inset-top)]">
             <div className="px-4 py-3 flex items-center justify-between">
               <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
@@ -223,7 +235,6 @@ const ExpatApp = ({ onBack, initialTab = "cult" }: ExpatAppProps) => {
                 </SheetTrigger>
                 <SheetContent side="left" className="w-80 p-0 pt-[env(safe-area-inset-top,3rem)] bg-background border-border flex flex-col">
                   <div className="flex flex-col h-full">
-                    {/* Sidebar header */}
                     <div className="p-6 relative border-b border-border bg-gradient-to-br from-muted/30 to-transparent">
                       <Button
                         variant="ghost"
@@ -251,39 +262,34 @@ const ExpatApp = ({ onBack, initialTab = "cult" }: ExpatAppProps) => {
 
                     <nav className="flex-1 p-4 space-y-1 overflow-auto">
                       <p className="text-[10px] font-bold text-accent uppercase tracking-[0.15em] px-3 pt-2 pb-2">
-                        {currentLang === "en" ? "My Journey" : currentLang === "es" ? "Mi Viaje" : "Minha Jornada Cult"}
+                        {currentLang === "en" ? "My Journey" : currentLang === "es" ? "Mi Viaje" : "Minha Jornada Culti"}
                       </p>
 
                       {[
+                        {
+                          tab: "presence" as TabType,
+                          icon: Home,
+                          label: currentLang === "en" ? "Home" : currentLang === "es" ? "Inicio" : "Início",
+                        },
                         {
                           tab: "cult" as TabType,
                           icon: Sparkles,
                           label:
                             currentLang === "en"
-                              ? "Cult Itinerary (Daily)"
+                              ? "Culti Itinerary"
                               : currentLang === "es"
-                                ? "Itinerario Cult"
-                                : "Roteiro Cult",
+                                ? "Itinerario Culti"
+                                : "Roteiro Culti",
                         },
                         {
                           tab: "housing" as TabType,
-                          icon: Home,
+                          icon: Briefcase,
                           label:
                             currentLang === "en"
                               ? "Housing Matching"
                               : currentLang === "es"
-                                ? "Vivienda (Housing)"
-                                : "Moradia (Housing)",
-                        },
-                        {
-                          tab: "presence" as TabType,
-                          icon: Compass,
-                          label:
-                            currentLang === "en"
-                              ? "Deep Map"
-                              : currentLang === "es"
-                                ? "Mapa Profundo"
-                                : "Mapão Fenomenológico",
+                                ? "Vivienda"
+                                : "Moradia",
                         },
                         { tab: "logbook" as TabType, icon: Map, label: logbookLabel },
                         {
@@ -404,8 +410,10 @@ const ExpatApp = ({ onBack, initialTab = "cult" }: ExpatAppProps) => {
                         variant="ghost"
                         className="w-full justify-start gap-3 h-11 rounded-xl text-destructive hover:text-destructive"
                         onClick={async () => {
+                          // 3. CORREÇÃO DO SIGN OUT:
+                          // Removemos o navigate("/"). Ao fazer signOut(), 
+                          // o "user" fica nulo e o useEffect lá de cima abre o modal sozinho.
                           await signOut();
-                          navigate("/", { replace: true });
                         }}
                       >
                         <LogOut className="h-4 w-4" />
@@ -417,7 +425,7 @@ const ExpatApp = ({ onBack, initialTab = "cult" }: ExpatAppProps) => {
               </Sheet>
 
               <div className="flex items-center gap-2">
-                <h1 className="font-display text-lg font-bold text-foreground">Cult AI</h1>
+                <h1 className="font-display text-lg font-bold text-foreground">Culti AI</h1>
                 <span className="text-[10px] text-muted-foreground hidden sm:inline">by Feltrip</span>
                 <CreditsDisplay />
               </div>
@@ -451,6 +459,7 @@ const ExpatApp = ({ onBack, initialTab = "cult" }: ExpatAppProps) => {
           </div>
 
           <div className="flex-1 overflow-auto">
+            {/* Opcional: Aqui decidimos se renderizamos o app atrás do modal. Como o modal vai estar por cima, pode deixar renderizar. */}
             {(activeTab === "presence" || activeTab === "map") && <MeuMapaTab />}
             {activeTab === "cult" && <CultChat embedded />}
             {activeTab === "concierge" && <ConciergeHub />}
@@ -473,27 +482,26 @@ const ExpatApp = ({ onBack, initialTab = "cult" }: ExpatAppProps) => {
             />
           )}
 
-          {/* BARRA INFERIOR DE NAVEGAÇÃO COM RESPIRO DA APPLE (SAFE AREA BOTTOM) */}
           <div className="border-t border-foreground/10 bg-background/90 backdrop-blur-md shrink-0 pb-[env(safe-area-inset-bottom)]">
             <div className="flex justify-around items-center h-14 px-1">
               {[
-                { tab: "cult" as TabType, icon: Sparkles, label: currentLang === "en" ? "Archetype" : "Arquétipo", activeColor: "text-accent" },
+                { tab: "presence" as TabType, icon: Home, label: currentLang === "en" ? "Home" : currentLang === "es" ? "Inicio" : "Início", activeColor: "text-secondary" },
+                { tab: "cult" as TabType, icon: Sparkles, label: currentLang === "en" ? "Archetype" : currentLang === "es" ? "Arquetipo" : "Arquétipo", activeColor: "text-accent" },
                 {
                   tab: "housing" as TabType,
-                  icon: Home,
-                  label: currentLang === "en" ? "Itinerary" : "Roteiro",
+                  icon: Briefcase,
+                  label: currentLang === "en" ? "Itinerary" : currentLang === "es" ? "Itinerario" : "Roteiro",
                   onClick: () => setActiveTab("housing"),
                   activeColor: "text-primary",
                 },
-                { tab: "presence" as TabType, icon: Compass, label: currentLang === "en" ? "Deep Map" : "Mapão", activeColor: "text-secondary" },
                 {
                   tab: "community" as TabType,
                   icon: Users,
-                  label: currentLang === "en" ? "Community" : "Comunidade",
+                  label: currentLang === "en" ? "Community" : currentLang === "es" ? "Comunidad" : "Comunidade",
                   onClick: () => setActiveTab("community"),
                   activeColor: "text-primary",
                 },
-                { tab: "profile" as TabType, icon: User, label: currentLang === "en" ? "Profile" : "Perfil", activeColor: "text-foreground" },
+                { tab: "profile" as TabType, icon: User, label: currentLang === "en" ? "Profile" : currentLang === "es" ? "Perfil" : "Perfil", activeColor: "text-foreground" },
               ].map(({ tab, icon: Icon, label, onClick, activeColor }: { tab: TabType; icon: any; label: string; onClick?: () => void; activeColor: string }) => {
                 const isActive = activeTab === tab || (activeTab === "map" && tab === "presence");
                 return (
@@ -533,7 +541,7 @@ const ExpatApp = ({ onBack, initialTab = "cult" }: ExpatAppProps) => {
       <Dialog open={showLegalDialog} onOpenChange={setShowLegalDialog}>
         <DialogContent className="max-w-2xl max-h-[85vh]">
           <DialogHeader>
-            <DialogTitle>Feltrip Cultural AI — Cult AI</DialogTitle>
+            <DialogTitle>Feltrip Cultural AI — Culti AI</DialogTitle>
             <DialogDescription className="sr-only">Documentos legais</DialogDescription>
           </DialogHeader>
           <div className="flex gap-2 mb-2">

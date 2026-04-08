@@ -1,3 +1,5 @@
+import { Capacitor } from '@capacitor/core';
+import { PushNotifications } from '@capacitor/push-notifications';
 import { useState, useEffect } from 'react';
 import { Bell, BellRing, Mail, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -12,7 +14,7 @@ import { toast } from 'sonner';
 
 export function NotificationBell() {
   const [open, setOpen] = useState(false);
-  const [pushPermission, setPushPermission] = useState<NotificationPermission>('default');
+  const [pushPermission, setPushPermission] = useState<NotificationPermission | 'default' | 'granted' | 'denied'>('default');
   const {
     emailEnabled,
     pushEnabled,
@@ -21,23 +23,82 @@ export function NotificationBell() {
     isLoading: prefsLoading
   } = useNotificationPreferences();
 
+  // Verifica o status inicial da permissão (Web e Nativo)
   useEffect(() => {
-    if ('Notification' in window) {
-      setPushPermission(Notification.permission);
+    const checkInitialPermissions = async () => {
+      if (Capacitor.isNativePlatform()) {
+        const permStatus = await PushNotifications.checkPermissions();
+        if (permStatus.receive === 'granted') {
+          setPushPermission('granted');
+        } else if (permStatus.receive === 'denied') {
+          setPushPermission('denied');
+        } else {
+          setPushPermission('default');
+        }
+      } else if ('Notification' in window) {
+        setPushPermission(Notification.permission);
+      }
+    };
+
+    checkInitialPermissions();
+  }, []);
+
+  // Adiciona os ouvintes para capturar o Token da Apple
+  useEffect(() => {
+    if (Capacitor.isNativePlatform()) {
+      PushNotifications.addListener('registration', (token) => {
+        console.log('✅ Push registration success, Token do iPhone: ', token.value);
+        // FUTURO: Salvar este token.value no Supabase
+      });
+
+      PushNotifications.addListener('registrationError', (error) => {
+        console.error('❌ Erro ao registrar Push Notifications: ', error);
+      });
     }
+
+    // Limpa os ouvintes ao desmontar
+    return () => {
+      if (Capacitor.isNativePlatform()) {
+        PushNotifications.removeAllListeners();
+      }
+    };
   }, []);
 
   const handleRequestPushPermission = async () => {
-    if ('Notification' in window) {
-      const permission = await Notification.requestPermission();
-      if (permission === 'granted') {
-        setPushPermission('granted');
-        await togglePushNotifications();
-        toast.success('Notificações push ativadas!');
-      } else {
-        setPushPermission(Notification.permission);
-        if (Notification.permission === 'denied') {
-          toast.error('Permissão negada. Ative nas configurações do navegador.');
+    // 1. LÓGICA NATIVA (iOS / Android)
+    if (Capacitor.isNativePlatform()) {
+      let permStatus = await PushNotifications.checkPermissions();
+
+      if (permStatus.receive === 'prompt') {
+        permStatus = await PushNotifications.requestPermissions();
+      }
+
+      if (permStatus.receive !== 'granted') {
+        setPushPermission('denied');
+        toast.error('Permissão negada. Ative nas configurações do seu celular.');
+        return;
+      }
+
+      // Se aceitou, registra para gerar o token
+      await PushNotifications.register();
+
+      setPushPermission('granted');
+      await togglePushNotifications();
+      toast.success('Notificações push ativadas!');
+
+    } else {
+      // 2. LÓGICA WEB (Navegador)
+      if ('Notification' in window) {
+        const permission = await Notification.requestPermission();
+        if (permission === 'granted') {
+          setPushPermission('granted');
+          await togglePushNotifications();
+          toast.success('Notificações push ativadas!');
+        } else {
+          setPushPermission(Notification.permission);
+          if (Notification.permission === 'denied') {
+            toast.error('Permissão negada. Ative nas configurações do navegador.');
+          }
         }
       }
     }
@@ -99,7 +160,7 @@ export function NotificationBell() {
           </div>
           {pushPermission === 'denied' && (
             <p className="text-xs text-destructive">
-              Push bloqueado no navegador
+              Push bloqueado nas configurações
             </p>
           )}
         </div>

@@ -135,6 +135,45 @@ export default function Profile() {
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
+  const handleDeleteSession = async (id: string) => {
+    const confirmText = lang === "en" ? "Delete this archetype permanently?" : lang === "es" ? "¿Eliminar este arquetipo permanentemente?" : "Deletar este arquétipo permanentemente?";
+    if (!window.confirm(confirmText)) return;
+
+    const { error } = await supabase.from('mrp_sessions').delete().eq('id', id);
+    if (error) {
+      toast({ title: t('common.error'), variant: "destructive" });
+    } else {
+      setSessions(prev => prev.filter(s => s.id !== id));
+      toast({ title: t('common.success') });
+    }
+  };
+
+  const handleDeleteGem = async (id: string) => {
+    const confirmText = lang === "en" ? "Delete this gem?" : lang === "es" ? "¿Eliminar esta gema?" : "Deletar esta gema?";
+    if (!window.confirm(confirmText)) return;
+
+    const { error } = await supabase.from('mrp_gems').delete().eq('id', id);
+    if (error) {
+      toast({ title: t('common.error'), variant: "destructive" });
+    } else {
+      setGems(prev => prev.filter(g => g.id !== id));
+      toast({ title: t('common.success') });
+    }
+  };
+
+  const handleDeleteMap = async (id: string) => {
+    const confirmText = lang === "en" ? "Delete this map?" : lang === "es" ? "¿Eliminar este mapa?" : "Deletar este mapa?";
+    if (!window.confirm(confirmText)) return;
+
+    const { error } = await supabase.from('city_questionnaires').delete().eq('id', id);
+    if (error) {
+      toast({ title: t('common.error'), variant: "destructive" });
+    } else {
+      setMaps(prev => prev.filter(m => m.id !== id));
+      toast({ title: t('common.success') });
+    }
+  };
+
   const handleDeleteAccount = async () => {
     if (!user) return;
     setIsDeleting(true);
@@ -272,9 +311,18 @@ export default function Profile() {
             {sessions.map(session => (
               <div
                 key={session.id}
-                className="w-full rounded-3xl overflow-hidden shadow-xl"
+                className="w-full rounded-3xl overflow-hidden shadow-xl relative"
                 style={{ background: "linear-gradient(160deg, #0D1F1A 0%, #1A1A2E 60%, #0D1F1A 100%)" }}
               >
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="absolute top-4 right-4 z-10 text-[#C4B8A0]/40 hover:text-destructive hover:bg-destructive/10 transition-colors"
+                  onClick={() => handleDeleteSession(session.id)}
+                >
+                  <Trash2 className="h-5 w-5" />
+                </Button>
+
                 <div className="relative px-6 py-10 flex flex-col items-center text-center">
                   <div
                     className="absolute inset-0 opacity-[0.04] pointer-events-none"
@@ -282,7 +330,7 @@ export default function Profile() {
                       backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
                     }}
                   />
-                  <p className="text-[11px] font-bold tracking-[0.3em] uppercase text-[#E8896A] mb-1">✦ CULT AI</p>
+                  <p className="text-[11px] font-bold tracking-[0.3em] uppercase text-[#E8896A] mb-1">✦ CULTI AI</p>
                   {session.city && (
                     <p className="text-[11px] font-bold tracking-[0.2em] uppercase text-[#C4B8A0] mb-6">
                       {session.city.toUpperCase()}
@@ -321,7 +369,7 @@ export default function Profile() {
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 max-h-72 overflow-y-auto">
               {gems.map(gem => (
-                <div key={gem.id} className="flex items-center gap-3 p-3 rounded-lg bg-muted/30">
+                <div key={gem.id} className="flex items-center gap-3 p-3 rounded-lg bg-muted/30 group">
                   <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-sm shrink-0">💎</div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-foreground truncate">{gem.name}</p>
@@ -329,6 +377,14 @@ export default function Profile() {
                       {gem.cidade || ''}{gem.categoria_principal ? ` · ${gem.categoria_principal}` : ''}{' · '}{formatDate(gem.created_at)}
                     </p>
                   </div>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 text-muted-foreground/40 hover:text-destructive opacity-0 group-hover:opacity-100 transition-all shrink-0"
+                    onClick={() => handleDeleteGem(gem.id)}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
                 </div>
               ))}
             </div>
@@ -348,7 +404,7 @@ export default function Profile() {
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
               {maps.map(map => (
-                <div key={map.id} className="flex items-center gap-3 p-3 rounded-lg bg-muted/30">
+                <div key={map.id} className="flex items-center gap-3 p-3 rounded-lg bg-muted/30 group">
                   <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-sm shrink-0">🗺️</div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-foreground">{map.city}</p>
@@ -357,6 +413,14 @@ export default function Profile() {
                       {' · '}{formatDate(map.created_at)}
                     </p>
                   </div>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 text-muted-foreground/40 hover:text-destructive opacity-0 group-hover:opacity-100 transition-all shrink-0"
+                    onClick={() => handleDeleteMap(map.id)}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
                 </div>
               ))}
             </div>

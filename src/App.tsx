@@ -23,6 +23,7 @@ import { Loader2 } from "lucide-react";
 import { Capacitor } from "@capacitor/core";
 import { initAppleStore } from "@/lib/appleIAP";
 import MeuMapaTab from "@/components/app/MeuMapaTab";
+import OneSignal from "onesignal-cordova-plugin";
 
 const queryClient = new QueryClient();
 
@@ -140,7 +141,14 @@ const App = () => {
   // O initAppleStore agora está no lugar correto: dentro do componente App!
   useEffect(() => {
     initAppleStore();
+
+    // ACORDANDO O CARTEIRO (ONESIGNAL) ASSIM QUE O APP ABRE NO CELULAR
+    if (Capacitor.isNativePlatform()) {
+      OneSignal.initialize("f0d37766-7320-4471-83fa-b31453cdfedc");
+      console.log("✅ OneSignal Inicializado com sucesso!");
+    }
   }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider delayDuration={0}>
