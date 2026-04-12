@@ -48,16 +48,16 @@ export const PresenceMapResults = ({ scores, poeticResponse, onReset }: Presence
   const [freePrompt, setFreePrompt] = useState("");
   const [aiResponse, setAiResponse] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  
+
   // Analysis is unlocked if: user bought a personal_map, has explorer credits, or is premium
   const isAnalysisLocked = !hasPurchasedMap && !isPremium;
-  
+
   const UNLOCK_CTA: Record<string, string> = {
-    pt: 'Ver análise completa → R$ 29,90',
-    en: 'See full analysis → R$ 29.90',
-    es: 'Ver análisis completo → R$ 29,90',
-    fr: 'Voir l\'analyse complète → R$ 29,90',
-    zh: '查看完整分析 → R$ 29.90',
+    pt: 'Ver análise completa → R$ 129,90',
+    en: 'See full analysis → $ 29.90',
+    es: 'Ver análisis completo → $ 29,90',
+    fr: 'Voir l\'analyse complète → $ 29,90',
+    zh: '查看完整分析 → $ 29.90',
   };
 
   const chartData = Object.entries(scores).map(([pillar, value]) => ({
@@ -117,16 +117,16 @@ export const PresenceMapResults = ({ scores, poeticResponse, onReset }: Presence
             <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-b from-background/40 via-primary/10 to-background/80 backdrop-blur-[3px] rounded-lg p-6 text-center">
               <div className="text-4xl mb-3">🔮</div>
               <h3 className="text-lg font-bold text-foreground mb-2">
-                {i18n.language?.startsWith('pt') ? 'Sua análise profunda está pronta' : 
-                 i18n.language?.startsWith('es') ? 'Tu análisis profundo está listo' : 
-                 'Your deep analysis is ready'}
+                {i18n.language?.startsWith('pt') ? 'Sua análise profunda está pronta' :
+                  i18n.language?.startsWith('es') ? 'Tu análisis profundo está listo' :
+                    'Your deep analysis is ready'}
               </h3>
               <p className="text-sm text-muted-foreground mb-4 max-w-xs leading-relaxed">
-                {i18n.language?.startsWith('pt') ? 'Descubra como você realmente habita o mundo. 5 pilares, 1 revelação.' : 
-                 i18n.language?.startsWith('es') ? 'Descubre cómo realmente habitas el mundo. 5 pilares, 1 revelación.' : 
-                 'Discover how you truly inhabit the world. 5 pillars, 1 revelation.'}
+                {i18n.language?.startsWith('pt') ? 'Descubra como você realmente habita o mundo. 5 pilares, 1 revelação.' :
+                  i18n.language?.startsWith('es') ? 'Descubre cómo realmente habitas el mundo. 5 pilares, 1 revelación.' :
+                    'Discover how you truly inhabit the world. 5 pillars, 1 revelation.'}
               </p>
-              <Button 
+              <Button
                 onClick={() => openCheckout('personal_map')}
                 className="bg-primary text-primary-foreground font-bold shadow-lg h-12 px-8 text-base"
               >
@@ -259,17 +259,17 @@ export const PresenceMapResults = ({ scores, poeticResponse, onReset }: Presence
       <button
         onClick={() => {
           // Dispara evento para abrir o modal de compartilhamento
-          window.dispatchEvent(new CustomEvent('openArchetypeShare', { 
-            detail: { scores, poeticResponse } 
+          window.dispatchEvent(new CustomEvent('openArchetypeShare', {
+            detail: { scores, poeticResponse }
           }));
         }}
         className="w-full py-4 bg-[#25D366] hover:bg-[#128C7E] text-white font-bold rounded-xl text-sm uppercase tracking-wider hover:brightness-105 transition-all flex items-center justify-center gap-2 shadow-lg"
       >
         <Share2 className="h-5 w-5" />
-        {i18n.language === 'pt' ? '✦ Compartilhar meu Arquétipo' : 
-         i18n.language === 'es' ? '✦ Compartir mi Arquetipo' : 
-         i18n.language === 'fr' ? '✦ Partager mon Archétype' :
-         '✦ Share my Archetype'}
+        {i18n.language === 'pt' ? '✦ Compartilhar meu Arquétipo' :
+          i18n.language === 'es' ? '✦ Compartir mi Arquetipo' :
+            i18n.language === 'fr' ? '✦ Partager mon Archétype' :
+              '✦ Share my Archetype'}
       </button>
 
       {/* Reset Button */}

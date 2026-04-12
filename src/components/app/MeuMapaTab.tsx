@@ -177,7 +177,12 @@ export const MeuMapaTab = () => {
             // Show generating screen
             setViewState("generating");
 
-            const result = await generateCityMap(freshQ as any, profile?.full_name || t('mapTab.traveler'));
+            // CONSERTO: Passando o idioma atual limpo (2 letras) para o gerador da AWS
+            const result = await generateCityMap(
+                freshQ as any,
+                profile?.full_name || t('mapTab.traveler'),
+                i18n.language?.substring(0, 2) || "pt"
+            );
 
             if (result.success) {
                 // Re-fetch to get generated map_content

@@ -16,6 +16,27 @@ import { ptBR, enUS, es, fr, zhCN } from 'date-fns/locale';
 import { CreateCommunityPin } from './CreateCommunityPin';
 import { useTranslation } from 'react-i18next';
 
+const COPY = {
+  pt: {
+    search: "Buscar endereço...",
+    add: "Adicionar",
+    pains: "Dores",
+    delights: "Delícias"
+  },
+  en: {
+    search: "Search address...",
+    add: "Add",
+    pains: "Pains",
+    delights: "Delights"
+  },
+  es: {
+    search: "Buscar dirección...",
+    add: "Añadir",
+    pains: "Dolores",
+    delicias: "Delicias"
+  }
+};
+
 // Helper function to get city name from coordinates using reverse geocoding approximation
 const getCityFromCoords = (lat: number, lng: number): string => {
   // Approximate city detection based on coordinates ranges
@@ -68,10 +89,10 @@ export function CommunityMap({ isManager = false }: CommunityMapProps) {
   const searchMarkerRef = useRef<mapboxgl.Marker | null>(null);
   const { user } = useAuth();
   const { sharedTips, isLoading, toggleLike, addComment, deleteComment, fetchComments, unshareFromCommunity, refresh } = useCommunityTips();
-  
+
   const currentLocale = dateLocales[i18n.language] || enUS;
   const getTypeLabel = (type: string) => t(`community.tipTypes.${type}`) || type;
-  
+
   const [selectedTip, setSelectedTip] = useState<SharedTip | null>(null);
   const [comments, setComments] = useState<TipComment[]>([]);
   const [newComment, setNewComment] = useState('');
@@ -189,7 +210,7 @@ export function CommunityMap({ isManager = false }: CommunityMapProps) {
 
   const handleAddComment = async () => {
     if (!selectedTip || !newComment.trim()) return;
-    
+
     const success = await addComment(selectedTip.id, newComment);
     if (success) {
       setNewComment('');
@@ -221,12 +242,12 @@ export function CommunityMap({ isManager = false }: CommunityMapProps) {
   // Get unique cities from tips
   const citiesWithTips = useMemo(() => {
     const cityMap = new Map<string, { name: string; coords: [number, number]; count: number }>();
-    
+
     sharedTips.forEach(tip => {
       const cityName = getCityFromCoords(tip.latitude, tip.longitude);
       if (!cityMap.has(cityName)) {
-        cityMap.set(cityName, { 
-          name: cityName, 
+        cityMap.set(cityName, {
+          name: cityName,
           coords: [tip.longitude, tip.latitude],
           count: 1
         });
@@ -235,7 +256,7 @@ export function CommunityMap({ isManager = false }: CommunityMapProps) {
         existing.count++;
       }
     });
-    
+
     return Array.from(cityMap.values()).sort((a, b) => b.count - a.count);
   }, [sharedTips]);
 
@@ -253,7 +274,7 @@ export function CommunityMap({ isManager = false }: CommunityMapProps) {
 
   const handleSearchAddress = async () => {
     if (!searchAddress.trim() || !map.current) return;
-    
+
     setIsSearching(true);
     try {
       const { data, error } = await supabase.functions.invoke('geocode-address', {
@@ -267,7 +288,7 @@ export function CommunityMap({ isManager = false }: CommunityMapProps) {
 
       const lng = data.longitude;
       const lat = data.latitude;
-      
+
       if (searchMarkerRef.current) {
         searchMarkerRef.current.remove();
       }
@@ -317,7 +338,7 @@ export function CommunityMap({ isManager = false }: CommunityMapProps) {
       {/* Map */}
       <div className="relative h-[250px] sm:h-[350px] md:h-[400px] rounded-2xl overflow-hidden border border-border/60 shadow-sm">
         <div ref={mapContainer} className="absolute inset-0" />
-        
+
         {!mapLoaded && (
           <div className="absolute inset-0 flex items-center justify-center bg-background/80">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -334,9 +355,9 @@ export function CommunityMap({ isManager = false }: CommunityMapProps) {
               onKeyPress={(e) => e.key === 'Enter' && handleSearchAddress()}
               className="bg-background/95 backdrop-blur-sm shadow-md rounded-xl"
             />
-            <Button 
-              size="icon" 
-              onClick={handleSearchAddress} 
+            <Button
+              size="icon"
+              onClick={handleSearchAddress}
               disabled={isSearching}
               className="shrink-0 shadow-md"
             >
@@ -397,7 +418,7 @@ export function CommunityMap({ isManager = false }: CommunityMapProps) {
         {selectedTip && (
           <>
             {/* Full screen backdrop on mobile */}
-            <div 
+            <div
               className="fixed inset-0 bg-black/40 z-40 sm:absolute sm:inset-0 sm:bg-black/20 sm:z-10"
               onClick={() => setSelectedTip(null)}
             />
@@ -425,10 +446,10 @@ export function CommunityMap({ isManager = false }: CommunityMapProps) {
                         )}
                       </Button>
                     )}
-                    <Button 
-                      variant="secondary" 
-                      size="sm" 
-                      onClick={() => setSelectedTip(null)} 
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      onClick={() => setSelectedTip(null)}
                       className="h-9 w-9 p-0 rounded-full"
                     >
                       <X className="h-5 w-5" />
@@ -436,7 +457,7 @@ export function CommunityMap({ isManager = false }: CommunityMapProps) {
                   </div>
                 </div>
               </div>
-              
+
               {/* Scrollable content */}
               <div className="flex-1 overflow-auto px-4 py-3">
                 <div className="flex items-center gap-2 mb-3">
@@ -459,8 +480,8 @@ export function CommunityMap({ isManager = false }: CommunityMapProps) {
                   <p className="text-sm text-muted-foreground mb-2">{selectedTip.content}</p>
                 )}
                 {selectedTip.image_url && (
-                  <img 
-                    src={selectedTip.image_url} 
+                  <img
+                    src={selectedTip.image_url}
                     alt={selectedTip.title}
                     className="w-full rounded-xl mb-3 max-h-24 object-cover"
                   />
@@ -521,7 +542,7 @@ export function CommunityMap({ isManager = false }: CommunityMapProps) {
                   )}
                 </div>
               </div>
-              
+
               {/* Fixed comment input at bottom */}
               <div className="flex-shrink-0 px-4 py-3 border-t border-border/40 bg-background">
                 <div className="flex gap-2">
@@ -561,9 +582,8 @@ export function CommunityMap({ isManager = false }: CommunityMapProps) {
                   <button
                     key={tip.id}
                     onClick={() => handleTipClick(tip)}
-                    className={`w-full text-left p-3 rounded-xl border border-border/40 transition-all hover:bg-muted/50 ${
-                      selectedTip?.id === tip.id ? 'bg-muted border-primary/50 shadow-sm' : ''
-                    }`}
+                    className={`w-full text-left p-3 rounded-xl border border-border/40 transition-all hover:bg-muted/50 ${selectedTip?.id === tip.id ? 'bg-muted border-primary/50 shadow-sm' : ''
+                      }`}
                   >
                     <div className="flex items-start gap-3">
                       <span className="text-xl">{typeIcons[tip.type] || '📍'}</span>

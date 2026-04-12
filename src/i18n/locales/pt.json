@@ -409,13 +409,13 @@
     "modelDesc": "Para observar a presença relacional em processos de adaptação e pertencimento.",
     "method": "Método:",
     "methodDesc": "Observação através de autoavaliações fenomenológicas (percepção corporal, emocional e simbólica), mediadas por práticas orientadas Feltrip™.",
-    "aboutBoba": "Sobre Boba",
+    "aboutBoba": "Sobre Culti",
     "aboutBobaDesc": "Conheça seu guardião de presença e os 5 pilares",
     "guardianOfPresence": "Guardiã da Presença",
     "chooseExploration": "Escolha como deseja explorar sua presença hoje",
-    "talkToBobaChat": "Conversar com Cult IA",
-    "talkToCultChat": "Conversar com Cult",
-    "talkToBoba": "Fale com Cult",
+    "talkToBobaChat": "Conversar com Culti IA",
+    "talkToCultChat": "Conversar com Culti",
+    "talkToBoba": "Fale com Culti",
     "workplaceMRP": "Mapa de Presença Relacional do Trabalho",
     "mrpWorkplace": "MRP Workplace",
     "mrpWorkplaceDescription": "Aqui você pode dizer como está sua experiência no trabalho, para que a liderança possa oferecer apoio e melhorias organizacionais.",
@@ -429,7 +429,7 @@
     "cultCompassDesc": "Acesse insights reais e camadas ocultas das cidades — Rio de Janeiro, São Paulo e Florianópolis. Use este espaço para pedir gemas, lugares e dicas práticas calibradas com a sua vibe de hoje.",
     "cultNotGenericAI": "A Cult não é uma IA genérica; é uma curadoria viva da Feltrip, nutrida por pesquisas acadêmicas e experiência vivida nos territórios para que você saiba exatamente onde ir e como pertencer.",
     "cultCredits": "Você tem 10 conversas/mês com a Cult AI disponíveis",
-    "connectingToBoba": "Conectando com a Boba...",
+    "connectingToBoba": "Conectando com a Culti...",
     "yourConfidentialCompanion": "Sua companheira confidencial",
     "presenceMap": "Mapa de Presença",
     "fivePillarsTab": "5 Pilares",
@@ -455,7 +455,7 @@
     "pleaseSelectAnswer": "Por favor, selecione uma resposta",
     "chooseHowMuchAgree": "Escolha o quanto você concorda com esta afirmação.",
     "questionOf": "Questão {{current}} de {{total}}",
-    "bobaIntro1a": "Ao interagir com Boba, os usuários podem escolher como querem interagir: explorando a",
+    "bobaIntro1a": "Ao interagir com Culti, os usuários podem escolher como querem interagir: explorando a",
     "bobaIntro1b": "cultura brasileira",
     "bobaIntro1c": "de forma mais ampla, acessando",
     "bobaIntro1d": "insights locais e camadas ocultas das cidades",
@@ -468,7 +468,7 @@
     "bobaIntro1k": "o outro",
     "bobaIntro1l": "e",
     "bobaIntro1m": "os espaços de casa e trabalho",
-    "bobaIntro2a": "Boba tira seu nome do",
+    "bobaIntro2a": "Culti tira seu nome do",
     "bobaIntro2b": "bobo da corte",
     "bobaIntro2c": "— uma figura lúdica mas perspicaz, autorizada a transitar entre hierarquias e falar livremente, oferecendo perspectivas que conectam liderança e equipes igualmente. Ela não é uma IA genérica, mas uma",
     "bobaIntro2d": "curadoria viva pela Feltrip",
@@ -577,7 +577,7 @@
     "step1Content3": "você",
     "step1Content4": "— e como seu corpo aterrissa no mundo.",
     "step1Content5": "Eu sou",
-    "step1Content6": "Boba",
+    "step1Content6": "Culti",
     "step1Content7": "Estou aqui para caminhar com você pelos primeiros passos desta nova paisagem.",
     "step1Cta": "Continuar",
     "step2Title": "Vamos Observar o Que Vive em Você Agora",
@@ -594,7 +594,7 @@
     "step3Content4": "propostas poéticas",
     "step3Content5": "inspiradas em arte, performance e estética relacional — pequenos rituais para expandir sua atenção e suavizar sua jornada.",
     "step3Content6": "Quando estiver pronto, entramos na minha casa. Lá, a jornada começa.",
-    "step3Cta": "Entrar com Boba"
+    "step3Cta": "Entrar com Culti"
   },
   "presenceQuestions": {
     "before_arrival": {
@@ -862,7 +862,8 @@
     "tryAgainLater": "Tente novamente mais tarde.",
     "loadError": "❌ Erro ao carregar o mapa. Formato inesperado.",
     "relationalMap": "Mapa Relacional",
-    "traveler": "Viajante"
+    "traveler": "Viajante",
+    "weaving": "Tecendo..."
   },
   "pricingDisclaimer": "* O valor e a moeda podem variar de acordo com a sua região na hora do pagamento.",
   "cultChat": {

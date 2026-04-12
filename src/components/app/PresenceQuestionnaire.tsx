@@ -128,7 +128,6 @@ export const PresenceQuestionnaire = ({ type, onComplete, onBack }: PresenceQues
         localStorage.setItem("feltrip_pending_presence_scores", JSON.stringify(pendingData));
 
         // 2. Chama o componente Pai (Cult Tab) passando os scores, mas sem texto de IA.
-        // O Pai vai usar isso para embaçar a tela e forçar o login!
         onComplete(scores, "");
         setIsSubmitting(false);
         return;
@@ -137,7 +136,11 @@ export const PresenceQuestionnaire = ({ type, onComplete, onBack }: PresenceQues
 
       // Get AI poetic response (Só roda se o usuário estiver logado)
       const { data: aiData, error: aiError } = await supabase.functions.invoke("presence-ai", {
-        body: { pillarScores: scores, questionnaireType: type, language: i18n.language },
+        body: {
+          pillarScores: scores,
+          questionnaireType: type,
+          language: i18n.language?.substring(0, 2) || "pt" // CONSERTO: Sinal de idioma limpo
+        },
       });
 
       if (aiError) {

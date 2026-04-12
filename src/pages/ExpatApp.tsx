@@ -45,7 +45,6 @@ import { useProfile } from "@/hooks/useProfile";
 import { useUserTier } from "@/hooks/useUserTier";
 import { RenewalPopup } from "@/components/app/components/ConversionNudges";
 import { CreditsDisplay } from "@/components/app/CreditsDisplay";
-import { NotificationBell } from "@/components/app/NotificationBell";
 import { LanguageSelector } from "@/components/LanguageSelector";
 
 interface ExpatAppProps {
@@ -204,7 +203,7 @@ const ExpatApp = ({ onBack, initialTab = "presence" }: ExpatAppProps) => {
   };
 
   const logbookLabel =
-    currentLang === "en" ? "Saved Gems" : currentLang === "es" ? "Gemas Guardadas" : "Diário (Gemas)";
+    currentLang === "en" ? "Logbook" : currentLang === "es" ? "Diario de Viaje" : "Diário de Bordo ";
   const conciergeLabel =
     currentLang === "en" ? "Concierge Services" : currentLang === "es" ? "Servicios Concierge" : "Serviços Concierge";
   const languageLabel =
@@ -434,7 +433,6 @@ const ExpatApp = ({ onBack, initialTab = "presence" }: ExpatAppProps) => {
                 <LanguageSelector />
                 {user ? (
                   <>
-                    <NotificationBell />
                     <Avatar className="w-9 h-9 ring-1 ring-border">
                       <AvatarImage src={profile?.avatar_url || undefined} alt={displayName} />
                       <AvatarFallback className="bg-muted text-foreground/70 font-display text-sm">

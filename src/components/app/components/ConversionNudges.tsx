@@ -9,11 +9,11 @@ interface MapNudgePopupProps {
 }
 
 const TEXTS: Record<string, { title: string; subtitle: string; cta: string }> = {
-  pt: { title: 'Quer descobrir seu bairro ideal?', subtitle: 'Seu Mapa Pessoal revela os 5 pilares da sua presença + lugares feitos pra você.', cta: 'Fazer meu Mapa Pessoal → R$ 29,90' },
-  en: { title: 'Want to discover your ideal neighborhood?', subtitle: 'Your Personal Map reveals the 5 pillars of your presence + places made for you.', cta: 'Get my Personal Map → R$ 29.90' },
-  es: { title: '¿Quieres descubrir tu barrio ideal?', subtitle: 'Tu Mapa Personal revela los 5 pilares de tu presencia + lugares hechos para ti.', cta: 'Hacer mi Mapa Personal → R$ 29,90' },
-  fr: { title: 'Vous voulez découvrir votre quartier idéal ?', subtitle: 'Votre Carte Personnelle révèle les 5 piliers de votre présence + lieux pour vous.', cta: 'Ma Carte Personnelle → R$ 29,90' },
-  zh: { title: '想发现您理想的社区？', subtitle: '您的个人地图揭示您存在的5个支柱+为您打造的地点。', cta: '获取个人地图 → R$ 29.90' },
+  pt: { title: 'Quer descobrir seu bairro ideal?', subtitle: 'Seu Mapa Pessoal revela os 5 pilares da sua presença + lugares feitos pra você.', cta: 'Fazer meu Mapa Pessoal → R$ 129,90' },
+  en: { title: 'Want to discover your ideal neighborhood?', subtitle: 'Your Personal Map reveals the 5 pillars of your presence + places made for you.', cta: 'Get my Personal Map → $ 29.00' },
+  es: { title: '¿Quieres descubrir tu barrio ideal?', subtitle: 'Tu Mapa Personal revela los 5 pilares de tu presencia + lugares hechos para ti.', cta: 'Hacer mi Mapa Personal → $ 29,00' },
+  fr: { title: 'Vous voulez découvrir votre quartier idéal ?', subtitle: 'Votre Carte Personnelle révèle les 5 piliers de votre présence + lieux pour vous.', cta: 'Ma Carte Personnelle → $ 29,90' },
+  zh: { title: '想发现您理想的社区？', subtitle: '您的个人地图揭示您存在的5个支柱+为您打造的地点。', cta: '获取个人地图 → $ 29.90' },
 };
 
 export const MapNudgePopup: React.FC<MapNudgePopupProps> = ({ onClose, lang }) => {
@@ -46,11 +46,11 @@ interface StickyMapCtaProps {
 }
 
 const STICKY_TEXTS: Record<string, { cta: string }> = {
-  pt: { cta: '🔓 Desbloquear análise completa → R$ 29,90' },
-  en: { cta: '🔓 Unlock full analysis → R$ 29.90' },
-  es: { cta: '🔓 Desbloquear análisis completo → R$ 29,90' },
-  fr: { cta: '🔓 Débloquer l\'analyse complète → R$ 29,90' },
-  zh: { cta: '🔓 解锁完整分析 → R$ 29.90' },
+  pt: { cta: '🔓 Desbloquear análise completa → R$ 129,90' },
+  en: { cta: '🔓 Unlock full analysis → $ 29.90' },
+  es: { cta: '🔓 Desbloquear análisis completo → $ 29,90' },
+  fr: { cta: '🔓 Débloquer l\'analyse complète → $ 29,90' },
+  zh: { cta: '🔓 解锁完整分析 → $ 29.90' },
 };
 
 export const StickyMapCta: React.FC<StickyMapCtaProps> = ({ lang, onClose }) => {
@@ -78,11 +78,11 @@ interface PostLoginMapBannerProps {
 }
 
 const BANNER_TEXTS: Record<string, { title: string; cta: string }> = {
-  pt: { title: '✨ Seu Mapa está pronto.', cta: 'Ver análise completa → R$ 29,90' },
-  en: { title: '✨ Your Map is ready.', cta: 'See full analysis → R$ 29.90' },
-  es: { title: '✨ Tu Mapa está listo.', cta: 'Ver análisis completo → R$ 29,90' },
-  fr: { title: '✨ Votre Carte est prête.', cta: 'Voir l\'analyse complète → R$ 29,90' },
-  zh: { title: '✨ 您的地图已准备好。', cta: '查看完整分析 → R$ 29.90' },
+  pt: { title: '✨ Seu Mapa está pronto.', cta: 'Ver análise completa → R$ 129,90' },
+  en: { title: '✨ Your Map is ready.', cta: 'See full analysis → $ 29.90' },
+  es: { title: '✨ Tu Mapa está listo.', cta: 'Ver análisis completo → $ 29,90' },
+  fr: { title: '✨ Votre Carte est prête.', cta: 'Voir l\'analyse complète → $ 29,90' },
+  zh: { title: '✨ 您的地图已准备好。', cta: '查看完整分析 → $ 29.90' },
 };
 
 export const PostLoginMapBanner: React.FC<PostLoginMapBannerProps> = ({ lang, onClose }) => {

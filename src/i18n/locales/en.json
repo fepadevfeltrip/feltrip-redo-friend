@@ -409,7 +409,7 @@
     "modelDesc": "To observe relational presence in adaptation and belonging processes.",
     "method": "Method:",
     "methodDesc": "Observation through phenomenological self-assessments (bodily, emotional and symbolic perception), mediated by Feltrip™ oriented practices.",
-    "aboutBoba": "About Boba",
+    "aboutBoba": "About Culti",
     "aboutBobaDesc": "Meet your presence guardian and the 5 pillars",
     "guardianOfPresence": "Guardian of Presence",
     "chooseExploration": "Choose how you want to explore your presence today",
@@ -420,7 +420,7 @@
     "mrpWorkplace": "MRP Workplace",
     "mrpWorkplaceDescription": "Here you can share how your work experience is going, so leadership can offer support and organizational improvements.",
     "confidentialSpace": "Confidential Space",
-    "confidentialDescription": "This is a safe and private space. Your conversations with Boba are confidential and are not shared with HR or leadership.",
+    "confidentialDescription": "This is a safe and private space. Your conversations with Culti are confidential and are not shared with HR or leadership.",
     "cultTitle": "Cult",
     "cultSubtitle": "Culture: Your City Guide",
     "cultConfidentialTitle": "Confidential Space",
@@ -455,7 +455,7 @@
     "pleaseSelectAnswer": "Please select an answer",
     "chooseHowMuchAgree": "Choose how much you agree with this statement.",
     "questionOf": "Question {{current}} of {{total}}",
-    "bobaIntro1a": "When interacting with Boba, users can choose how they want to interact: exploring",
+    "bobaIntro1a": "When interacting with Culti, users can choose how they want to interact: exploring",
     "bobaIntro1b": "Brazilian culture",
     "bobaIntro1c": "more broadly, accessing",
     "bobaIntro1d": "local insights and hidden layers of the cities",
@@ -468,7 +468,7 @@
     "bobaIntro1k": "the other",
     "bobaIntro1l": "and",
     "bobaIntro1m": "home and work spaces",
-    "bobaIntro2a": "Boba takes its name from the",
+    "bobaIntro2a": "Culti takes its name from the",
     "bobaIntro2b": "court jester",
     "bobaIntro2c": "— a playful but insightful figure, authorized to move between hierarchies and speak freely, offering perspectives that connect leadership and teams equally. She is not a generic AI, but a",
     "bobaIntro2d": "living curation by Feltrip",
@@ -577,7 +577,7 @@
     "step1Content3": "you",
     "step1Content4": "— and how your body lands in the world.",
     "step1Content5": "I am",
-    "step1Content6": "Boba",
+    "step1Content6": "Culti",
     "step1Content7": "I'm here to walk with you through the first steps of this new landscape.",
     "step1Cta": "Continue",
     "step2Title": "Let's Observe What Lives in You Now",
@@ -594,7 +594,7 @@
     "step3Content4": "poetic proposals",
     "step3Content5": "inspired by art, performance and relational aesthetics — small rituals to expand your attention and soften your journey.",
     "step3Content6": "When you're ready, we enter my house. There, the journey begins.",
-    "step3Cta": "Enter with Boba"
+    "step3Cta": "Enter with Culti"
   },
   "presenceQuestions": {
     "before_arrival": {
@@ -731,12 +731,12 @@
     "mapTitle": "Your Relational Presence Map",
     "activationSubtitle": "Relational Presence Activation",
     "pillarsTitle": "Your 5 Pillars",
-    "pillarsDescription": "Tap a pillar to explore it with Boba",
-    "talkToBoba": "Talk to Boba about {{pillar}}",
+    "pillarsDescription": "Tap a pillar to explore it with Culti",
+    "talkToBoba": "Talk to Culti about {{pillar}}",
     "shareMind": "Share what's on your mind about this pillar",
-    "tellBoba": "Tell Boba what you're experiencing with {{pillar}}...",
-    "bobaReflecting": "Boba is reflecting...",
-    "askBoba": "Ask Boba",
+    "tellBoba": "Tell Culti what you're experiencing with {{pillar}}...",
+    "bobaReflecting": "Culti is reflecting...",
+    "askBoba": "Ask Culti",
     "takeAnother": "Take Another Questionnaire"
   },
   "cityQ": {
@@ -819,7 +819,7 @@
     "startMap": "🗺️ Personal City Map",
     "startMapDesc": "Moving to the city? Create your personalized map.",
     "startAnotherMap": "Create another Map for another city",
-    "startAnotherMapDesc": "Want to explore your hometown, one you'll visit or where you live now? Each new map costs R$47.",
+    "startAnotherMapDesc": "Want to explore your hometown, one you'll visit or where you live now?",
     "purchasingPower": "Purchasing power",
     "purchasingPowerDesc": "This helps us personalize tips for places, experiences and services compatible with your moment.",
     "powerEconomic": "Economic — I prioritize cost-benefit",
@@ -862,7 +862,8 @@
     "tryAgainLater": "Try again later.",
     "loadError": "❌ Error loading the map. Unexpected format.",
     "relationalMap": "Relational Map",
-    "traveler": "Traveler"
+    "traveler": "Traveler",
+    "weaving": "Weaving..."
   },
   "cultChat": {
     "freeLimitTitle": "You have already used your free itinerary",

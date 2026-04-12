@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useSearchParams, Link } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { LEGAL_TEXT_PT, LEGAL_TEXT_EN, LEGAL_TEXT_ES } from "@/components/app/constants/legalTexts";
@@ -7,12 +7,10 @@ import CultChat from "@/components/app/CultChat";
 import { FeltripLogo } from "@/components/FeltripLogo";
 import { CookieConsent } from "@/components/CookieConsent";
 import { NewsPreferencesModal } from "@/components/app/components/NewsPreferencesModal";
-import { LanguageSelector } from "@/components/LanguageSelector";
 import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { useProfile } from "@/hooks/useProfile";
-import { Loader2, ArrowLeft } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { CONTENT } from "@/components/app/constants";
 import { useTranslation } from "react-i18next";
@@ -52,7 +50,6 @@ const Index = () => {
           let processed = false;
 
           if (plan === "personal_map") {
-            // Personal map: check map_purchases table
             const { data } = await supabase
               .from("map_purchases")
               .select("id")
@@ -60,7 +57,6 @@ const Index = () => {
               .limit(1) as any;
             processed = !!(data && data.length > 0);
           } else {
-            // All other plans: check chat_access
             const { data: chatData } = await supabase
               .from("chat_access")
               .select("id")
@@ -77,7 +73,6 @@ const Index = () => {
             if (plan === "explorer") {
               navigate("/app", { replace: true });
             }
-            // personal_map / gem_single — stay, data is fresh
           }
         }, 2000);
         setTimeout(() => clearInterval(pollInterval), 30000);
@@ -91,25 +86,13 @@ const Index = () => {
       searchParams.delete("payment");
       setSearchParams(searchParams, { replace: true });
     }
-  }, []);
+  }, [searchParams, user, navigate, refreshProfile, t, toast]);
 
   useEffect(() => {
     if (!profileLoading && user && (profile?.user_tier === 'premium_company' || profile?.user_tier === 'premium_company_plus_language')) {
       navigate('/premium', { replace: true });
     }
   }, [user, profile, profileLoading, navigate]);
-
-  const handleDevLogin = async () => {
-    setDevLoading(true);
-    const pwd = prompt("Senha do talkawaylanguage@gmail.com:");
-    if (!pwd) { setDevLoading(false); return; }
-    const { error } = await supabase.auth.signInWithPassword({
-      email: "talkawaylanguage@gmail.com",
-      password: pwd
-    });
-    if (error) alert("Erro: " + error.message);
-    setDevLoading(false);
-  };
 
   if (user && profileLoading) {
     return (
@@ -129,7 +112,7 @@ const Index = () => {
           onClick={() => setShowLegalDialog(true)}
           className="text-[10px] text-muted-foreground/60 hover:text-foreground transition-colors underline underline-offset-2"
         >
-          {lang === "en" ? "Terms of Use and Privacy Policy" : lang === "es" ? "Términos de Uso y Política de Privacidad" : "Termos de Uso e Política de Privacidade"}
+          {lang === "en" ? "Terms of Use and Privacy Policy" : lang === "es" ? "Términos de Uso e Política de Privacidad" : "Termos de Uso e Política de Privacidade"}
         </button>
       </footer>
 
@@ -138,7 +121,7 @@ const Index = () => {
           <DialogHeader>
             <DialogTitle>Feltrip Cultural AI — Cult AI</DialogTitle>
             <DialogDescription>
-              {lang === "en" ? "Terms of Use and Privacy Policy" : lang === "es" ? "Términos de Uso y Política de Privacidad" : "Termos de Uso e Política de Privacidade"}
+              {lang === "en" ? "Terms of Use and Privacy Policy" : lang === "es" ? "Términos de Uso e Política de Privacidad" : "Termos de Uso e Política de Privacidade"}
             </DialogDescription>
           </DialogHeader>
           <ScrollArea className="h-[65vh] pr-4">

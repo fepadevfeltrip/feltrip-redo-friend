@@ -5,8 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Input } from "@/components/ui/input";
-import { ArrowLeft, ArrowRight, MapPin, Clock, Loader2, Wallet, User, Search, Globe } from "lucide-react";
+import { ArrowLeft, ArrowRight, MapPin, Clock, Loader2, Wallet, User, Globe } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -20,17 +19,8 @@ type PurchasingPower = "economic" | "moderate" | "comfortable" | "premium";
 type Generation = "gen_z" | "millennial" | "gen_x" | "boomer";
 type Gender = "feminine" | "masculine" | "other";
 
-// Popular Brazilian cities for quick selection
-const POPULAR_CITIES = [
+const AVAILABLE_CITIES = [
   "Rio de Janeiro", "São Paulo", "Florianópolis",
-  "Brasília", "Salvador", "Belo Horizonte",
-  "Curitiba", "Porto Alegre", "Recife",
-  "Fortaleza", "Belém", "Manaus",
-  "Goiânia", "Vitória", "Natal",
-  "João Pessoa", "Maceió", "Campo Grande",
-  "Cuiabá", "São Luís", "Teresina",
-  "Campinas", "Santos", "Niterói",
-  "Ouro Preto", "Paraty", "Gramado",
 ];
 
 const JOURNEY_OPTIONS = [
@@ -125,24 +115,15 @@ const TOTAL_STEPS = 9;
 const CITY_TEXTS = {
   pt: {
     title: "Qual cidade do Brasil combina com você?",
-    subtitle: "Digite o nome de uma cidade brasileira ou escolha uma das populares",
-    searchPlaceholder: "Ex: Salvador, Curitiba, Belém...",
-    popular: "Cidades Populares",
-    customCity: "Ou digite outra cidade:",
+    subtitle: "Escolha uma das cidades disponíveis",
   },
   en: {
     title: "Which Brazilian city matches you?",
-    subtitle: "Type a Brazilian city name or pick from the popular ones",
-    searchPlaceholder: "Ex: Salvador, Curitiba, Belém...",
-    popular: "Popular Cities",
-    customCity: "Or type another city:",
+    subtitle: "Choose one of the available cities",
   },
   es: {
     title: "¿Qué ciudad de Brasil combina contigo?",
-    subtitle: "Escribe el nombre de una ciudad brasileña o elige una de las populares",
-    searchPlaceholder: "Ej: Salvador, Curitiba, Belém...",
-    popular: "Ciudades Populares",
-    customCity: "O escribe otra ciudad:",
+    subtitle: "Elige una de las ciudades disponibles",
   },
 };
 
@@ -150,10 +131,9 @@ export const CityQuestionnaire = ({ onComplete, onBack }: CityQuestionnaireProps
   const { t, i18n } = useTranslation();
   const lang = (i18n.language?.substring(0, 2) || "pt") as "pt" | "en" | "es";
   const cityTexts = CITY_TEXTS[lang] || CITY_TEXTS.pt;
-  
+
   const [step, setStep] = useState(0);
   const [city, setCity] = useState<string>("");
-  const [citySearch, setCitySearch] = useState("");
   const [stayDuration, setStayDuration] = useState<StayDuration | null>(null);
   const [purchasingPower, setPurchasingPower] = useState<PurchasingPower | null>(null);
   const [generation, setGeneration] = useState<Generation | null>(null);
@@ -172,9 +152,6 @@ export const CityQuestionnaire = ({ onComplete, onBack }: CityQuestionnaireProps
     setAnswers((prev) => ({ ...prev, [key]: value }));
   };
 
-  const filteredCities = citySearch.trim()
-    ? POPULAR_CITIES.filter(c => c.toLowerCase().includes(citySearch.toLowerCase()))
-    : POPULAR_CITIES;
 
   const canProceed = () => {
     if (step === 0) return city.trim().length > 0;
@@ -194,7 +171,7 @@ export const CityQuestionnaire = ({ onComplete, onBack }: CityQuestionnaireProps
 
     try {
       let { data: { user } } = await supabase.auth.getUser();
-      
+
       // Auto sign-in anonymously if no session (same as gems flow)
       if (!user) {
         const { data: anonData, error: anonError } = await supabase.auth.signInAnonymously();
@@ -206,7 +183,7 @@ export const CityQuestionnaire = ({ onComplete, onBack }: CityQuestionnaireProps
         }
         user = anonData.user;
       }
-      
+
       if (!user) {
         toast.error("Não foi possível autenticar. Tente novamente.");
         setIsSubmitting(false);
@@ -259,7 +236,7 @@ export const CityQuestionnaire = ({ onComplete, onBack }: CityQuestionnaireProps
             activity_type: "city_questionnaire",
           });
         }
-      } catch {}
+      } catch { }
 
       toast.success(t("cityQ.submitted"));
       onComplete(data.id);
@@ -295,46 +272,21 @@ export const CityQuestionnaire = ({ onComplete, onBack }: CityQuestionnaireProps
             <p className="text-muted-foreground text-sm">{cityTexts.subtitle}</p>
           </div>
 
-          {/* Custom city input */}
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder={cityTexts.searchPlaceholder}
-              value={city || citySearch}
-              onChange={(e) => {
-                const val = e.target.value;
-                setCity(val);
-                setCitySearch(val);
-              }}
-              className="pl-10 py-5 text-base"
-            />
-          </div>
-
-          {/* Popular cities grid */}
-          <div className="space-y-2">
-            <p className="text-xs text-muted-foreground font-bold uppercase tracking-widest">{cityTexts.popular}</p>
-            <div className="flex flex-wrap gap-2 max-h-[280px] overflow-y-auto">
-              {filteredCities.map((c) => (
-                <button
-                  key={c}
-                  onClick={() => { setCity(c); setCitySearch(""); }}
-                  className={`px-3 py-1.5 rounded-full text-sm border transition-all ${
-                    city === c
-                      ? "bg-primary text-primary-foreground border-primary shadow-md"
-                      : "bg-card border-border hover:border-primary/50 text-foreground"
+          {/* City buttons */}
+          <div className="grid gap-3 w-full max-w-xs mx-auto">
+            {AVAILABLE_CITIES.map((c) => (
+              <button
+                key={c}
+                onClick={() => setCity(c)}
+                className={`w-full py-4 rounded-2xl border text-sm font-bold uppercase tracking-widest transition-all ${city === c
+                  ? "bg-primary text-primary-foreground border-primary shadow-md"
+                  : "bg-card border-border hover:border-primary/50 text-foreground"
                   }`}
-                >
-                  {c}
-                </button>
-              ))}
-            </div>
+              >
+                {c}
+              </button>
+            ))}
           </div>
-
-          {city && !POPULAR_CITIES.includes(city) && (
-            <div className="bg-primary/5 border border-primary/20 rounded-xl p-3 text-center">
-              <p className="text-sm text-primary font-medium">🌍 {city}</p>
-            </div>
-          )}
         </div>
       )}
 

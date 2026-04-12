@@ -2,7 +2,7 @@
 
 ## Visão Geral da Arquitetura
 
-A Boba Professora usa uma arquitetura serverless com:
+A Culti Professora usa uma arquitetura serverless com:
 - **API Gateway WebSocket** - Comunicação bidirecional em tempo real
 - **Lambda Functions** - Processamento de mensagens, transcrição e chat
 - **S3** - Armazenamento de áudios (opcional)

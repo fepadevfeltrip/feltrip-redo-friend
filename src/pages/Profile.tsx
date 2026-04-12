@@ -174,24 +174,41 @@ export default function Profile() {
     }
   };
 
+  // === CONSERTO DA EXCLUSÃO DE CONTA (RPC) ===
+  // === CONSERTO DA EXCLUSÃO DE CONTA (VIA EDGE FUNCTION) ===
   const handleDeleteAccount = async () => {
     if (!user) return;
     setIsDeleting(true);
+
     try {
-      const { error } = await supabase.rpc('purge_user_data', { p_user_id: user.id });
+      // Chamamos a Edge Function que já existe e tem a Service Role Key
+      const { data, error } = await supabase.functions.invoke('cancel-subscription');
+
       if (error) throw error;
+
+      // Se a função deletou no banco, agora limpamos a sessão no navegador
       await supabase.auth.signOut();
-      toast({ title: t('profile.accountDeleted'), description: t('profile.accountDeletedDesc') });
+
+      toast({
+        title: t('profile.accountDeleted'),
+        description: t('profile.accountDeletedDesc')
+      });
+
+      // Redireciona para a landing page
       window.location.href = "/";
-    } catch (err) {
+
+    } catch (err: any) {
       console.error("Delete account error:", err);
-      toast({ title: t('common.error'), description: t('profile.deleteError'), variant: "destructive" });
+      toast({
+        title: t('common.error'),
+        description: err.message || t('profile.deleteError'),
+        variant: "destructive"
+      });
     } finally {
       setIsDeleting(false);
       setShowDeleteConfirm(false);
     }
   };
-
   const getInitials = (name: string) => name.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2);
 
   const formatDate = (dateString: string) => {
@@ -413,14 +430,6 @@ export default function Profile() {
                       {' · '}{formatDate(map.created_at)}
                     </p>
                   </div>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8 text-muted-foreground/40 hover:text-destructive opacity-0 group-hover:opacity-100 transition-all shrink-0"
-                    onClick={() => handleDeleteMap(map.id)}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
                 </div>
               ))}
             </div>

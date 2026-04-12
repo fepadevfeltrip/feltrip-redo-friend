@@ -1,288 +1,399 @@
-import { useState, useEffect, useRef } from 'react';
-import mapboxgl from 'mapbox-gl';
-import 'mapbox-gl/dist/mapbox-gl.css';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Loader2, Search, Plus, X, MapPin, Heart, MessageCircle, Send, Trash2, Upload } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/hooks/useAuth';
-import { useToast } from '@/hooks/use-toast';
-import { formatDistanceToNow } from 'date-fns';
-import { ptBR, enUS, es } from 'date-fns/locale';
-import { useTranslation } from 'react-i18next';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { useState, useEffect, useRef, useMemo } from "react";
+import mapboxgl from "mapbox-gl";
+import "mapbox-gl/dist/mapbox-gl.css";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Heart, MessageCircle, Send, Trash2, Loader2, X, MapPin, Search, Shield, Plus, MoreVertical, Flag, Ban } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { useCommunityTips, SharedTip, TipComment } from "@/hooks/useCommunityTips";
+import { useAuth } from "@/hooks/useAuth";
+import { formatDistanceToNow, Locale } from "date-fns";
+import { ptBR, enUS, es, fr, zhCN } from "date-fns/locale";
+import { CreateCommunityPin } from "./CreateCommunityPin";
+import { useTranslation } from "react-i18next";
 
-const MAGENTA = '#ff007f';
-const TEAL = '#016970';
+const COPY = {
+  pt: {
+    search: "Buscar endereço...",
+    add: "Adicionar",
+    pains: "Dores",
+    delights: "Delícias",
+    errorLoadingMap: "Erro ao carregar mapa",
+    errorInitMap: "Erro ao inicializar o mapa",
+    cityPlaceholder: "Cidade",
+    tipsCount: "Dicas",
+    clickToAdd: "Clique no mapa para adicionar",
+    writeComment: "Escreva um comentário...",
+    communityTips: "Dicas da Comunidade",
+    noTipsYet: "Nenhuma dica ainda.",
+    by: "Por",
+    lockTitle: "Mapa Bloqueado",
+    lockDesc: "Faça login para descobrir as gemas e os segredos mapeados pela comunidade Cult.",
+    report: "Denunciar",
+    block: "Bloquear Usuário",
+    blocked: "Usuário bloqueado. Você não verá mais as publicações desta pessoa.",
+  },
+  en: {
+    search: "Search address...",
+    add: "Add",
+    pains: "Pains",
+    delights: "Delights",
+    errorLoadingMap: "Error loading map",
+    errorInitMap: "Error initializing map",
+    cityPlaceholder: "City",
+    tipsCount: "Tips",
+    clickToAdd: "Click on map to add",
+    writeComment: "Write a comment...",
+    communityTips: "Community Tips",
+    noTipsYet: "No tips yet.",
+    by: "By",
+    lockTitle: "Map Locked",
+    lockDesc: "Sign in to discover the gems and secrets mapped by the Cult community.",
+    report: "Report",
+    block: "Block User",
+    blocked: "User blocked. You will no longer see posts from this person.",
+  },
+  es: {
+    search: "Buscar dirección...",
+    add: "Añadir",
+    pains: "Dolores",
+    delights: "Delicias",
+    errorLoadingMap: "Error al cargar mapa",
+    errorInitMap: "Error al inicializar el mapa",
+    cityPlaceholder: "Ciudad",
+    tipsCount: "Consejos",
+    clickToAdd: "Haga clic para agregar",
+    writeComment: "Escribe un comentario...",
+    communityTips: "Consejos de la Comunidad",
+    noTipsYet: "Aún no hay consejos.",
+    by: "Por",
+    lockTitle: "Mapa Bloqueado",
+    lockDesc: "Inicia sesión para descubrir las gemas y secretos mapeados por la comunidad Cult.",
+    report: "Denunciar",
+    block: "Bloquear Usuario",
+    blocked: "Usuario bloqueado. Ya no verás las publicaciones de esta persona.",
+  },
+};
 
-interface CommunityPin {
-  id: string;
-  user_id: string;
-  title: string;
-  content: string | null;
-  type: string; // 'dor' or 'delicia'
-  latitude: number;
-  longitude: number;
-  image_url: string | null;
-  created_at: string;
-  author?: { full_name: string; avatar_url: string | null };
-  likes_count: number;
-  user_liked: boolean;
+// Ícones fiéis ao print (Mapeando possíveis retornos do banco)
+const typeIcons: Record<string, string> = {
+  pain: "🚩",
+  dor: "🚩",
+  delight: "💎",
+  delicia: "💎",
+};
+
+// Coordenadas fake apenas com Dores (pain) e Delícias (delight)
+const MOCK_TIPS: any[] = [
+  { id: "m1", type: "delight", latitude: -23.5505, longitude: -46.6333 }, // SP
+  { id: "m2", type: "pain", latitude: -23.5615, longitude: -46.6565 }, // SP
+  { id: "m3", type: "delight", latitude: -23.5489, longitude: -46.6454 }, // SP
+  { id: "m4", type: "pain", latitude: -22.9068, longitude: -43.1729 }, // RJ
+  { id: "m5", type: "delight", latitude: -22.9836, longitude: -43.2045 }, // RJ
+  { id: "m6", type: "pain", latitude: -22.9519, longitude: -43.185 }, // RJ
+];
+
+const getCityFromCoords = (lat: number, lng: number): string => {
+  if (lat >= -24 && lat <= -23 && lng >= -47 && lng <= -46) return "São Paulo";
+  if (lat >= -23 && lat <= -22 && lng >= -44 && lng <= -42) return "Rio de Janeiro";
+  if (lat >= -26 && lat <= -25 && lng >= -50 && lng <= -49) return "Curitiba";
+  if (lat >= -20 && lat <= -19 && lng >= -44 && lng <= -43) return "Belo Horizonte";
+  if (lat >= -31 && lat <= -29 && lng >= -52 && lng <= -50) return "Porto Alegre";
+  if (lat >= 38 && lat <= 39 && lng >= -10 && lng <= -8) return "Lisboa";
+  return "Outra cidade";
+};
+
+const dateLocales: Record<string, Locale> = { pt: ptBR, en: enUS, es: es, fr: fr, zh: zhCN };
+
+interface CommunityMapProps {
+  isManager?: boolean;
 }
 
-const dateLocales: Record<string, any> = { pt: ptBR, en: enUS, es };
+export function DoresDeliciasMap({ isManager = false }: CommunityMapProps) {
+  const { t: t_i18n, i18n } = useTranslation();
+  const lang = (i18n.language?.substring(0, 2) as "pt" | "en" | "es") || "pt";
+  const t = COPY[lang] || COPY.pt;
 
-export function DoresDeliciasMap() {
-  const { t, i18n } = useTranslation();
-  const { user } = useAuth();
-  const { toast } = useToast();
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const markersRef = useRef<mapboxgl.Marker[]>([]);
-  const isAddingRef = useRef(false);
+  const searchMarkerRef = useRef<mapboxgl.Marker | null>(null);
+  const { user } = useAuth();
+  const { sharedTips, isLoading, toggleLike, addComment, deleteComment, fetchComments, unshareFromCommunity, refresh } =
+    useCommunityTips();
 
-  const [pins, setPins] = useState<CommunityPin[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const currentLocale = dateLocales[lang] || enUS;
+
+  const [selectedTip, setSelectedTip] = useState<SharedTip | null>(null);
+  const [comments, setComments] = useState<TipComment[]>([]);
+  const [newComment, setNewComment] = useState("");
+  const [loadingComments, setLoadingComments] = useState(false);
   const [mapLoaded, setMapLoaded] = useState(false);
   const [mapError, setMapError] = useState<string | null>(null);
-  const [searchAddress, setSearchAddress] = useState('');
+  const [searchAddress, setSearchAddress] = useState("");
   const [isSearching, setIsSearching] = useState(false);
-  const [isAddingMode, setIsAddingMode] = useState(false);
-  const [selectedPin, setSelectedPin] = useState<CommunityPin | null>(null);
-
-  // Create pin dialog
-  const [showCreateDialog, setShowCreateDialog] = useState(false);
+  const [showCreatePin, setShowCreatePin] = useState(false);
   const [newPinCoords, setNewPinCoords] = useState<{ lat: number; lng: number } | null>(null);
-  const [newPinType, setNewPinType] = useState<'dor' | 'delicia'>('delicia');
-  const [newPinTitle, setNewPinTitle] = useState('');
-  const [newPinContent, setNewPinContent] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isAddingMode, setIsAddingMode] = useState(false);
+  const [blockedUsers, setBlockedUsers] = useState<string[]>(() => {
+    try { return JSON.parse(localStorage.getItem("feltrip_blocked_users") || "[]"); } catch { return []; }
+  });
+  const isAddingModeRef = useRef(false);
 
-  const currentLocale = dateLocales[i18n.language?.substring(0, 2)] || ptBR;
+  useEffect(() => {
+    isAddingModeRef.current = isAddingMode;
+  }, [isAddingMode]);
 
-  useEffect(() => { isAddingRef.current = isAddingMode; }, [isAddingMode]);
+  const getInitials = (name: string) =>
+    name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
 
-  const fetchPins = async () => {
-    setIsLoading(true);
-    const { data, error } = await supabase
-      .from('map_pins')
-      .select('*')
-      .eq('is_shared_to_community', true)
-      .in('type', ['dor', 'delicia', 'food', 'culture', 'nature', 'shopping', 'nightlife', 'transport', 'health', 'other'])
-      .order('created_at', { ascending: false });
-
-    if (!error && data) {
-      // Fetch author info
-      const userIds = [...new Set(data.map(p => p.user_id))];
-      const { data: profiles } = await supabase
-        .from('profiles')
-        .select('user_id, full_name, avatar_url')
-        .in('user_id', userIds);
-
-      const profileMap = new Map(profiles?.map(p => [p.user_id, p]) || []);
-
-      // Fetch likes
-      const pinIds = data.map(p => p.id);
-      const { data: likes } = await supabase
-        .from('map_pin_likes')
-        .select('map_pin_id, user_id')
-        .in('map_pin_id', pinIds);
-
-      const likesMap = new Map<string, { count: number; userLiked: boolean }>();
-      likes?.forEach(l => {
-        const existing = likesMap.get(l.map_pin_id) || { count: 0, userLiked: false };
-        existing.count++;
-        if (l.user_id === user?.id) existing.userLiked = true;
-        likesMap.set(l.map_pin_id, existing);
-      });
-
-      const mappedPins: CommunityPin[] = data.map(pin => ({
-        id: pin.id,
-        user_id: pin.user_id,
-        title: pin.title,
-        content: pin.content,
-        type: pin.type === 'dor' || pin.type === 'delicia' ? pin.type : 'delicia',
-        latitude: pin.latitude,
-        longitude: pin.longitude,
-        image_url: pin.image_url,
-        created_at: pin.created_at,
-        author: profileMap.get(pin.user_id) ? {
-          full_name: profileMap.get(pin.user_id)!.full_name,
-          avatar_url: profileMap.get(pin.user_id)!.avatar_url
-        } : undefined,
-        likes_count: likesMap.get(pin.id)?.count || 0,
-        user_liked: likesMap.get(pin.id)?.userLiked || false
-      }));
-
-      setPins(mappedPins);
-    }
-    setIsLoading(false);
+  const handleReportTip = (tip: SharedTip) => {
+    const subject = encodeURIComponent("Denúncia de Conteúdo - Cult AI");
+    const body = encodeURIComponent(
+      `Gostaria de denunciar este conteúdo.\n\nID do pin: ${tip.id}\nAutor: ${tip.author?.full_name || "Desconhecido"}\nTítulo: ${tip.title || ""}\nConteúdo: ${tip.content?.substring(0, 200) || ""}`
+    );
+    window.open(`mailto:info@feltrip.com?subject=${subject}&body=${body}`, "_self");
   };
 
-  useEffect(() => { fetchPins(); }, [user]);
+  const handleBlockUser = (userId: string) => {
+    const blocked = [...blockedUsers];
+    if (!blocked.includes(userId)) {
+      blocked.push(userId);
+      localStorage.setItem("feltrip_blocked_users", JSON.stringify(blocked));
+      setBlockedUsers(blocked);
+    }
+    setSelectedTip(null);
+    toast(t.blocked);
+  };
 
-  // Init map
+  // Calcula a quantidade de Dores e Delícias
+  const activeTips = user ? sharedTips.filter(tip => !blockedUsers.includes(tip.user_id)) : MOCK_TIPS;
+  const painsCount = activeTips.filter((tip) => tip.type === "pain" || tip.type === "dor").length;
+  const delightsCount = activeTips.filter((tip) => tip.type === "delight" || tip.type === "delicia").length;
+
   useEffect(() => {
     if (!mapContainer.current || map.current) return;
 
     const initMap = async () => {
       try {
-        const { data, error } = await supabase.functions.invoke('get-mapbox-token');
-        if (error || !data?.token) { setMapError('Erro ao carregar mapa'); return; }
+        const { data, error } = await supabase.functions.invoke("get-mapbox-token");
+        if (error || !data?.token) {
+          setMapError(t.errorLoadingMap);
+          return;
+        }
 
         mapboxgl.accessToken = data.token;
+
         map.current = new mapboxgl.Map({
           container: mapContainer.current!,
-          style: 'mapbox://styles/mapbox/light-v11',
-          center: [-46.6333, -23.5505],
-          zoom: 3
+          style: "mapbox://styles/mapbox/streets-v12",
+          center: [-46.6333, -23.5505], // SP como default
+          zoom: 3,
         });
 
-        map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
-        map.current.on('load', () => setMapLoaded(true));
+        map.current.addControl(new mapboxgl.NavigationControl(), "top-right");
+        map.current.on("load", () => setMapLoaded(true));
 
-        map.current.on('click', (e) => {
-          if (isAddingRef.current) {
+        map.current.on("click", (e) => {
+          if (isAddingModeRef.current && user) {
             setNewPinCoords({ lat: e.lngLat.lat, lng: e.lngLat.lng });
-            setShowCreateDialog(true);
+            setShowCreatePin(true);
             setIsAddingMode(false);
           }
         });
-      } catch { setMapError('Erro ao inicializar mapa'); }
+      } catch (err) {
+        setMapError(t.errorInitMap);
+      }
     };
 
     initMap();
-    return () => { map.current?.remove(); map.current = null; };
-  }, []);
 
-  // Render markers
+    return () => {
+      map.current?.remove();
+      map.current = null;
+    };
+  }, [user]);
+
   useEffect(() => {
     if (!map.current || !mapLoaded) return;
 
-    markersRef.current.forEach(m => m.remove());
+    markersRef.current.forEach((marker) => marker.remove());
     markersRef.current = [];
 
-    pins.forEach(pin => {
-      const isDor = pin.type === 'dor';
-      const color = isDor ? MAGENTA : TEAL;
-      const icon = isDor ? '🚩' : '💎';
+    activeTips.forEach((tip) => {
+      const el = document.createElement("div");
+      el.className = "cursor-pointer text-3xl transform hover:scale-125 transition-transform";
+      // Fallback para pino padrão caso o tipo seja inesperado
+      el.textContent = typeIcons[tip.type] || "📍";
+      el.style.filter = "drop-shadow(0 2px 4px rgba(0,0,0,0.3))";
 
-      const el = document.createElement('div');
-      el.className = 'cursor-pointer transform hover:scale-125 transition-transform';
-      el.style.fontSize = '24px';
-      el.style.filter = `drop-shadow(0 2px 4px ${color}44)`;
-      el.textContent = icon;
+      const marker = new mapboxgl.Marker({ element: el }).setLngLat([tip.longitude, tip.latitude]).addTo(map.current!);
 
-      const marker = new mapboxgl.Marker({ element: el })
-        .setLngLat([pin.longitude, pin.latitude])
-        .addTo(map.current!);
-
-      el.addEventListener('click', () => {
-        if (user) {
-          setSelectedPin(pin);
-          map.current?.flyTo({ center: [pin.longitude, pin.latitude], zoom: 14 });
-        }
-      });
+      if (user) {
+        el.addEventListener("click", () => {
+          setSelectedTip(tip);
+          loadComments(tip.id);
+          map.current?.flyTo({ center: [tip.longitude, tip.latitude], zoom: 14 });
+        });
+      }
 
       markersRef.current.push(marker);
     });
 
-    if (pins.length > 0) {
+    if (activeTips.length > 0 && mapLoaded) {
       const bounds = new mapboxgl.LngLatBounds();
-      pins.forEach(p => bounds.extend([p.longitude, p.latitude]));
-      map.current.fitBounds(bounds, { padding: 50, maxZoom: 12 });
+      activeTips.forEach((tip) => bounds.extend([tip.longitude, tip.latitude]));
+      setTimeout(() => {
+        if (map.current) map.current.fitBounds(bounds, { padding: 50, maxZoom: 12, duration: 1000 });
+      }, 500);
     }
-  }, [pins, mapLoaded, user]);
+  }, [sharedTips, mapLoaded, isLoading, user]);
 
-  const handleSearch = async () => {
+  const loadComments = async (tipId: string) => {
+    setLoadingComments(true);
+    const tipComments = await fetchComments(tipId);
+    setComments(tipComments);
+    setLoadingComments(false);
+  };
+
+  const handleAddComment = async () => {
+    if (!selectedTip || !newComment.trim()) return;
+    const success = await addComment(selectedTip.id, newComment);
+    if (success) {
+      setNewComment("");
+      await loadComments(selectedTip.id);
+    }
+  };
+
+  const handleDeleteComment = async (commentId: string) => {
+    if (!selectedTip) return;
+    await deleteComment(commentId);
+    await loadComments(selectedTip.id);
+  };
+
+  const handleLike = async () => {
+    if (!selectedTip) return;
+    await toggleLike(selectedTip.id);
+    refresh();
+  };
+
+  const handleRemoveTip = async () => {
+    if (!selectedTip) return;
+    await unshareFromCommunity(selectedTip.id);
+    setSelectedTip(null);
+  };
+
+  const citiesWithTips = useMemo(() => {
+    if (!user) return [];
+    const cityMap = new Map<string, { name: string; coords: [number, number]; count: number }>();
+    sharedTips.forEach((tip) => {
+      const cityName = getCityFromCoords(tip.latitude, tip.longitude);
+      if (!cityMap.has(cityName)) {
+        cityMap.set(cityName, { name: cityName, coords: [tip.longitude, tip.latitude], count: 1 });
+      } else {
+        cityMap.get(cityName)!.count++;
+      }
+    });
+    return Array.from(cityMap.values()).sort((a, b) => b.count - a.count);
+  }, [sharedTips, user]);
+
+  const flyToCity = (cityName: string) => {
+    if (!map.current) return;
+    const city = citiesWithTips.find((c) => c.name === cityName);
+    if (city) map.current.flyTo({ center: city.coords, zoom: 12, duration: 2000 });
+  };
+
+  const handleSearchAddress = async () => {
     if (!searchAddress.trim() || !map.current) return;
     setIsSearching(true);
     try {
-      const { data, error } = await supabase.functions.invoke('geocode-address', { body: { address: searchAddress } });
-      if (!error && data?.found) {
-        map.current.flyTo({ center: [data.longitude, data.latitude], zoom: 15 });
-      }
-    } catch {} finally { setIsSearching(false); }
-  };
+      const { data, error } = await supabase.functions.invoke("geocode-address", { body: { address: searchAddress } });
+      if (error || !data?.found) return;
 
-  const handleCreatePin = async () => {
-    if (!user || !newPinCoords || !newPinTitle.trim()) return;
-    setIsSubmitting(true);
+      if (searchMarkerRef.current) searchMarkerRef.current.remove();
 
-    try {
-      const { error } = await supabase.from('map_pins').insert({
-        user_id: user.id,
-        title: newPinTitle.trim(),
-        content: newPinContent.trim() || null,
-        type: newPinType,
-        latitude: newPinCoords.lat,
-        longitude: newPinCoords.lng,
-        is_shared_to_community: true
-      });
+      const el = document.createElement("div");
+      el.className = "text-3xl";
+      el.textContent = "📍";
+      el.style.filter = "drop-shadow(0 2px 6px rgba(0,0,0,0.4))";
 
-      if (error) throw error;
-
-      toast({ title: newPinType === 'dor' ? '🚩 Dor registrada!' : '💎 Delícia adicionada!' });
-      setShowCreateDialog(false);
-      setNewPinTitle('');
-      setNewPinContent('');
-      setNewPinCoords(null);
-      fetchPins();
-    } catch (err: any) {
-      toast({ title: 'Erro', description: err.message, variant: 'destructive' });
-    } finally { setIsSubmitting(false); }
-  };
-
-  const handleToggleLike = async (pinId: string) => {
-    if (!user) return;
-    const pin = pins.find(p => p.id === pinId);
-    if (!pin) return;
-
-    if (pin.user_liked) {
-      await supabase.from('map_pin_likes').delete().eq('map_pin_id', pinId).eq('user_id', user.id);
-    } else {
-      await supabase.from('map_pin_likes').insert({ map_pin_id: pinId, user_id: user.id });
-    }
-    fetchPins();
-    if (selectedPin?.id === pinId) {
-      setSelectedPin(prev => prev ? { ...prev, user_liked: !prev.user_liked, likes_count: prev.user_liked ? prev.likes_count - 1 : prev.likes_count + 1 } : null);
+      searchMarkerRef.current = new mapboxgl.Marker({ element: el })
+        .setLngLat([data.longitude, data.latitude])
+        .addTo(map.current);
+      map.current.flyTo({ center: [data.longitude, data.latitude], zoom: 15, duration: 2000 });
+    } catch (err) {
+      console.error("Search error:", err);
+    } finally {
+      setIsSearching(false);
     }
   };
 
-  const handleDeletePin = async (pinId: string) => {
-    await supabase.from('map_pins').delete().eq('id', pinId);
-    setSelectedPin(null);
-    fetchPins();
+  const handleTipClick = (tip: SharedTip) => {
+    setSelectedTip(tip);
+    loadComments(tip.id);
+    map.current?.flyTo({ center: [tip.longitude, tip.latitude], zoom: 14 });
   };
 
-  if (mapError) {
-    return <div className="p-8 text-center text-muted-foreground">{mapError}</div>;
-  }
-
-  const dorCount = pins.filter(p => p.type === 'dor').length;
-  const deliciaCount = pins.filter(p => p.type === 'delicia').length;
+  if (mapError)
+    return (
+      <Card>
+        <CardContent className="py-8 text-center text-muted-foreground">{mapError}</CardContent>
+      </Card>
+    );
 
   return (
-    <div className="space-y-3">
-      {/* Legend */}
-      <div className="flex items-center gap-4 text-xs">
-        <span className="flex items-center gap-1">
-          <span className="inline-block w-3 h-3 rounded-full" style={{ backgroundColor: MAGENTA }} />
-          <span className="font-medium">{dorCount} Dores</span>
-        </span>
-        <span className="flex items-center gap-1">
-          <span className="inline-block w-3 h-3 rounded-full" style={{ backgroundColor: TEAL }} />
-          <span className="font-medium">{deliciaCount} Delícias</span>
-        </span>
-      </div>
+    <div className="space-y-4">
+      {/* Legenda: Dores e Delícias - Visível apenas para logados */}
+      {user && (
+        <div className="flex items-center gap-4 px-1 pb-1">
+          <div className="flex items-center gap-1.5">
+            <div className="w-3 h-3 rounded-full bg-pink-500" />
+            <span className="text-sm font-medium">
+              {painsCount} {t.pains}
+            </span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <div className="w-3 h-3 rounded-full bg-teal-500" />
+            <span className="text-sm font-medium">
+              {delightsCount} {t.delights}
+            </span>
+          </div>
+        </div>
+      )}
 
-      {/* Map */}
-      <div className="relative h-[280px] sm:h-[380px] rounded-2xl overflow-hidden border border-border/60 shadow-sm">
+      {/* Container do Mapa */}
+
+      {/* Container do Mapa */}
+      <div className="relative h-[250px] sm:h-[350px] md:h-[400px] rounded-2xl overflow-hidden border border-border/60 shadow-sm">
         <div ref={mapContainer} className="absolute inset-0" />
+
+        {/* OVERLAY DE BLOQUEIO PARA QUEM NÃO TEM LOGIN */}
+        {!user && mapLoaded && (
+          <div className="absolute inset-0 z-30 flex items-center justify-center bg-background/20 backdrop-blur-[3px]">
+            <div className="bg-background/95 p-6 rounded-2xl shadow-2xl text-center max-w-[300px] border border-border/50 animate-in fade-in zoom-in duration-300">
+              <div className="text-4xl mb-3">🔒</div>
+              <h3 className="font-bold mb-1 text-foreground">{t.lockTitle}</h3>
+              <p className="text-xs text-muted-foreground mb-4 leading-relaxed">{t.lockDesc}</p>
+            </div>
+          </div>
+        )}
 
         {!mapLoaded && (
           <div className="absolute inset-0 flex items-center justify-center bg-background/80">
@@ -290,56 +401,72 @@ export function DoresDeliciasMap() {
           </div>
         )}
 
-        {/* Search */}
-        {mapLoaded && (
-          <div className="absolute top-3 left-3 right-12 z-10 flex gap-2">
-            <Input
-              placeholder="Buscar endereço..."
-              value={searchAddress}
-              onChange={e => setSearchAddress(e.target.value)}
-              onKeyPress={e => e.key === 'Enter' && handleSearch()}
-              className="bg-background/95 backdrop-blur-sm shadow-md rounded-xl text-sm"
-            />
-            <Button size="icon" onClick={handleSearch} disabled={isSearching} className="shrink-0 shadow-md">
-              {isSearching ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
-            </Button>
-          </div>
-        )}
-
-        {/* Add button */}
+        {/* Controles do mapa só aparecem se logado */}
         {mapLoaded && user && (
-          <div className="absolute top-14 left-3 z-10">
-            <Button
-              size="sm"
-              variant={isAddingMode ? 'default' : 'outline'}
-              className="shadow text-xs rounded-xl"
-              onClick={() => setIsAddingMode(!isAddingMode)}
-            >
-              <Plus className="h-3 w-3 mr-1" />
-              {isAddingMode ? 'Clique no mapa...' : 'Adicionar'}
-            </Button>
-          </div>
-        )}
-
-        {/* Non-logged blur overlay */}
-        {!user && mapLoaded && (
-          <div className="absolute inset-0 bg-background/40 backdrop-blur-[2px] flex items-center justify-center z-10">
-            <div className="text-center px-6">
-              <p className="text-sm font-medium text-foreground">🔒 Faça login para interagir com o mapa</p>
-            </div>
-          </div>
-        )}
-
-        {isAddingMode && (
-          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 px-4 py-2 rounded-full shadow-lg z-10 text-sm font-medium text-white" style={{ backgroundColor: TEAL }}>
-            Toque no mapa para marcar
-          </div>
-        )}
-
-        {/* Selected pin panel */}
-        {selectedPin && (
           <>
-            <div className="fixed inset-0 bg-black/40 z-40 sm:absolute sm:inset-0 sm:bg-black/20 sm:z-10" onClick={() => setSelectedPin(null)} />
+            <div className="absolute top-3 left-3 right-12 z-10 flex gap-2">
+              <Input
+                placeholder={t.search}
+                value={searchAddress}
+                onChange={(e) => setSearchAddress(e.target.value)}
+                onKeyPress={(e) => e.key === "Enter" && handleSearchAddress()}
+                className="bg-background/95 backdrop-blur-sm shadow-md rounded-xl"
+              />
+              <Button size="icon" onClick={handleSearchAddress} disabled={isSearching} className="shrink-0 shadow-md">
+                {isSearching ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
+              </Button>
+            </div>
+
+            <div className="absolute top-14 left-3 right-3 sm:right-auto flex flex-wrap items-center gap-2 pointer-events-none z-10">
+              {citiesWithTips.length > 0 && (
+                <div className="bg-background/95 backdrop-blur-sm rounded-xl shadow border border-border/40 pointer-events-auto">
+                  <Select onValueChange={flyToCity}>
+                    <SelectTrigger className="w-[140px] sm:w-[180px] border-0 bg-transparent text-xs sm:text-sm">
+                      <div className="flex items-center gap-1 sm:gap-2">
+                        <MapPin className="h-3 w-3 sm:h-4 sm:w-4 text-primary shrink-0" />
+                        <SelectValue placeholder={t.cityPlaceholder} />
+                      </div>
+                    </SelectTrigger>
+                    <SelectContent className="max-h-[300px] bg-background z-50">
+                      {citiesWithTips.map((city) => (
+                        <SelectItem key={city.name} value={city.name}>
+                          {city.name} ({city.count})
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+              <div className="hidden sm:block bg-background/95 backdrop-blur-sm px-3 py-2 rounded-xl shadow border border-border/40 pointer-events-auto">
+                <span className="text-sm font-medium">
+                  {sharedTips.length} {t.tipsCount}
+                </span>
+              </div>
+              <Button
+                size="sm"
+                variant={isAddingMode ? "default" : "outline"}
+                className="pointer-events-auto shadow text-xs sm:text-sm px-2 sm:px-3 rounded-xl"
+                onClick={() => setIsAddingMode(!isAddingMode)}
+              >
+                <Plus className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                {isAddingMode ? "..." : t.add}
+              </Button>
+            </div>
+          </>
+        )}
+
+        {isAddingMode && user && (
+          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground px-4 py-2 rounded-full shadow-lg z-10 text-sm font-medium">
+            {t.clickToAdd}
+          </div>
+        )}
+
+        {selectedTip && user && (
+          <>
+            <div
+              className="fixed inset-0 bg-black/40 z-40 sm:absolute sm:inset-0 sm:bg-black/20 sm:z-10"
+              onClick={() => setSelectedTip(null)}
+            />
             <div className="fixed bottom-0 left-0 right-0 sm:absolute sm:bottom-auto sm:top-4 sm:right-4 sm:left-auto w-full sm:w-80 max-h-[60vh] sm:max-h-[350px] bg-background rounded-t-2xl sm:rounded-2xl shadow-xl z-50 sm:z-20 flex flex-col">
               <div className="flex-shrink-0">
                 <div className="sm:hidden flex justify-center pt-3 pb-2">
@@ -347,55 +474,151 @@ export function DoresDeliciasMap() {
                 </div>
                 <div className="px-4 py-3 flex items-center justify-between border-b border-border/40">
                   <div className="flex items-center gap-2">
-                    <span className="text-xl">{selectedPin.type === 'dor' ? '🚩' : '💎'}</span>
-                    <span
-                      className="text-xs px-2 py-0.5 rounded-full font-bold text-white"
-                      style={{ backgroundColor: selectedPin.type === 'dor' ? MAGENTA : TEAL }}
-                    >
-                      {selectedPin.type === 'dor' ? 'Dor' : 'Delícia'}
+                    <span className="text-3xl">{typeIcons[selectedTip.type] || "📍"}</span>
+                    <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full uppercase font-bold tracking-wider">
+                      {selectedTip.type === "pain" || selectedTip.type === "dor" ? t.pains : t.delights}
                     </span>
                   </div>
-                  <div className="flex items-center gap-2">
-                    {selectedPin.user_id === user?.id && (
-                      <Button variant="ghost" size="sm" onClick={() => handleDeletePin(selectedPin.id)} className="text-destructive h-9 w-9 p-0 rounded-full">
-                        <Trash2 className="h-4 w-4" />
+                  <div className="flex items-center gap-1">
+                    {(isManager || selectedTip.user_id === user?.id) && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={handleRemoveTip}
+                        className="text-destructive hover:text-destructive h-9 w-9 p-0 rounded-full"
+                      >
+                        {isManager && selectedTip.user_id !== user?.id ? (
+                          <Shield className="h-4 w-4" />
+                        ) : (
+                          <Trash2 className="h-4 w-4" />
+                        )}
                       </Button>
                     )}
-                    <Button variant="secondary" size="sm" onClick={() => setSelectedPin(null)} className="h-9 w-9 p-0 rounded-full">
+                    {selectedTip.user_id !== user?.id && (
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="sm" className="h-9 w-9 p-0 rounded-full text-muted-foreground">
+                            <MoreVertical className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={() => handleReportTip(selectedTip)}>
+                            <Flag className="h-4 w-4 mr-2" />
+                            {t.report}
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem
+                            onClick={() => handleBlockUser(selectedTip.user_id)}
+                            className="text-destructive focus:text-destructive"
+                          >
+                            <Ban className="h-4 w-4 mr-2" />
+                            {t.block}
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    )}
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      onClick={() => setSelectedTip(null)}
+                      className="h-9 w-9 p-0 rounded-full"
+                    >
                       <X className="h-5 w-5" />
                     </Button>
                   </div>
                 </div>
               </div>
               <div className="flex-1 overflow-auto px-4 py-3">
-                {selectedPin.author && (
-                  <div className="flex items-center gap-2 mb-3">
-                    <Avatar className="h-8 w-8">
-                      <AvatarImage src={selectedPin.author.avatar_url || undefined} />
-                      <AvatarFallback className="text-xs">{selectedPin.author.full_name?.slice(0, 2).toUpperCase()}</AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <p className="text-sm font-medium">{selectedPin.author.full_name}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {formatDistanceToNow(new Date(selectedPin.created_at), { addSuffix: true, locale: currentLocale })}
-                      </p>
-                    </div>
+                <div className="flex items-center gap-2 mb-3">
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage src={selectedTip.author?.avatar_url || undefined} />
+                    <AvatarFallback className="text-xs">
+                      {getInitials(selectedTip.author?.full_name || "U")}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <p className="text-sm font-medium">{selectedTip.author?.full_name}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {formatDistanceToNow(new Date(selectedTip.created_at), {
+                        addSuffix: true,
+                        locale: currentLocale,
+                      })}
+                    </p>
                   </div>
+                </div>
+                <h4 className="font-semibold mb-1">{selectedTip.title}</h4>
+                {selectedTip.content && <p className="text-sm text-muted-foreground mb-2">{selectedTip.content}</p>}
+                {selectedTip.image_url && (
+                  <img
+                    src={selectedTip.image_url}
+                    alt={selectedTip.title}
+                    className="w-full rounded-xl mb-3 max-h-24 object-cover"
+                  />
                 )}
-                <h4 className="font-semibold mb-1">{selectedPin.title}</h4>
-                {selectedPin.content && <p className="text-sm text-muted-foreground mb-2">{selectedPin.content}</p>}
-                {selectedPin.image_url && (
-                  <img src={selectedPin.image_url} alt="" className="w-full h-32 object-cover rounded-lg mb-2" />
-                )}
-                <div className="flex items-center gap-3 pt-2 border-t border-border/40">
+                <div className="flex items-center gap-3 py-2 border-t border-b border-border/50">
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => handleToggleLike(selectedPin.id)}
-                    className={selectedPin.user_liked ? 'text-red-500' : 'text-muted-foreground'}
+                    className={`gap-1 rounded-full ${selectedTip.user_liked ? "text-red-500" : ""}`}
+                    onClick={handleLike}
                   >
-                    <Heart className={`h-4 w-4 mr-1 ${selectedPin.user_liked ? 'fill-red-500' : ''}`} />
-                    {selectedPin.likes_count}
+                    <Heart className={`h-4 w-4 ${selectedTip.user_liked ? "fill-current" : ""}`} />
+                    {selectedTip.likes_count}
+                  </Button>
+                  <span className="flex items-center gap-1 text-sm text-muted-foreground">
+                    <MessageCircle className="h-4 w-4" />
+                    {selectedTip.comments_count}
+                  </span>
+                </div>
+                <div className="mt-3 space-y-2">
+                  {loadingComments ? (
+                    <div className="flex justify-center py-2">
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    </div>
+                  ) : (
+                    <>
+                      {comments.slice(0, 3).map((comment) => (
+                        <div key={comment.id} className="flex gap-2">
+                          <Avatar className="h-6 w-6">
+                            <AvatarImage src={comment.author?.avatar_url || undefined} />
+                            <AvatarFallback className="text-xs">
+                              {getInitials(comment.author?.full_name || "U")}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="flex-1 bg-muted/50 rounded-xl p-2">
+                            <div className="flex items-center justify-between">
+                              <p className="text-xs font-medium">{comment.author?.full_name}</p>
+                              {(comment.user_id === user?.id || isManager) && (
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="h-5 w-5 p-0 rounded-full"
+                                  onClick={() => handleDeleteComment(comment.id)}
+                                  title={isManager && comment.user_id !== user?.id ? "Remover" : "Remover"}
+                                >
+                                  <Trash2 className="h-3 w-3" />
+                                </Button>
+                              )}
+                            </div>
+                            <p className="text-sm">{comment.content}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </>
+                  )}
+                </div>
+              </div>
+              <div className="flex-shrink-0 px-4 py-3 border-t border-border/40 bg-background">
+                <div className="flex gap-2">
+                  <Input
+                    placeholder={t.writeComment}
+                    value={newComment}
+                    onChange={(e) => setNewComment(e.target.value)}
+                    onKeyPress={(e) => e.key === "Enter" && handleAddComment()}
+                    className="text-sm rounded-full"
+                  />
+                  <Button size="sm" onClick={handleAddComment} className="rounded-full px-3">
+                    <Send className="h-4 w-4" />
                   </Button>
                 </div>
               </div>
@@ -404,82 +627,67 @@ export function DoresDeliciasMap() {
         )}
       </div>
 
-      {/* Create Pin Dialog */}
-      <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <MapPin className="h-5 w-5" />
-              O que você viveu agora?
-            </DialogTitle>
-            <DialogDescription>Marque no mapa: uma Dor ou uma Delícia?</DialogDescription>
-          </DialogHeader>
-
-          <div className="space-y-4">
-            {/* Type selector */}
-            <div className="grid grid-cols-2 gap-3">
-              <button
-                type="button"
-                onClick={() => setNewPinType('dor')}
-                className={`p-4 rounded-xl border-2 transition-all text-center ${newPinType === 'dor' ? 'border-current shadow-lg' : 'border-border hover:border-muted-foreground/40'}`}
-                style={newPinType === 'dor' ? { borderColor: MAGENTA, backgroundColor: MAGENTA + '10' } : {}}
-              >
-                <span className="text-2xl block mb-1">🚩</span>
-                <span className="text-sm font-bold" style={{ color: MAGENTA }}>Dor</span>
-                <p className="text-[10px] text-muted-foreground mt-0.5">Cilada, furada, problema</p>
-              </button>
-              <button
-                type="button"
-                onClick={() => setNewPinType('delicia')}
-                className={`p-4 rounded-xl border-2 transition-all text-center ${newPinType === 'delicia' ? 'border-current shadow-lg' : 'border-border hover:border-muted-foreground/40'}`}
-                style={newPinType === 'delicia' ? { borderColor: TEAL, backgroundColor: TEAL + '10' } : {}}
-              >
-                <span className="text-2xl block mb-1">💎</span>
-                <span className="text-sm font-bold" style={{ color: TEAL }}>Delícia</span>
-                <p className="text-[10px] text-muted-foreground mt-0.5">Segredo, gema, beleza</p>
-              </button>
-            </div>
-
-            <div className="space-y-2">
-              <Label>Título *</Label>
-              <Input
-                placeholder={newPinType === 'dor' ? 'Ex: Golpe do taxi no aeroporto' : 'Ex: Café secreto incrível'}
-                value={newPinTitle}
-                onChange={e => setNewPinTitle(e.target.value)}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label>Descrição (opcional)</Label>
-              <Textarea
-                placeholder="Conte mais sobre o que aconteceu..."
-                value={newPinContent}
-                onChange={e => setNewPinContent(e.target.value)}
-                rows={3}
-              />
-            </div>
-
-            {newPinCoords && (
-              <div className="text-xs text-muted-foreground bg-muted/50 p-2 rounded">
-                📍 {newPinCoords.lat.toFixed(4)}, {newPinCoords.lng.toFixed(4)}
+      {/* Tips List */}
+      {user && (
+        <Card>
+          <CardContent className="py-3">
+            <h3 className="font-semibold mb-3">{t.communityTips}</h3>
+            {isLoading ? (
+              <div className="flex justify-center py-4">
+                <Loader2 className="h-5 w-5 animate-spin text-primary" />
               </div>
+            ) : sharedTips.length === 0 ? (
+              <p className="text-sm text-muted-foreground text-center py-4">{t.noTipsYet}</p>
+            ) : (
+              <ScrollArea className="h-[200px]">
+                <div className="space-y-2 pr-4">
+                  {sharedTips.map((tip) => (
+                    <button
+                      key={tip.id}
+                      onClick={() => handleTipClick(tip)}
+                      className={`w-full text-left p-3 rounded-xl border border-border/40 transition-all hover:bg-muted/50 ${selectedTip?.id === tip.id ? "bg-muted border-primary/50 shadow-sm" : ""}`}
+                    >
+                      <div className="flex items-start gap-3">
+                        <span className="text-2xl">{typeIcons[tip.type] || "📍"}</span>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2">
+                            <p className="font-medium text-sm truncate">{tip.title}</p>
+                          </div>
+                          <p className="text-xs text-muted-foreground truncate">
+                            {t.by} {tip.author?.full_name}
+                          </p>
+                          <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground">
+                            <span className="flex items-center gap-1">
+                              <Heart className="h-3 w-3" /> {tip.likes_count}
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <MessageCircle className="h-3 w-3" /> {tip.comments_count}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </ScrollArea>
             )}
+          </CardContent>
+        </Card>
+      )}
 
-            <div className="flex gap-2">
-              <Button variant="outline" className="flex-1" onClick={() => setShowCreateDialog(false)}>Cancelar</Button>
-              <Button
-                className="flex-1 text-white"
-                style={{ backgroundColor: newPinType === 'dor' ? MAGENTA : TEAL }}
-                onClick={handleCreatePin}
-                disabled={isSubmitting || !newPinTitle.trim()}
-              >
-                {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
-                {newPinType === 'dor' ? '🚩 Marcar Dor' : '💎 Marcar Delícia'}
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+      {newPinCoords && user && (
+        <CreateCommunityPin
+          open={showCreatePin}
+          onOpenChange={setShowCreatePin}
+          latitude={newPinCoords.lat}
+          longitude={newPinCoords.lng}
+          onSuccess={() => {
+            refresh();
+            setNewPinCoords(null);
+          }}
+        />
+      )}
     </div>
   );
 }
+

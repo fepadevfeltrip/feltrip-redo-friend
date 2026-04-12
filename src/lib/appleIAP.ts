@@ -89,17 +89,20 @@ export async function openApplePurchase(priceKey: PriceKey): Promise<CheckoutRes
   } catch (err: any) {
     toast.dismiss("iap-loading");
     toast.dismiss("iap-processing");
-
+    
+    console.error("Erro COMPLETO na transação Apple:", JSON.stringify(err, null, 2));
+    console.error("Erro code:", err?.code);
+    console.error("Erro underlyingErrorMessage:", err?.underlyingErrorMessage);
+    
     if (err.userCancelled) {
       console.log("Usuário cancelou a compra.");
       return "cancelled";
     }
-
-    console.error("Erro na transação Apple:", err);
+    
     toast.error("Erro ao processar o pagamento com a Apple.");
     return "error";
   }
-}
+} // <--- Essa é a "chave" (curly brace) que estava faltando para fechar a função openApplePurchase
 
 export const getPendingCheckout = (): PriceKey | null => null;
 export const clearPendingCheckout = () => { };

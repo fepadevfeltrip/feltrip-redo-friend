@@ -2,10 +2,12 @@ import React, { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Language } from "../types";
 import { CONTENT } from "../constants";
-import { LEGAL_TEXT_PT, LEGAL_TEXT_EN, LEGAL_TEXT_ES } from "../constants/legalTexts";
+import {
+  LEGAL_TEXT_PT, LEGAL_TEXT_EN, LEGAL_TEXT_ES,
+  PRIVACY_TEXT_PT, PRIVACY_TEXT_EN, PRIVACY_TEXT_ES
+} from "../constants/legalTexts";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { Capacitor } from "@capacitor/core";
-import OneSignal from "onesignal-cordova-plugin";
 
 const SIGNUP_TEXTS = {
   pt: {
@@ -33,16 +35,16 @@ const SIGNUP_TEXTS = {
     invalidCode: "Invalid code. Please check and try again.",
     emailRequired: "Enter your email",
     sending: "Sending...",
-    verifying: "Verificando...",
+    verifying: "Verifying...",
     backToEmail: "← Change email",
   },
   es: {
     termsNotice: "Al iniciar sesión, aceptas nuestros",
     termsLink: "Términos de Uso y Política de Privacidad",
-    notificationsOptIn: "Activa las notificaciones y recibe códigos promocionais y sorpresas hechas para tu perfil.",
+    notificationsOptIn: "Activa las notificaciones y recibe códigos promocionales y sorpresas hechas para tu perfil.",
     emailPlaceholder: "tu@email.com",
     sendCode: "Recibir Código",
-    codeSent: "Enviamos um código seguro a tu email",
+    codeSent: "Enviamos un código seguro a tu email",
     enterCode: "Entrar",
     invalidCode: "Código inválido. Verifica e intenta de nuevo.",
     emailRequired: "Escribe tu email",
@@ -72,9 +74,15 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, lang, onClose, red
 
   const t = CONTENT[lang];
   const st = SIGNUP_TEXTS[lang] || SIGNUP_TEXTS.pt;
-  const legalText = lang === "en" ? LEGAL_TEXT_EN : lang === "es" ? LEGAL_TEXT_ES : LEGAL_TEXT_PT;
+
+  // Costurando os Termos com a Privacidade baseada no idioma selecionado
+  const termsText = lang === "en" ? LEGAL_TEXT_EN : lang === "es" ? LEGAL_TEXT_ES : LEGAL_TEXT_PT;
+  const privacyText = lang === "en" ? PRIVACY_TEXT_EN : lang === "es" ? PRIVACY_TEXT_ES : PRIVACY_TEXT_PT;
+  const fullLegalText = `${termsText}\n\n=========================================\n\n${privacyText}`;
 
   if (!isOpen) return null;
+
+  const APPLE_REVIEW_EMAILS = ["talkawaylanguage@gmail.com", "freetest@feltrip.com"];
 
   const handleSendOtp = async () => {
     if (!otpEmail.trim()) {
@@ -82,8 +90,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, lang, onClose, red
       return;
     }
 
-    // Apple Review: skip real OTP, go straight to code input
-    if (otpEmail.trim().toLowerCase() === APPLE_REVIEW_EMAIL) {
+    if (APPLE_REVIEW_EMAILS.includes(otpEmail.trim().toLowerCase())) {
       setOtpStep("code");
       return;
     }
@@ -105,8 +112,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, lang, onClose, red
     }
   };
 
-  const APPLE_REVIEW_EMAIL = "talkawaylanguage@gmail.com";
-
   const handleVerifyOtp = async () => {
     const cleanCode = otpCode.trim();
     if (cleanCode.length !== 6) return;
@@ -116,8 +121,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, lang, onClose, red
     try {
       const emailLower = otpEmail.trim().toLowerCase();
 
-      // Apple Review bypass: use Edge Function for the tester account
-      if (emailLower === APPLE_REVIEW_EMAIL) {
+      if (APPLE_REVIEW_EMAILS.includes(emailLower)) {
         const { data: bypassData, error: bypassError } = await supabase.functions.invoke(
           "apple-review-auth",
           { body: { email: emailLower, code: cleanCode } }
@@ -126,36 +130,24 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, lang, onClose, red
         if (bypassError) throw bypassError;
         if (bypassData?.error) throw new Error(bypassData.error);
 
-        const { data: verifyData, error: verifyError } = await supabase.auth.verifyOtp({
+        const { error: verifyError } = await supabase.auth.verifyOtp({
           token_hash: bypassData.token_hash,
           type: "magiclink",
         });
 
         if (verifyError) throw verifyError;
 
-        // OneSignal Login for Apple Review User
-        if (Capacitor.isNativePlatform() && verifyData?.user?.id) {
-          OneSignal.login(verifyData.user.id);
-        }
-
         onClose();
         return;
       }
 
-      // Normal OTP verification
-      const { data, error } = await supabase.auth.verifyOtp({
+      const { error } = await supabase.auth.verifyOtp({
         email: otpEmail.trim(),
         token: cleanCode,
         type: "email",
       });
 
       if (error) throw error;
-
-      // CONEXÃO COM ONESIGNAL: Atrela o ID do usuário logado ao aparelho
-      if (Capacitor.isNativePlatform() && data?.user?.id) {
-        OneSignal.login(data.user.id);
-        console.log("✅ OneSignal vinculado ao usuário:", data.user.id);
-      }
 
       onClose();
     } catch (err: any) {
@@ -173,14 +165,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, lang, onClose, red
           onClick={onClose}
           className="absolute top-4 right-4 text-boba-teal/50 hover:text-boba-coral dark:text-white/50 dark:hover:text-white transition-colors"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth={2.5}
-            stroke="currentColor"
-            className="w-6 h-6"
-          >
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-6 h-6">
             <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
@@ -293,34 +278,31 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, lang, onClose, red
 
       {showLegal && (
         <div
-          className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
+          className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
           onClick={() => setShowLegal(false)}
         >
+          {/* Aqui apliquei flex-col para garantir que o scroll interno funcione independentemente do tamanho da tela */}
           <div
-            className="bg-boba-offWhite dark:bg-boba-darkCard rounded-2xl w-full max-w-2xl max-h-[85vh] shadow-2xl border border-boba-teal/20 dark:border-white/10 overflow-hidden"
+            className="bg-boba-offWhite dark:bg-boba-darkCard rounded-2xl w-full max-w-2xl h-[85vh] flex flex-col shadow-2xl border border-boba-teal/20 dark:border-white/10"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between p-4 border-b border-boba-teal/10 dark:border-white/10">
-              <h3 className="font-serif font-bold text-boba-teal dark:text-white">Feltrip Cultural AI — Cult AI</h3>
+            {/* Header fixo */}
+            <div className="flex items-center justify-between p-5 border-b border-boba-teal/10 dark:border-white/10 shrink-0">
+              <h3 className="font-serif font-bold text-lg text-boba-teal dark:text-white">Culti AI — Terms</h3>
               <button
                 onClick={() => setShowLegal(false)}
                 className="text-boba-teal/50 hover:text-boba-coral dark:text-white/50 dark:hover:text-white transition-colors"
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={2.5}
-                  stroke="currentColor"
-                  className="w-5 h-5"
-                >
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-6 h-6">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
             </div>
-            <div className="p-4 overflow-y-auto max-h-[70vh]">
-              <div className="text-sm text-boba-teal/70 dark:text-white/60 whitespace-pre-wrap leading-relaxed">
-                {legalText}
+
+            {/* Área de rolagem flexível */}
+            <div className="p-6 flex-1 overflow-y-auto">
+              <div className="text-sm text-boba-teal/80 dark:text-white/70 whitespace-pre-wrap leading-relaxed">
+                {fullLegalText}
               </div>
             </div>
           </div>

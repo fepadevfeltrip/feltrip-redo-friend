@@ -1,51 +1,44 @@
-import { useState } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Map, MessageSquare, Calendar, Users } from 'lucide-react';
-import { useAuth } from '@/hooks/useAuth';
-import { useCommunity } from '@/hooks/useCommunity';
-import { CommunityWall } from '@/components/community/CommunityWall';
-import { CommunityEvents } from '@/components/community/CommunityEvents';
-import { CommunityGroups } from '@/components/community/CommunityGroups';
-import { DoresDeliciasMap } from '@/components/community/DoresDeliciasMap';
-import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
-import { useTranslation } from 'react-i18next';
+import { useState } from "react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Map, MessageSquare, Calendar } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { useCommunity } from "@/hooks/useCommunity";
+import { CommunityWall } from "@/components/community/CommunityWall";
+import { CommunityEvents } from "@/components/community/CommunityEvents";
+import { DoresDeliciasMap } from "@/components/community/DoresDeliciasMap";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+import { useTranslation } from "react-i18next";
 
 const COPY = {
   pt: {
     title: "Dores & Delícias",
-    subtitle: "O mapa afetivo da cidade",
+    subtitle: "O lado B das cidades",
     map: "Mapa",
     feed: "Feed",
-    groups: "Grupos",
     events: "Eventos",
-    blurWall: "Para entrar na rede e compartilhar dores e delícias, precisamos saber quem você é.",
-    blurGroups: "Faça login para ver e participar dos grupos da comunidade.",
-    blurEvents: "Faça login para ver os eventos da comunidade.",
+    blurWall: "Para entrar na rede e compartilhar suas gemas, precisamos saber quem você é.",
+    blurEvents: "Faça login para ter acesso aos eventos da comunidade.",
     signInHint: 'Clique em "Sign In" no topo para entrar.',
   },
   en: {
     title: "Pains & Delights",
-    subtitle: "The city's affective map",
+    subtitle: "The B-side of the cities",
     map: "Map",
     feed: "Feed",
-    groups: "Groups",
     events: "Events",
-    blurWall: "To join the network and share pains and delights, we need to know who you are.",
-    blurGroups: "Sign in to see and join community groups.",
-    blurEvents: "Sign in to see community events.",
+    blurWall: "To join the network and share your gems, we need to know who you are.",
+    blurEvents: "Sign in to access community events.",
     signInHint: 'Click "Sign In" at the top to enter.',
   },
   es: {
     title: "Dolores & Delicias",
-    subtitle: "El mapa afectivo de la ciudad",
+    subtitle: "El lado B de las ciudades",
     map: "Mapa",
     feed: "Feed",
-    groups: "Grupos",
     events: "Eventos",
-    blurWall: "Para entrar en la red y compartir dolores y delicias, necesitamos saber quién eres.",
-    blurGroups: "Inicia sesión para ver y unirte a los grupos de la comunidad.",
-    blurEvents: "Inicia sesión para ver los eventos de la comunidad.",
+    blurWall: "Para entrar en la red y compartir tus gemas, necesitamos saber quién eres.",
+    blurEvents: "Inicia sesión para tener acceso a los eventos de la comunidad.",
     signInHint: 'Haz clic en "Sign In" arriba para entrar.',
   },
 };
@@ -57,9 +50,9 @@ export default function CommunityTab() {
 
   const { user, role } = useAuth();
   const { toast } = useToast();
-  const [activeTab, setActiveTab] = useState('map');
+  const [activeTab, setActiveTab] = useState("map");
 
-  const isAdmin = role === 'admin' || role === 'owner';
+  const isAdmin = role === "admin" || role === "owner";
 
   const {
     posts,
@@ -71,20 +64,17 @@ export default function CommunityTab() {
     deleteEvent,
     participateInEvent,
     cancelParticipation,
-    refreshPosts
+    refreshPosts,
   } = useCommunity();
 
   const handleDeletePost = async (postId: string) => {
     if (isAdmin) {
-      const { error } = await supabase
-        .from('community_posts')
-        .delete()
-        .eq('id', postId);
+      const { error } = await supabase.from("community_posts").delete().eq("id", postId);
 
       if (error) {
-        toast({ title: 'Erro', description: 'Não foi possível excluir o post', variant: 'destructive' });
+        toast({ title: "Erro", description: "Não foi possível excluir o post", variant: "destructive" });
       } else {
-        toast({ title: 'Post excluído' });
+        toast({ title: "Post excluído" });
         refreshPosts();
       }
     } else {
@@ -101,7 +91,7 @@ export default function CommunityTab() {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-4 mb-4">
+          <TabsList className="grid w-full grid-cols-3 mb-4">
             <TabsTrigger value="map" className="flex items-center gap-1 text-xs">
               <Map className="h-4 w-4" />
               <span className="hidden sm:inline">{t.map}</span>
@@ -109,10 +99,6 @@ export default function CommunityTab() {
             <TabsTrigger value="wall" className="flex items-center gap-1 text-xs">
               <MessageSquare className="h-4 w-4" />
               <span className="hidden sm:inline">{t.feed}</span>
-            </TabsTrigger>
-            <TabsTrigger value="groups" className="flex items-center gap-1 text-xs">
-              <Users className="h-4 w-4" />
-              <span className="hidden sm:inline">{t.groups}</span>
             </TabsTrigger>
             <TabsTrigger value="events" className="flex items-center gap-1 text-xs">
               <Calendar className="h-4 w-4" />
@@ -135,14 +121,6 @@ export default function CommunityTab() {
                 isLoading={isLoading}
                 isManager={isAdmin}
               />
-            )}
-          </TabsContent>
-
-          <TabsContent value="groups" className="mt-0">
-            {!user ? (
-              <BlurredContent message={t.blurGroups} hint={t.signInHint} />
-            ) : (
-              <CommunityGroups isManager={isAdmin} />
             )}
           </TabsContent>
 
@@ -170,7 +148,7 @@ function BlurredContent({ message, hint }: { message: string; hint: string }) {
   return (
     <div className="relative rounded-2xl overflow-hidden">
       <div className="filter blur-md pointer-events-none select-none opacity-60 space-y-3 p-4">
-        {[1, 2, 3].map(i => (
+        {[1, 2, 3].map((i) => (
           <div key={i} className="bg-muted rounded-xl p-4 space-y-2">
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 rounded-full bg-muted-foreground/20" />

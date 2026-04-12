@@ -1,7 +1,19 @@
 import { supabase } from "@/integrations/supabase/client";
-import type { MapContentStructured } from "../types/mapContent";
+import type { MapContentStructured, PillarSection } from "../types/mapContent";
 
-const MAX_RETRIES = 3;
+const MAX_RETRIES = 2;
+const FREE_COMPLETION_STATUS = "completed_free";
+const PREMIUM_COMPLETION_STATUS = "completed";
+
+type GenerationPartStatus =
+  | "generating_part_1"
+  | "generating_part_2"
+  | "generating_part_3"
+  | "generating_part_4"
+  | "generating_part_5"
+  | "generating_part_6";
+
+type GenerationStatus = GenerationPartStatus | typeof FREE_COMPLETION_STATUS | typeof PREMIUM_COMPLETION_STATUS;
 
 interface CityQuestionnaireRow {
   id: string;
@@ -11,12 +23,36 @@ interface CityQuestionnaireRow {
   generation?: string | null;
   gender?: string | null;
   journey_identities?: string[] | null;
-  body_q1: number; body_q2: number; body_q3: number; body_q4: number;
-  space_q1: number; space_q2: number; space_q3: number; space_q4: number;
-  territory_q1: number; territory_q2: number; territory_q3: number; territory_q4: number;
-  identity_q1: number; identity_q2: number; identity_q3: number; identity_q4: number;
-  other_q1: number; other_q2: number; other_q3: number; other_q4: number;
+  map_status?: string | null;
+  map_content?: string | null;
+  body_q1: number;
+  body_q2: number;
+  body_q3: number;
+  body_q4: number;
+  space_q1: number;
+  space_q2: number;
+  space_q3: number;
+  space_q4: number;
+  territory_q1: number;
+  territory_q2: number;
+  territory_q3: number;
+  territory_q4: number;
+  identity_q1: number;
+  identity_q2: number;
+  identity_q3: number;
+  identity_q4: number;
+  other_q1: number;
+  other_q2: number;
+  other_q3: number;
+  other_q4: number;
 }
+
+export type GenerationProgress = {
+  currentPart: number;
+  totalParts: number;
+  status: string;
+  isDone?: boolean;
+};
 
 function buildScores(q: CityQuestionnaireRow) {
   return {
@@ -28,223 +64,335 @@ function buildScores(q: CityQuestionnaireRow) {
   };
 }
 
-const CONTEXT_BLOCK = (q: CityQuestionnaireRow, scores: ReturnType<typeof buildScores>, userName: string) => {
-  const personalization = [
-    q.generation ? `Geração: ${q.generation}` : '',
-    q.gender ? `Gênero: ${q.gender}` : '',
-    q.journey_identities?.length ? `Jornada: ${q.journey_identities.join(', ')}` : '',
-  ].filter(Boolean).join('. ');
-  return `Método Feltrip™ (Mapa da Presença Relacional). Usuário: ${userName}. Cidade: ${q.city}. Estadia: ${q.stay_duration}. Poder aquisitivo: ${q.purchasing_power}. ${personalization ? `Personalização: ${personalization}.` : ''} Respostas detalhadas: Corpo(q1=${q.body_q1},q2=${q.body_q2},q3=${q.body_q3},q4=${q.body_q4}), Espaço(q1=${q.space_q1},q2=${q.space_q2},q3=${q.space_q3},q4=${q.space_q4}), Território(q1=${q.territory_q1},q2=${q.territory_q2},q3=${q.territory_q3},q4=${q.territory_q4}), Identidade(q1=${q.identity_q1},q2=${q.identity_q2},q3=${q.identity_q3},q4=${q.identity_q4}), O Outro(q1=${q.other_q1},q2=${q.other_q2},q3=${q.other_q3},q4=${q.other_q4}). Scores: Corpo=${scores.body}%, Espaço=${scores.space}%, Território=${scores.territory}%, Identidade=${scores.identity}%, O Outro=${scores.other}%.`;
+const LANG_INSTRUCTIONS: Record<string, string> = {
+  pt: "Responda EXCLUSIVAMENTE em Português brasileiro.",
+  en: "Respond EXCLUSIVELY in English.",
+  es: "Responde EXCLUSIVAMENTE en Español.",
+  fr: "Répondez EXCLUSIVEMENT en Français.",
+  zh: "请仅使用中文回复。",
 };
 
-function buildPromptPart1(q: CityQuestionnaireRow, scores: ReturnType<typeof buildScores>, userName: string): string {
-  return `${CONTEXT_BLOCK(q, scores, userName)}
+function contextBlock(
+  q: CityQuestionnaireRow,
+  scores: ReturnType<typeof buildScores>,
+  userName: string,
+  lang: string,
+): string {
+  const langInstruction = LANG_INSTRUCTIONS[lang] || LANG_INSTRUCTIONS.en;
+  const personalization = [
+    q.generation ? `Geração: ${q.generation}` : "",
+    q.gender ? `Gênero: ${q.gender}` : "",
+    q.journey_identities?.length ? `Jornada: ${q.journey_identities.join(", ")}` : "",
+  ]
+    .filter(Boolean)
+    .join(". ");
 
-Gere a PARTE 1 do mapa profundo. Esta parte inclui SOMENTE: título, subtítulo, introdução poética, e os pilares CORPO e ESPAÇO.
-
-Escreva com profundidade e sensibilidade. Cada pilar deve ter:
-- summary: 2-3 frases resumindo a relação do usuário com esse pilar
-- deep_analysis: parágrafo denso (5-8 frases) analisando como o perfil do usuário se relaciona com ${q.city}
-- recommendations: 3-4 recomendações práticas e personalizadas
-- places: 2-3 lugares reais de ${q.city} com descrição rica, motivo personalizado e bairro
-
-Responda SOMENTE com JSON válido. Sem markdown, sem texto antes ou depois.
-
-{"title":"...","subtitle":"...","introduction":"introdução poética de 3-4 frases sobre a jornada relacional em ${q.city}","sections":{"body":{"title":"Corpo","summary":"...","deep_analysis":"...","recommendations":["...","...","..."],"places":[{"name":"...","description":"...","why":"...","neighborhood":"..."}]},"space":{"title":"Espaço","summary":"...","deep_analysis":"...","recommendations":["...","...","..."],"places":[{"name":"...","description":"...","why":"...","neighborhood":"..."}]}}}`;
+  return `${langInstruction} Método Feltrip™ (Mapa da Presença Relacional). Usuário: ${userName}. Cidade: ${q.city}. Estadia: ${q.stay_duration}. Poder aquisitivo: ${q.purchasing_power}. ${personalization ? `Personalização: ${personalization}.` : ""} Respostas detalhadas: Corpo(q1=${q.body_q1},q2=${q.body_q2},q3=${q.body_q3},q4=${q.body_q4}), Espaço(q1=${q.space_q1},q2=${q.space_q2},q3=${q.space_q3},q4=${q.space_q4}), Território(q1=${q.territory_q1},q2=${q.territory_q2},q3=${q.territory_q3},q4=${q.territory_q4}), Identidade(q1=${q.identity_q1},q2=${q.identity_q2},q3=${q.identity_q3},q4=${q.identity_q4}), O Outro(q1=${q.other_q1},q2=${q.other_q2},q3=${q.other_q3},q4=${q.other_q4}). Scores: Corpo=${scores.body}%, Espaço=${scores.space}%, Território=${scores.territory}%, Identidade=${scores.identity}%, O Outro=${scores.other}%.`;
 }
 
-function buildPromptPart2(q: CityQuestionnaireRow, scores: ReturnType<typeof buildScores>, userName: string): string {
-  return `${CONTEXT_BLOCK(q, scores, userName)}
+function promptPart1(q: CityQuestionnaireRow, scores: ReturnType<typeof buildScores>, userName: string, lang: string) {
+  return `${contextBlock(q, scores, userName, lang)}
 
-Gere a PARTE 2 do mapa profundo. Esta parte inclui SOMENTE os pilares TERRITÓRIO e IDENTIDADE.
-
-Escreva com profundidade e sensibilidade. Cada pilar deve ter:
-- summary: 2-3 frases resumindo a relação do usuário com esse pilar
-- deep_analysis: parágrafo denso (5-8 frases) analisando como o perfil do usuário se relaciona com ${q.city}
-- recommendations: 3-4 recomendações práticas e personalizadas
-- places: 2-3 lugares reais de ${q.city} com descrição rica, motivo personalizado e bairro
+Gere APENAS a Parte 1: Título, Subtítulo e Introdução do mapa profundo.
+- title: título poético do mapa (1 frase)
+- subtitle: subtítulo personalizado para ${userName} (1 frase)
+- introduction: parágrafo denso de 8 frases conectando o perfil do usuário à cidade ${q.city}, usando linguagem fenomenológica e sensorial.
 
 Responda SOMENTE com JSON válido. Sem markdown, sem texto antes ou depois.
-
-{"sections":{"territory":{"title":"Território","summary":"...","deep_analysis":"...","recommendations":["...","...","..."],"places":[{"name":"...","description":"...","why":"...","neighborhood":"..."}]},"identity":{"title":"Identidade","summary":"...","deep_analysis":"...","recommendations":["...","...","..."],"places":[{"name":"...","description":"...","why":"...","neighborhood":"..."}]}}}`;
+{"title":"...","subtitle":"...","introduction":"..."}`;
 }
 
-function buildPromptPart3(q: CityQuestionnaireRow, scores: ReturnType<typeof buildScores>, userName: string): string {
-  return `${CONTEXT_BLOCK(q, scores, userName)}
+function promptPart2(q: CityQuestionnaireRow, scores: ReturnType<typeof buildScores>, userName: string, lang: string) {
+  return `${contextBlock(q, scores, userName, lang)}
 
-Gere a PARTE 3 (final) do mapa profundo. Esta parte inclui SOMENTE: pilar O OUTRO, insights de poder aquisitivo, conclusão e proposição poética.
+Gere APENAS o pilar CORPO do mapa profundo de ${q.city}.
+- title: "Corpo" (ou tradução adequada)
+- summary: 3 frases
+- deep_analysis: análise fenomenológica DENSA de 8 frases
+- recommendations: 4 recomendações práticas e personalizadas
+- places: 3 lugares reais de ${q.city} com name, description (2 frases), why, neighborhood
 
-O pilar "O Outro" deve ter:
-- summary: 2-3 frases resumindo a relação do usuário com esse pilar
-- deep_analysis: parágrafo denso (5-8 frases) sobre relações interpessoais e interculturais em ${q.city}
-- recommendations: 3-4 recomendações práticas e personalizadas
-- places: 2-3 lugares reais de ${q.city} para conexões humanas
+Responda SOMENTE com JSON válido.
+{"title":"...","summary":"...","deep_analysis":"...","recommendations":["..."],"places":[{"name":"...","description":"...","why":"...","neighborhood":"..."}]}`;
+}
 
-A conclusão deve ser poética e profunda (3-4 frases).
-A proposição poética deve ser uma instrução contemplativa inspirada em Yoko Ono (2-3 frases).
-Os insights de poder aquisitivo devem ser práticos sobre custo de vida em ${q.city} para o perfil ${q.purchasing_power} (3-4 frases).
+function promptPart3(q: CityQuestionnaireRow, scores: ReturnType<typeof buildScores>, userName: string, lang: string) {
+  return `${contextBlock(q, scores, userName, lang)}
 
-Responda SOMENTE com JSON válido. Sem markdown, sem texto antes ou depois.
+Gere APENAS o pilar ESPAÇO do mapa profundo de ${q.city}.
+- title: "Espaço" (ou tradução adequada)
+- summary: 3 frases
+- deep_analysis: análise fenomenológica DENSA de 8 frases
+- recommendations: 4 recomendações práticas e personalizadas
+- places: 3 lugares reais de ${q.city} com name, description (2 frases), why, neighborhood
 
-{"sections":{"other":{"title":"O Outro","summary":"...","deep_analysis":"...","recommendations":["...","...","..."],"places":[{"name":"...","description":"...","why":"...","neighborhood":"..."}]}},"purchasing_power_insights":"...","conclusion":"...","poetic_proposition":"..."}`;
+Responda SOMENTE com JSON válido.
+{"title":"...","summary":"...","deep_analysis":"...","recommendations":["..."],"places":[{"name":"...","description":"...","why":"...","neighborhood":"..."}]}`;
+}
+
+function promptPart4(q: CityQuestionnaireRow, scores: ReturnType<typeof buildScores>, userName: string, lang: string) {
+  return `${contextBlock(q, scores, userName, lang)}
+
+Gere APENAS o pilar TERRITÓRIO do mapa profundo de ${q.city}.
+- title: "Território" (ou tradução adequada)
+- summary: 3 frases
+- deep_analysis: análise fenomenológica DENSA de 8 frases
+- recommendations: 4 recomendações práticas e personalizadas
+- places: 3 lugares reais de ${q.city} com name, description (2 frases), why, neighborhood
+
+Responda SOMENTE com JSON válido.
+{"title":"...","summary":"...","deep_analysis":"...","recommendations":["..."],"places":[{"name":"...","description":"...","why":"...","neighborhood":"..."}]}`;
+}
+
+function promptPart5(q: CityQuestionnaireRow, scores: ReturnType<typeof buildScores>, userName: string, lang: string) {
+  return `${contextBlock(q, scores, userName, lang)}
+
+Gere APENAS os pilares IDENTIDADE e O OUTRO do mapa profundo de ${q.city}.
+Para cada pilar:
+- title: nome do pilar
+- summary: 3 frases
+- deep_analysis: análise fenomenológica DENSA de 8 frases
+- recommendations: 4 recomendações práticas
+- places: 3 lugares reais de ${q.city} com name, description, why, neighborhood
+
+Responda SOMENTE com JSON válido.
+{"identity":{"title":"...","summary":"...","deep_analysis":"...","recommendations":["..."],"places":[...]},"other":{"title":"...","summary":"...","deep_analysis":"...","recommendations":["..."],"places":[...]}}`;
+}
+
+function promptPart6(q: CityQuestionnaireRow, scores: ReturnType<typeof buildScores>, userName: string, lang: string) {
+  return `${contextBlock(q, scores, userName, lang)}
+
+Gere APENAS a Parte Final do mapa profundo de ${q.city}:
+- purchasing_power_insights: 4 frases práticas sobre custo de vida
+- conclusion: conclusão poética e profunda de 4 frases
+- poetic_proposition: instrução contemplativa inspirada em Yoko Ono (3 frases)
+
+Responda SOMENTE com JSON válido.
+{"purchasing_power_insights":"...","conclusion":"...","poetic_proposition":"..."}`;
 }
 
 function extractJson(raw: string): any | null {
+  if (!raw) return null;
   let cleaned = raw.trim();
-  // Remove XML tags from Bedrock orchestration
   const answerMatch = cleaned.match(/<answer>([\s\S]*?)<\/answer>/);
   if (answerMatch) cleaned = answerMatch[1].trim();
-  // Remove markdown code fences
-  cleaned = cleaned.replace(/```json\s*/gi, '').replace(/```\s*/gi, '');
-  // Find JSON object
-  const start = cleaned.indexOf('{');
-  const end = cleaned.lastIndexOf('}');
-  if (start === -1 || end === -1 || end <= start) {
-    console.error('[CityMap] No JSON braces found in response');
-    return null;
-  }
-  const jsonStr = cleaned.substring(start, end + 1);
+  cleaned = cleaned.replace(/```json\s*/gi, "").replace(/```\s*/gi, "");
+  const start = cleaned.indexOf("{");
+  const end = cleaned.lastIndexOf("}");
+  if (start === -1 || end === -1 || end <= start) return null;
   try {
-    return JSON.parse(jsonStr);
-  } catch (e) {
-    console.error('[CityMap] JSON.parse failed:', (e as Error).message, 'Last 100 chars:', jsonStr.slice(-100));
+    return JSON.parse(cleaned.substring(start, end + 1));
+  } catch {
     return null;
   }
+}
+
+function parseSavedMapContent(mapContent?: string | null): Partial<MapContentStructured> {
+  if (!mapContent) return {};
+  try {
+    return JSON.parse(mapContent);
+  } catch {
+    return {};
+  }
+}
+
+function emptyPillar(title: string): PillarSection {
+  return { title, summary: "", deep_analysis: "", recommendations: [], places: [] };
+}
+
+function buildBasePartialMap(userName: string, saved: Partial<MapContentStructured>): MapContentStructured {
+  return {
+    title: saved.title || "",
+    subtitle: saved.subtitle || `Para ${userName}`,
+    introduction: saved.introduction || "",
+    sections: {
+      body: saved.sections?.body || emptyPillar("Corpo"),
+      space: saved.sections?.space || emptyPillar("Espaço"),
+      territory: saved.sections?.territory || emptyPillar("Território"),
+      identity: saved.sections?.identity || emptyPillar("Identidade"),
+      other: saved.sections?.other || emptyPillar("O Outro"),
+    },
+    purchasing_power_insights: saved.purchasing_power_insights || "",
+    conclusion: saved.conclusion || "",
+    poetic_proposition: saved.poetic_proposition || "",
+  };
 }
 
 async function callAgent(prompt: string, sessionId: string): Promise<string> {
-  const { data, error } = await supabase.functions.invoke('city-map-agent', {
+  const { data, error } = await supabase.functions.invoke("city-map-agent", {
     body: { message: prompt, sessionId },
   });
+
   if (error) throw new Error(`Edge function error: ${error.message}`);
-  return data?.text || '';
+  if (!data?.text || data.text.trim().length === 0) throw new Error("Agent returned empty response");
+  return data.text;
 }
 
-function validateMergedContent(merged: MapContentStructured): boolean {
-  try {
-    const str = JSON.stringify(merged);
-    const parsed = JSON.parse(str);
-    if (!parsed.sections) return false;
-    const pillars = ['body', 'space', 'territory', 'identity', 'other'] as const;
-    for (const p of pillars) {
-      if (!parsed.sections[p]?.title || !parsed.sections[p]?.summary) {
-        console.error(`[CityMap] Validation: missing ${p}.title or ${p}.summary`);
-        return false;
-      }
-    }
-    if (typeof parsed.introduction !== 'string' || !parsed.introduction) {
-      console.error('[CityMap] Validation: missing introduction');
-      return false;
-    }
-    return true;
-  } catch (e) {
-    console.error('[CityMap] Validation roundtrip failed:', e);
-    return false;
+async function callWithRetry(prompt: string, sessionId: string, validator: (parsed: any) => boolean): Promise<any> {
+  for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+    const raw = await callAgent(prompt, `${sessionId}-a${attempt}`);
+    const parsed = extractJson(raw);
+    if (parsed && validator(parsed)) return parsed;
+    console.warn(`[CityMap] Attempt ${attempt} failed validation, retrying...`);
   }
+  throw new Error("Failed after retries");
+}
+
+async function updateQuestionnaire(id: string, payload: { map_status: string; map_content?: string }) {
+  const { error } = await supabase.from("city_questionnaires").update(payload).eq("id", id);
+  if (error) throw error;
+}
+
+function getNextPart(mapStatus: string | null | undefined, isPremium: boolean): { part: number; status: GenerationPartStatus } | null {
+  if (!mapStatus || mapStatus === "pending" || mapStatus === "failed") return { part: 1, status: "generating_part_1" };
+  if (mapStatus === "generating_part_1") return { part: 1, status: "generating_part_1" };
+  if (mapStatus === FREE_COMPLETION_STATUS) return isPremium ? { part: 2, status: "generating_part_2" } : null;
+  if (mapStatus === "generating_part_2") return { part: 2, status: "generating_part_2" };
+  if (mapStatus === "generating_part_3") return { part: 3, status: "generating_part_3" };
+  if (mapStatus === "generating_part_4") return { part: 4, status: "generating_part_4" };
+  if (mapStatus === "generating_part_5") return { part: 5, status: "generating_part_5" };
+  if (mapStatus === "generating_part_6") return { part: 6, status: "generating_part_6" };
+  return null;
 }
 
 export async function generateCityMap(
   questionnaire: CityQuestionnaireRow,
-  userName: string
-): Promise<{ success: boolean; error?: string }> {
+  userName: string,
+  language: string = "pt",
+  isPremium: boolean = false,
+  onProgress?: (progress: GenerationProgress) => void,
+): Promise<{ success: boolean; error?: string; done?: boolean; nextStatus?: string }> {
+  const lang = language.substring(0, 2);
   const scores = buildScores(questionnaire);
+  const sessionBase = `citymap-${questionnaire.id}-${Date.now()}`;
+  const totalParts = isPremium ? 6 : 1;
+  const next = getNextPart(questionnaire.map_status, isPremium);
 
-  await supabase
-    .from('city_questionnaires')
-    .update({ map_status: 'generating' })
-    .eq('id', questionnaire.id);
-
-  for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
-    try {
-      const sessionBase = `citymap-${questionnaire.id}-${Date.now()}`;
-
-      // === PART 1: Intro + Body + Space ===
-      console.log(`[CityMap] Attempt ${attempt}/${MAX_RETRIES}: Part 1 (intro+body+space)...`);
-      const raw1 = await callAgent(buildPromptPart1(questionnaire, scores, userName), `${sessionBase}-p1`);
-      console.log(`[CityMap] Part 1 raw: ${raw1.length} chars`);
-      const part1 = extractJson(raw1);
-      if (!part1?.sections?.body || !part1?.sections?.space || !part1?.introduction) {
-        console.warn(`[CityMap] Part 1 incomplete. Found:`, part1 ? Object.keys(part1.sections || {}) : 'null');
-        if (attempt < MAX_RETRIES) continue;
-        throw new Error('Part 1 invalid after retries');
-      }
-      console.log(`[CityMap] Part 1 ✓`);
-
-      // === PART 2: Territory + Identity ===
-      console.log(`[CityMap] Attempt ${attempt}/${MAX_RETRIES}: Part 2 (territory+identity)...`);
-      const raw2 = await callAgent(buildPromptPart2(questionnaire, scores, userName), `${sessionBase}-p2`);
-      console.log(`[CityMap] Part 2 raw: ${raw2.length} chars`);
-      const part2 = extractJson(raw2);
-      if (!part2?.sections?.territory || !part2?.sections?.identity) {
-        console.warn(`[CityMap] Part 2 incomplete. Found:`, part2 ? Object.keys(part2.sections || {}) : 'null');
-        if (attempt < MAX_RETRIES) continue;
-        throw new Error('Part 2 invalid after retries');
-      }
-      console.log(`[CityMap] Part 2 ✓`);
-
-      // === PART 3: Other + Conclusion + Poetic ===
-      console.log(`[CityMap] Attempt ${attempt}/${MAX_RETRIES}: Part 3 (other+conclusion+poetic)...`);
-      const raw3 = await callAgent(buildPromptPart3(questionnaire, scores, userName), `${sessionBase}-p3`);
-      console.log(`[CityMap] Part 3 raw: ${raw3.length} chars`);
-      const part3 = extractJson(raw3);
-      if (!part3?.sections?.other) {
-        console.warn(`[CityMap] Part 3 incomplete. Found:`, part3 ? Object.keys(part3.sections || {}) : 'null');
-        if (attempt < MAX_RETRIES) continue;
-        throw new Error('Part 3 invalid after retries');
-      }
-      console.log(`[CityMap] Part 3 ✓`);
-
-      // === MERGE ===
-      const merged: MapContentStructured = {
-        title: part1.title || `Mapa Profundo de ${questionnaire.city}`,
-        subtitle: part1.subtitle || `Para ${userName}`,
-        introduction: part1.introduction,
-        sections: {
-          body: part1.sections.body,
-          space: part1.sections.space,
-          territory: part2.sections.territory,
-          identity: part2.sections.identity,
-          other: part3.sections.other,
-        },
-        purchasing_power_insights: part3.purchasing_power_insights || '',
-        conclusion: part3.conclusion || '',
-        poetic_proposition: part3.poetic_proposition || '',
-      };
-
-      if (!validateMergedContent(merged)) {
-        console.error(`[CityMap] Merged validation failed on attempt ${attempt}`);
-        if (attempt < MAX_RETRIES) continue;
-        throw new Error('Merged content validation failed');
-      }
-
-      const jsonString = JSON.stringify(merged);
-      console.log(`[CityMap] Final JSON: ${jsonString.length} chars`);
-
-      // Safety: parse what we're about to save
-      try { JSON.parse(jsonString); } catch {
-        throw new Error('Final JSON string is corrupt');
-      }
-
-      const { error: updateError } = await supabase
-        .from('city_questionnaires')
-        .update({ map_content: jsonString, map_status: 'completed' })
-        .eq('id', questionnaire.id);
-
-      if (updateError) throw updateError;
-
-      console.log(`[CityMap] ✅ Map generated on attempt ${attempt} (${jsonString.length} chars)`);
-      return { success: true };
-    } catch (err: any) {
-      console.error(`[CityMap] Attempt ${attempt} failed:`, err.message);
-      if (attempt >= MAX_RETRIES) {
-        await supabase
-          .from('city_questionnaires')
-          .update({ map_status: 'failed' })
-          .eq('id', questionnaire.id);
-        return { success: false, error: err.message };
-      }
-    }
+  if (!next) {
+    return { success: true, done: questionnaire.map_status === PREMIUM_COMPLETION_STATUS || questionnaire.map_status === FREE_COMPLETION_STATUS };
   }
 
-  return { success: false, error: 'Unknown error' };
+  const saved = parseSavedMapContent(questionnaire.map_content);
+  const partial = buildBasePartialMap(userName, saved);
+
+  try {
+    onProgress?.({ currentPart: next.part, totalParts, status: next.status });
+    await updateQuestionnaire(questionnaire.id, {
+      map_status: next.status,
+      map_content: JSON.stringify(partial),
+    });
+
+    if (next.part === 1) {
+      const part1 = await callWithRetry(
+        promptPart1(questionnaire, scores, userName, lang),
+        `${sessionBase}-p1`,
+        (p) => !!p?.title && !!p?.introduction,
+      );
+
+      const updated: MapContentStructured = {
+        ...partial,
+        title: part1.title,
+        subtitle: part1.subtitle || partial.subtitle,
+        introduction: part1.introduction,
+      };
+
+      const finalStatus: GenerationStatus = isPremium ? "generating_part_2" : FREE_COMPLETION_STATUS;
+      await updateQuestionnaire(questionnaire.id, {
+        map_status: finalStatus,
+        map_content: JSON.stringify(updated),
+      });
+
+      return { success: true, done: !isPremium, nextStatus: finalStatus };
+    }
+
+    if (next.part === 2) {
+      const body = await callWithRetry(
+        promptPart2(questionnaire, scores, userName, lang),
+        `${sessionBase}-p2`,
+        (p) => !!p?.title && !!p?.deep_analysis,
+      );
+
+      partial.sections.body = body;
+      await updateQuestionnaire(questionnaire.id, {
+        map_status: "generating_part_3",
+        map_content: JSON.stringify(partial),
+      });
+      return { success: true, done: false, nextStatus: "generating_part_3" };
+    }
+
+    if (next.part === 3) {
+      const space = await callWithRetry(
+        promptPart3(questionnaire, scores, userName, lang),
+        `${sessionBase}-p3`,
+        (p) => !!p?.title && !!p?.deep_analysis,
+      );
+
+      partial.sections.space = space;
+      await updateQuestionnaire(questionnaire.id, {
+        map_status: "generating_part_4",
+        map_content: JSON.stringify(partial),
+      });
+      return { success: true, done: false, nextStatus: "generating_part_4" };
+    }
+
+    if (next.part === 4) {
+      const territory = await callWithRetry(
+        promptPart4(questionnaire, scores, userName, lang),
+        `${sessionBase}-p4`,
+        (p) => !!p?.title && !!p?.deep_analysis,
+      );
+
+      partial.sections.territory = territory;
+      await updateQuestionnaire(questionnaire.id, {
+        map_status: "generating_part_5",
+        map_content: JSON.stringify(partial),
+      });
+      return { success: true, done: false, nextStatus: "generating_part_5" };
+    }
+
+    if (next.part === 5) {
+      const result = await callWithRetry(
+        promptPart5(questionnaire, scores, userName, lang),
+        `${sessionBase}-p5`,
+        (p) => !!p?.identity?.title && !!p?.other?.title,
+      );
+
+      partial.sections.identity = result.identity;
+      partial.sections.other = result.other;
+      await updateQuestionnaire(questionnaire.id, {
+        map_status: "generating_part_6",
+        map_content: JSON.stringify(partial),
+      });
+      return { success: true, done: false, nextStatus: "generating_part_6" };
+    }
+
+    if (next.part === 6) {
+      const result = await callWithRetry(
+        promptPart6(questionnaire, scores, userName, lang),
+        `${sessionBase}-p6`,
+        (p) => !!p?.conclusion && !!p?.poetic_proposition,
+      );
+
+      partial.purchasing_power_insights = result.purchasing_power_insights || "";
+      partial.conclusion = result.conclusion || "";
+      partial.poetic_proposition = result.poetic_proposition || "";
+
+      JSON.parse(JSON.stringify(partial));
+
+      await updateQuestionnaire(questionnaire.id, {
+        map_status: PREMIUM_COMPLETION_STATUS,
+        map_content: JSON.stringify(partial),
+      });
+      return { success: true, done: true, nextStatus: PREMIUM_COMPLETION_STATUS };
+    }
+
+    return { success: false, error: "No generation step matched" };
+  } catch (err: any) {
+    console.error("[CityMap] Generation failed:", err.message);
+    await updateQuestionnaire(questionnaire.id, {
+      map_status: "failed",
+      map_content: JSON.stringify(partial),
+    });
+    return { success: false, error: err.message };
+  }
 }

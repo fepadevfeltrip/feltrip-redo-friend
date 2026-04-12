@@ -409,7 +409,7 @@
     "modelDesc": "Para observar la presencia relacional en procesos de adaptación y pertenencia.",
     "method": "Método:",
     "methodDesc": "Observación a través de autoevaluaciones fenomenológicas (percepción corporal, emocional y simbólica), mediadas por prácticas orientadas por Feltrip™.",
-    "aboutBoba": "Sobre Boba",
+    "aboutBoba": "Sobre  Culti",
     "aboutBobaDesc": "Conozca a su guardián de presencia y los 5 pilares",
     "guardianOfPresence": "Guardián de la Presencia",
     "chooseExploration": "Elija cómo desea explorar su presencia hoy",
@@ -429,7 +429,7 @@
     "cultCompassDesc": "Acceda a insights reales y capas ocultas de las ciudades — Río de Janeiro, São Paulo y Florianópolis. Use este espacio para pedir gemas, lugares y consejos prácticos calibrados con su vibe de hoy.",
     "cultNotGenericAI": "Cult no es una IA genérica; es una curaduría viva de Feltrip, nutrida por investigaciones académicas y experiencias vividas en los territorios para que sepa exactamente a dónde ir y cómo pertenecer.",
     "cultCredits": "Usted tiene <bold>10</bold> conversaciones/mes con la Cult AI disponibles",
-    "connectingToBoba": "Conectando con Boba...",
+    "connectingToBoba": "Conectando con Culti...",
     "yourConfidentialCompanion": "Su compañera confidencial",
     "presenceMap": "Mapa de Presencia",
     "fivePillarsTab": "5 Pilares",
@@ -455,7 +455,7 @@
     "pleaseSelectAnswer": "Por favor, seleccione una respuesta",
     "chooseHowMuchAgree": "Elija cuánto está de acuerdo con esta afirmación.",
     "questionOf": "Cuestión {{current}} de {{total}}",
-    "bobaIntro1a": "Al interactuar con Boba, los usuarios pueden elegir cómo quieren interactuar: explorando la",
+    "bobaIntro1a": "Al interactuar con Culti, los usuarios pueden elegir cómo quieren interactuar: explorando la",
     "bobaIntro1b": "cultura brasileña",
     "bobaIntro1c": "de forma más amplia, accediendo a",
     "bobaIntro1d": "insights locales y capas ocultas de las ciudades",
@@ -468,7 +468,7 @@
     "bobaIntro1k": "el otro",
     "bobaIntro1l": "y",
     "bobaIntro1m": "los espacios de casa y trabajo",
-    "bobaIntro2a": "Boba toma su nombre del",
+    "bobaIntro2a": "Culti toma su nombre del",
     "bobaIntro2b": "bufón de la corte",
     "bobaIntro2c": "— una figura lúdica pero perspicaz, autorizada a transitar entre jerarquías y hablar libremente, ofreciendo perspectivas que conectan liderazgo y equipos por igual. Ella no es una IA genérica, sino una",
     "bobaIntro2d": "curaduría viva por Feltrip",
@@ -577,7 +577,7 @@
     "step1Content3": "usted",
     "step1Content4": "— y cómo su cuerpo aterriza en el mundo.",
     "step1Content5": "Yo soy",
-    "step1Content6": "Boba",
+    "step1Content6": "Culti",
     "step1Content7": "Estoy aquí para caminar con usted por los primeros pasos de este nuevo paisaje.",
     "step1Cta": "Continuar",
     "step2Title": "Vamos a Observar lo que Vive en Usted Ahora",
@@ -594,7 +594,7 @@
     "step3Content4": "propuestas poéticas",
     "step3Content5": "inspiradas en arte, performance y estética relacional — pequeños rituales para expandir su atención y suavizar su jornada.",
     "step3Content6": "Cuando esté listo, entramos en mi casa. Allí, la jornada comienza.",
-    "step3Cta": "Entrar con Boba"
+    "step3Cta": "Entrar con Culti"
   },
   "presenceQuestions": {
     "before_arrival": {
@@ -732,11 +732,11 @@
     "activationSubtitle": "Activación de Presencia Relacional",
     "pillarsTitle": "Sus 5 Pilares",
     "pillarsDescription": "Toque un pilar para explorarlo con Boba",
-    "talkToBoba": "Hable con Boba sobre {{pillar}}",
+    "talkToBoba": "Hable con Culti sobre {{pillar}}",
     "shareMind": "Comparta lo que tiene en mente sobre este pilar",
-    "tellBoba": "Cuéntele a Boba lo que está experimentando con {{pillar}}...",
-    "bobaReflecting": "Boba está reflexionando...",
-    "askBoba": "Preguntar a Boba",
+    "tellBoba": "Cuéntele a Culti lo que está experimentando con {{pillar}}...",
+    "bobaReflecting": "Culti está reflexionando...",
+    "askBoba": "Preguntar a Culti",
     "takeAnother": "Realizar Otro Cuestionario"
   },
   "cityQ": {
@@ -819,7 +819,7 @@
     "startMap": "🗺️ Mapa Personal de la Ciudad",
     "startMapDesc": "¿Se va a mudar a la ciudad? Haga su mapa personalizado.",
     "startAnotherMap": "Hacer otro Mapa de otra ciudad",
-    "startAnotherMapDesc": "¿Quiere explorar su ciudad natal, una que va a visitar o donde vive ahora? Cada mapa nuevo cuesta R$47.",
+    "startAnotherMapDesc": "¿Quiere explorar su ciudad natal, una que va a visitar o donde vive ahora?",
     "purchasingPower": "Poder adquisitivo",
     "purchasingPowerDesc": "Esto nos ayuda a personalizar consejos sobre lugares, experiencias y servicios compatibles con su momento.",
     "powerEconomic": "Económico — Priorizo la relación coste-beneficio",
@@ -862,7 +862,8 @@
     "tryAgainLater": "Inténtelo de nuevo más tarde.",
     "loadError": "❌ Error al cargar el mapa. Formato inesperado.",
     "relationalMap": "Mapa Relacional",
-    "traveler": "Viajero"
+    "traveler": "Viajero",
+    "weaving": "Tejendo..."
   },
   "cultChat": {
     "freeLimitTitle": "Ya usaste tu itinerario gratuito",

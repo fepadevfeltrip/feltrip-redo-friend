@@ -1,4 +1,6 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
+import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
 import {
   RadarChart,
   PolarGrid,
@@ -15,11 +17,12 @@ import {
 } from "@/components/ui/accordion";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Sparkles, Heart, Compass, Users, Brain, ChevronLeft, Share2 } from "lucide-react";
+import { MapPin, Sparkles, Heart, Compass, Users, Brain, ChevronLeft, Share2, Loader2, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { MapContentStructured } from "./types/mapContent";
 import { NotificationOptInBanner } from "./components/NotificationOptInBanner";
 import { supabase } from "./services/supabaseClient";
+import type { GenerationProgress } from "./services/cityMapAgentService";
 
 interface CityMapViewerProps {
   content: MapContentStructured;
@@ -28,11 +31,14 @@ interface CityMapViewerProps {
   userName: string;
   onBack: () => void;
   isAnonymous?: boolean;
+  isGeneratingMore?: boolean;
+  generationProgress?: GenerationProgress | null;
+  isFreeUser?: boolean;
+  mapStatus?: string;
 }
 
-const PILLAR_CONFIG = {
+const PILLAR_STYLE = {
   body: {
-    label: "Corpo",
     icon: Heart,
     color: "hsl(6, 100%, 71%)",
     bgClass: "bg-accent/10",
@@ -41,7 +47,6 @@ const PILLAR_CONFIG = {
     badgeClass: "bg-accent/20 text-accent border-accent/30",
   },
   space: {
-    label: "Espaço",
     icon: Compass,
     color: "hsl(38, 80%, 53%)",
     bgClass: "bg-secondary/10",
@@ -50,7 +55,6 @@ const PILLAR_CONFIG = {
     badgeClass: "bg-secondary/20 text-secondary border-secondary/30",
   },
   territory: {
-    label: "Território",
     icon: MapPin,
     color: "hsl(193, 65%, 29%)",
     bgClass: "bg-primary/10",
@@ -59,7 +63,6 @@ const PILLAR_CONFIG = {
     badgeClass: "bg-primary/20 text-primary border-primary/30",
   },
   identity: {
-    label: "Identidade",
     icon: Brain,
     color: "hsl(330, 100%, 56%)",
     bgClass: "bg-[hsl(330,100%,56%)]/10",
@@ -68,7 +71,6 @@ const PILLAR_CONFIG = {
     badgeClass: "bg-[hsl(330,100%,56%)]/20 text-[hsl(330,100%,56%)] border-[hsl(330,100%,56%)]/30",
   },
   other: {
-    label: "O Outro",
     icon: Users,
     color: "hsl(140, 15%, 50%)",
     bgClass: "bg-muted",
@@ -78,13 +80,18 @@ const PILLAR_CONFIG = {
   },
 } as const;
 
-const PILLAR_ORDER: (keyof typeof PILLAR_CONFIG)[] = [
+const PILLAR_ORDER: (keyof typeof PILLAR_STYLE)[] = [
   "body",
   "space",
   "territory",
   "identity",
   "other",
 ];
+
+function isPillarEmpty(section: any): boolean {
+  if (!section) return true;
+  return !section.deep_analysis && !section.summary && (!section.places || section.places.length === 0);
+}
 
 export const CityMapViewer = ({
   content,
@@ -93,7 +100,22 @@ export const CityMapViewer = ({
   userName,
   onBack,
   isAnonymous = false,
+  isGeneratingMore = false,
+  generationProgress,
+  isFreeUser = false,
+  mapStatus,
 }: CityMapViewerProps) => {
+  const { t } = useTranslation();
+  const navigate = useNavigate();
+
+  const pillarLabels: Record<keyof typeof PILLAR_STYLE, string> = {
+    body: t("presence.body"),
+    space: t("presence.space"),
+    territory: t("presence.territory"),
+    identity: t("presence.identity"),
+    other: t("presence.theOther"),
+  };
+
   const handleGoogleLogin = async () => {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
@@ -103,19 +125,24 @@ export const CityMapViewer = ({
   };
 
   const radarData = PILLAR_ORDER.map((key) => ({
-    pillar: PILLAR_CONFIG[key].label,
+    pillar: pillarLabels[key],
     score: scores[key],
     fullMark: 100,
   }));
 
+  const showFreeUpgradeBanner = isFreeUser && (mapStatus === "completed_free" || !mapStatus?.startsWith("generating"));
+
   return (
-    <div className="flex flex-col h-full bg-background overflow-y-auto">
+    <div className="flex flex-col min-h-[100dvh] h-full bg-background overflow-y-auto">
       {/* Header */}
       <div className="sticky top-0 z-30 bg-primary text-primary-foreground p-4">
         <Button
           variant="ghost"
           size="sm"
-          onClick={onBack}
+          onClick={() => {
+            onBack();
+            navigate('/');
+          }}
           className="text-primary-foreground/80 hover:text-primary-foreground hover:bg-primary-foreground/10 mb-2 -ml-2"
         >
           <ChevronLeft className="h-4 w-4 mr-1" />
@@ -146,7 +173,7 @@ export const CityMapViewer = ({
         <Card>
           <CardContent className="p-5">
             <h2 className="text-lg font-bold text-primary mb-4 text-center">
-              Seu Radar de Presença
+              {t("presence.yourRelationalPresenceRadar")}
             </h2>
             <div className="h-64">
               <ResponsiveContainer width="100%" height="100%">
@@ -174,14 +201,14 @@ export const CityMapViewer = ({
             {/* Score badges */}
             <div className="flex flex-wrap gap-2 justify-center mt-3">
               {PILLAR_ORDER.map((key) => {
-                const cfg = PILLAR_CONFIG[key];
+                const cfg = PILLAR_STYLE[key];
                 return (
                   <Badge
                     key={key}
                     variant="outline"
                     className={cfg.badgeClass}
                   >
-                    {cfg.label}: {scores[key]}%
+                    {pillarLabels[key]}: {scores[key]}%
                   </Badge>
                 );
               })}
@@ -189,15 +216,72 @@ export const CityMapViewer = ({
           </CardContent>
         </Card>
 
-      {/* Everything below intro + radar is blurred for anonymous users */}
+        {/* Free user banner — shows after intro + radar */}
+        {showFreeUpgradeBanner && (
+          <Card className="border-secondary/50 bg-gradient-to-br from-secondary/10 to-primary/5">
+            <CardContent className="p-5 text-center space-y-3">
+              <div className="flex justify-center">
+                <Lock className="h-8 w-8 text-secondary" />
+              </div>
+              <h3 className="text-lg font-bold text-primary">
+                {t("mapTab.deepLayersTitle")}
+              </h3>
+              <p className="text-sm text-muted-foreground">
+                {t("mapTab.deepLayersDesc")}
+              </p>
+              <Button
+                className="w-full"
+                onClick={() => {
+                  window.dispatchEvent(new CustomEvent("auth-required-for-checkout"));
+                }}
+              >
+                <Sparkles className="h-4 w-4 mr-2" />
+                {t("mapTab.unlockFullMap")}
+              </Button>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Everything below intro + radar is blurred for anonymous users */}
         <div className="relative">
-          <div className={isAnonymous ? "blur-[8px] select-none pointer-events-none" : ""}>
+          <div className={isAnonymous || showFreeUpgradeBanner ? "blur-[8px] select-none pointer-events-none" : ""}>
             <Accordion type="multiple" defaultValue={PILLAR_ORDER} className="space-y-3">
               {PILLAR_ORDER.map((pillarKey) => {
                 const section = content.sections[pillarKey];
                 if (!section) return null;
-                const cfg = PILLAR_CONFIG[pillarKey];
+                const cfg = PILLAR_STYLE[pillarKey];
                 const Icon = cfg.icon;
+                const empty = isPillarEmpty(section);
+
+                // If pillar is empty and we're generating, show a placeholder
+                if (empty && isGeneratingMore) {
+                  return (
+                    <div
+                      key={pillarKey}
+                      className={`border rounded-xl overflow-hidden ${cfg.borderClass} ${cfg.bgClass} px-4 py-4`}
+                    >
+                      <div className="flex items-center gap-3 opacity-50">
+                        <div
+                          className="w-10 h-10 rounded-full flex items-center justify-center"
+                          style={{ backgroundColor: cfg.color + "22" }}
+                        >
+                          <Icon className="h-5 w-5" style={{ color: cfg.color }} />
+                        </div>
+                        <div>
+                          <span className="font-bold text-base" style={{ color: cfg.color }}>
+                            {pillarLabels[pillarKey]}
+                          </span>
+                          <span className="block text-xs text-muted-foreground">
+                            {t("mapTab.weaving")}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                }
+
+                // If pillar is empty and not generating, skip
+                if (empty) return null;
 
                 return (
                   <AccordionItem
@@ -217,7 +301,7 @@ export const CityMapViewer = ({
                         </div>
                         <div className="text-left">
                           <span className="font-bold text-base" style={{ color: cfg.color }}>
-                            {section.title || cfg.label}
+                            {section.title || pillarLabels[pillarKey]}
                           </span>
                           <span className="block text-xs text-muted-foreground">
                             Score: {scores[pillarKey]}%
@@ -297,7 +381,7 @@ export const CityMapViewer = ({
           </div>
 
           {/* Login overlay on top of blurred content */}
-          {isAnonymous && (
+          {isAnonymous && !showFreeUpgradeBanner && (
             <div className="absolute inset-0 flex items-start justify-center pt-16 z-20">
               <div className="bg-white dark:bg-boba-darkCard p-6 sm:p-8 rounded-3xl shadow-2xl border-2 border-boba-coral/30 text-center space-y-4 mx-4 max-w-sm w-full">
                 <div className="text-3xl">🗺️</div>
@@ -313,7 +397,7 @@ export const CityMapViewer = ({
                     className="w-full flex items-center justify-center gap-3 bg-boba-coral hover:bg-boba-coral/90 text-white font-bold py-4 rounded-2xl shadow-lg text-xs uppercase tracking-widest hover:-translate-y-0.5 transition-all"
                   >
                     <div className="bg-white p-1.5 rounded-full flex items-center justify-center shrink-0">
-                      <svg className="w-4 h-4" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+                      <svg className="w-4 h-4" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" /><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" /><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" /><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" /></svg>
                     </div>
                     Continuar com Google
                   </button>
@@ -323,8 +407,25 @@ export const CityMapViewer = ({
           )}
         </div>
 
-        {/* Content below blurred section — only show if not anonymous */}
-        {!isAnonymous && (
+        {/* Generating more parts indicator — shown at the bottom for premium users */}
+        {isGeneratingMore && generationProgress && (
+          <Card className="border-secondary/40 bg-secondary/5 animate-pulse">
+            <CardContent className="p-4 flex items-center gap-4">
+              <Loader2 className="h-6 w-6 text-secondary animate-spin shrink-0" />
+              <div>
+                <p className="text-sm font-semibold text-secondary">
+                  ✨ Tecendo Parte {generationProgress.currentPart} de {generationProgress.totalParts}...
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  Os pilares vão aparecendo conforme ficam prontos.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Content below blurred section — only show if not anonymous and not free-locked */}
+        {!isAnonymous && !showFreeUpgradeBanner && (
           <>
             {/* Poetic Proposition */}
             {content.poetic_proposition && (

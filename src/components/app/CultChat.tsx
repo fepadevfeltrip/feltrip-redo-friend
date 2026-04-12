@@ -28,6 +28,109 @@ import { CultCharacter } from "./CultCharacter";
 import { HookScreen } from "./HookScreen";
 import { SplashScreen } from "./SplashScreen";
 
+// --- DICIONÁRIO DE INTERFACE (Evita Hardcodes) ---
+const getUITexts = (lang: Language) => {
+  const texts = {
+    en: {
+      ciladaTitle: "⚠️ The Trap — Avoid This",
+      ciladaFallback: "No logistical warnings for now.",
+      ciladaLockDesc: "Pro Exclusive: Discover the trap to avoid. Upgrade now.",
+      daytripTitle: "🎒 Short Trip",
+      daytripFallback: "No short trip suggested for now.",
+      daytripLockDesc: "Pro Exclusive: Discover the ideal short trip. Upgrade now.",
+      cycleDone: (c: number, max: number) => `🗓️ Cycle ${c} of ${max} completed`,
+      cycleDesc: "To maintain curation density, we deliver your immersion in weekly cycles.",
+      nextCycleBtn: (start: number, end: number) => `Unlock Next Cycle (Days ${start} to ${end})`,
+      generating: "Generating next cycle...",
+      upsellTitle: "Want to dive deeper?",
+      upsellDesc: "Unlock your ideal neighborhood (Housing), up to 30-day Itinerary, and get the AI Language Studio.",
+      upsellBtn: "Immersion Combo — up to 30 days — R$ 129.90 / US$ 39.00",
+      askOracle: "Ask the Oracle...",
+      limitReached: "Free plan limit reached...",
+      freeUpsell: "Unlock 24h unlimited chat + up to 7-day itinerary for R$ 29.90 / US$ 9.00!",
+      oopsError: "### Oops\n\n*Could not generate the next cycle. Please try again.*",
+      emptyGems: "### Oops, something went wrong\n\n*Could not display the itinerary safely. Please try again.*",
+      retryHint: "### 🔄 Free text itinerary\n\n*The AI responded without the gem structure. Send a new message (e.g., \"generate itinerary in JSON\") or try again.*",
+      chatDirect: "### 💬 Direct Chat\n\n*Ask me anything — about cities, culture, relocation, or your journey.*",
+      planLimit: "Free plan: 1 day per itinerary.",
+      proLimit: "Pro plan: up to 7 days per itinerary.",
+      freeLimitMsg: "On the free plan, we only generate the 1-Day Itinerary. Upgrade to plan the whole week!",
+      proLimitMsg: "In this flow, the Pro itinerary generates up to 7 days at a time.",
+      revealBtn: "🔓 Reveal my Itinerary",
+      revealDesc: "Google or email • 5 seconds • Your data stays safe",
+      loginGate: "### ✨ Your itinerary is ready!\n\nWe mapped your unique profile and curated secret gems just for you. **Sign in to reveal your full itinerary and save it to your profile** — it takes 5 seconds."
+    },
+    es: {
+      ciladaTitle: "⚠️ La Trampa — Evita Esto",
+      ciladaFallback: "Sin alertas logísticas por ahora.",
+      ciladaLockDesc: "Exclusivo Pro: Descubre la trampa a evitar. Suscríbete ahora.",
+      daytripTitle: "🎒 Viaje Corto",
+      daytripFallback: "Sin viaje corto sugerido por ahora.",
+      daytripLockDesc: "Exclusivo Pro: Descubre el viaje corto ideal. Suscríbete ahora.",
+      cycleDone: (c: number, max: number) => `Ciclo ${c} de ${max} completado`,
+      cycleDesc: "Para mantener la densidad de la curaduría, entregamos tu inmersión en ciclos semanales.",
+      nextCycleBtn: (start: number, end: number) => `Liberar Próximo Ciclo (Días ${start} a ${end})`,
+      generating: "Generando próximo ciclo...",
+      upsellTitle: "¿Quieres profundizar?",
+      upsellDesc: "Desbloquea tu barrio ideal (Housing), el Itinerario de hasta 30 días y obtén el Estudio de Idiomas con IA.",
+      upsellBtn: "Combo Inmersión — hasta 30 días — R$ 129,90 / US$ 29,00",
+      askOracle: "Pregunta al Oráculo...",
+      limitReached: "Límite del plan gratuito alcanzado...",
+      freeUpsell: "¡Desbloquea chat ilimitado 24h + itinerario de hasta 7 días por R$ 29,90 / US$ 9,00!",
+      oopsError: "### Ups\n\n*No se pudo generar el próximo ciclo. Intenta de nuevo.*",
+      emptyGems: "### Ups, algo salió mal\n\n*No se pudo mostrar el itinerario de forma segura. Intenta de nuevo.*",
+      retryHint: "### 🔄 Itinerario en texto libre\n\n*La IA respondió sin la estructura de gemas. Envía un nuevo mensaje (ej: \"genera el itinerario en JSON\") o intenta de nuevo.*",
+      chatDirect: "### 💬 Chat Directo\n\n*Pregúntame lo que quieras — sobre ciudades, cultura, mudanza o tu viaje.*",
+      planLimit: "Plan gratuito: 1 día por itinerario.",
+      proLimit: "Plan Pro: hasta 7 días por itinerario.",
+      freeLimitMsg: "En el plan gratuito, solo generamos el Itinerario de 1 Día. ¡Mejora para planear toda la semana!",
+      proLimitMsg: "En este flujo, el itinerario Pro genera hasta 7 días a la vez.",
+      revealBtn: "🔓 Revelar mi Itinerario",
+      revealDesc: "Google o email • 5 segundos • Tus datos están seguros",
+      loginGate: "### ✨ ¡Tu itinerario está listo!\n\nMapeamos tu perfil único y curamos gemas secretas solo para ti. **Inicia sesión para revelar tu itinerario completo y guardarlo en tu perfil** — toma 5 segundos."
+    },
+    pt: {
+      ciladaTitle: "⚠️ A Cilada — Evite Isso",
+      ciladaFallback: "Sem alertas logísticos por enquanto.",
+      ciladaLockDesc: "Exclusivo Pro: Descubra a cilada a evitar. Assine agora.",
+      daytripTitle: "🎒 Viagem Curta",
+      daytripFallback: "Sem viagem curta sugerida por enquanto.",
+      daytripLockDesc: "Exclusivo Pro: Descubra a viagem curta ideal. Assine agora.",
+      cycleDone: (c: number, max: number) => `🗓️ Ciclo ${c} de ${max} concluído`,
+      cycleDesc: "Para manter a densidade da curadoria, entregamos sua imersão em ciclos semanais.",
+      nextCycleBtn: (start: number, end: number) => `Liberar Próximo Ciclo (Dias ${start} a ${end})`,
+      generating: "Gerando próximo ciclo...",
+      upsellTitle: "Quer mergulhar fundo?",
+      upsellDesc: "Desbloqueie o seu bairro ideal (Housing), o Roteiro de até 30 dias e ganhe o Estúdio de Idiomas com IA.",
+      upsellBtn: "Combo Imersão — até 30 dias — R$ 129,90 / US$ 29,00",
+      askOracle: "Pergunte ao Oráculo...",
+      limitReached: "Limite do plano grátis atingido...",
+      freeUpsell: "Libere chat ilimitado 24h + roteiro até 7 dias por R$ 29,90 / US$ 9,00!",
+      oopsError: "### Ops\n\n*Não foi possível gerar o próximo ciclo. Tente novamente.*",
+      emptyGems: "### Ops, algo deu errado\n\n*Não foi possível exibir o roteiro com segurança. Tente novamente.*",
+      retryHint: "### 🔄 Roteiro em texto livre\n\n*A IA respondeu sem a estrutura de gemas. Envie uma nova mensagem (ex: \"gere o roteiro em JSON\") ou tente novamente.*",
+      chatDirect: "### 💬 Chat Direto\n\n*Pergunte o que quiser — sobre cidades, cultura, mudança ou sua jornada.*",
+      planLimit: "Plano gratuito: 1 dia por roteiro.",
+      proLimit: "Plano Pro: até 7 dias por roteiro.",
+      freeLimitMsg: "No plano gratuito, geramos apenas o Roteiro de 1 Dia. Faça upgrade para planejar a semana toda!",
+      proLimitMsg: "Neste fluxo, o roteiro Pro gera até 7 dias por vez.",
+      revealBtn: "🔓 Revelar meu Roteiro",
+      revealDesc: "Google ou email • 5 segundos • Seus dados ficam seguros",
+      loginGate: "### ✨ Seu roteiro está pronto!\n\nMapeamos seu perfil único e curamos gemas secretas só para você. **Faça login para revelar seu roteiro completo e salvar no seu perfil** — leva 5 segundos."
+    }
+  };
+  return texts[lang] || texts.pt;
+};
+
+// CONSERTO: Limpador de IA Robusto (Remove tags JSON, Answer e Markdown)
+const cleanAI = (text: string) => {
+  if (!text) return "";
+  return text
+    .replace(/<json>|<\/json>|<answer>|<\/answer>/gi, "") // Remove tags de estrutura
+    .replace(/```json|```/gi, "") // Remove blocos de código markdown
+    .trim();
+};
+
 const parseCoord = (val: any) => {
   if (val === undefined || val === null || val === "") return 0;
   const num = parseFloat(
@@ -42,7 +145,6 @@ const normalizeGems = (rawGems: any[]): Gem[] => {
   if (!Array.isArray(rawGems)) return [];
   return rawGems
     .filter((raw: any) => {
-      // Filtra gemas sem nome real — evita cards "Nova Descoberta" vazios
       const g: any = {};
       for (const key in raw) {
         if (raw.hasOwnProperty(key)) g[key.toLowerCase()] = raw[key];
@@ -75,7 +177,7 @@ const normalizeGems = (rawGems: any[]): Gem[] => {
                 ? "night"
                 : rawShift,
         name: String(g.name || g.nome_local || g.nome || g.title || g.local),
-        description: String(g.description || g.vibe_curta || g.descricao || g.desc || g.vibe || ""),
+        description: cleanAI(String(g.description || g.vibe_curta || g.descricao || g.desc || g.vibe || "")),
         address: String(g.address || g.endereco || g.localizacao || ""),
         dia: String(g.dia || g.data_evento || g.data || ""),
         horario: String(g.horario || g.hora || ""),
@@ -119,13 +221,13 @@ const groupGemsByDay = (gems: Gem[], fallbackStartDay = 1) => {
     .map((day) => ({ day, gems: grouped[day] }));
 };
 
-const createPremiumLockMessage = (id: string, title: string, timestamp: number): Message => ({
+const createPremiumLockMessage = (id: string, lockTitle: string, lockDescription: string, timestamp: number): Message => ({
   id,
   role: "model",
   text: "",
   isPremiumLock: true,
-  lockTitle: title,
-  lockDescription: "Exclusivo Pro: Descubra a cilada a evitar e a viagem curta ideal. Assine agora.",
+  lockTitle,
+  lockDescription,
   timestamp,
 });
 
@@ -144,6 +246,7 @@ export default function App({ embedded = false, initialFlow = "city_selection" }
     return ["pt", "en", "es", "fr", "zh"].includes(mapped) ? mapped : "pt";
   };
   const [language, setLanguage] = useState<Language>(mapI18nLang(i18n.language));
+  const uiText = getUITexts(language);
 
   // Splash + Hook state
   const [showSplash, setShowSplash] = useState(!embedded && !sessionStorage.getItem("cult_splash_shown"));
@@ -166,9 +269,8 @@ export default function App({ embedded = false, initialFlow = "city_selection" }
   const [freeAlreadyUsed, setFreeAlreadyUsed] = useState(false);
   const [daysLimitMessage, setDaysLimitMessage] = useState<string | null>(null);
 
-  // Ciclos de 7 dias
-  const [currentCycle, setCurrentCycle] = useState(1); // ciclo atual (1 = dias 1-7, 2 = dias 8-14, etc.)
-  const [allCycleGems, setAllCycleGems] = useState<Gem[][]>([]); // gemas agrupadas por ciclo
+  const [currentCycle, setCurrentCycle] = useState(1);
+  const [allCycleGems, setAllCycleGems] = useState<Gem[][]>([]);
   const [cycleLoading, setCycleLoading] = useState(false);
 
   const [calculatedMRP, setCalculatedMRP] = useState<MRPData | null>(null);
@@ -178,7 +280,6 @@ export default function App({ embedded = false, initialFlow = "city_selection" }
 
   const isAnonymous = !!user && ((user as any).is_anonymous === true || !user.email);
 
-  // FREE: Verifica se o usuário já usou seu roteiro gratuito (lifetime)
   useEffect(() => {
     if (!user || !isFree) return;
     const checkExistingSession = async () => {
@@ -193,14 +294,12 @@ export default function App({ embedded = false, initialFlow = "city_selection" }
     checkExistingSession();
   }, [user, isFree]);
 
-  // Escuta o evento de compartilhar disparado pelo componente MRPChart
   useEffect(() => {
     const handleOpenShare = () => setShowArchetypeShare(true);
     window.addEventListener("open-share-modal", handleOpenShare);
     return () => window.removeEventListener("open-share-modal", handleOpenShare);
   }, []);
 
-  // POST-LOGIN: When user transitions from anonymous to authenticated, reveal the gems
   useEffect(() => {
     if (!isAnonymous && user?.email && allCycleGems.length > 0 && calculatedMRP && flowState === "diagnosis_result") {
       const hasLoginGate = messages.some((m) => m.isLoginGate);
@@ -218,14 +317,13 @@ export default function App({ embedded = false, initialFlow = "city_selection" }
       }
 
       if (isFree) {
-        gemMessages.push(createPremiumLockMessage(`cilada-lock-${ts}`, "⚠️ A Cilada — Evite Isso", ts++));
-        gemMessages.push(createPremiumLockMessage(`daytrip-lock-${ts}`, "🎒 Viagem Curta", ts++));
+        gemMessages.push(createPremiumLockMessage(`cilada-lock-${ts}`, uiText.ciladaTitle, uiText.ciladaLockDesc, ts++));
+        gemMessages.push(createPremiumLockMessage(`daytrip-lock-${ts}`, uiText.daytripTitle, uiText.daytripLockDesc, ts++));
       }
 
       setMessages([...archetypeMessages, ...gemMessages]);
       setFreeAlreadyUsed(true);
 
-      // Persist to backend
       (async () => {
         try {
           const savedSession = await saveMRPSession({
@@ -272,7 +370,6 @@ export default function App({ embedded = false, initialFlow = "city_selection" }
   }, [isLoading, language]);
 
   const handleCitySelect = (city: City) => {
-    // RESET COMPLETO do estado antes de nova geração
     setMessages([]);
     setCalculatedMRP(null);
     setShowArchetypeShare(false);
@@ -308,11 +405,7 @@ export default function App({ embedded = false, initialFlow = "city_selection" }
       const daysLimit = getDaysLimit(isFree);
 
       if (requestedDays > daysLimit && !daysLimitMessage) {
-        setDaysLimitMessage(
-          isFree
-            ? "No plano gratuito, geramos apenas o Roteiro de 1 Dia. Faça upgrade para planejar a semana toda!"
-            : "Neste fluxo, o roteiro Pro gera até 7 dias por vez.",
-        );
+        setDaysLimitMessage(isFree ? uiText.freeLimitMsg : uiText.proLimitMsg);
         return;
       }
 
@@ -333,7 +426,6 @@ export default function App({ embedded = false, initialFlow = "city_selection" }
       if (quizIndex < 6) {
         setQuizIndex(quizIndex + 1);
       } else {
-        // Reset messages ANTES de iniciar nova análise
         setMessages([]);
         setCalculatedMRP(null);
         setFlowState("analyzing");
@@ -342,9 +434,6 @@ export default function App({ embedded = false, initialFlow = "city_selection" }
     }, 600);
   };
 
-  // Ao montar, tenta carregar sessão existente do backend
-  // Pagantes: sempre restaura a última sessão (não precisa refazer o quiz)
-  // Free: só restaura após pagamento bem-sucedido
   useEffect(() => {
     if (!user || flowState !== "city_selection") return;
     const loadSavedSession = async () => {
@@ -359,7 +448,6 @@ export default function App({ embedded = false, initialFlow = "city_selection" }
         if (!sessions || sessions.length === 0) return;
         const session = sessions[0];
 
-        // Carrega gemas associadas
         const { data: gems } = await supabase
           .from("mrp_gems")
           .select("*")
@@ -395,14 +483,13 @@ export default function App({ embedded = false, initialFlow = "city_selection" }
             categoria_principal: g.categoria_principal || "",
           }));
 
-        // Inicializa sessão de chat para que o pagante possa conversar direto
         await startChatSession(
           `CIDADE: ${session.city || ""}. IDIOMA: ${session.language || language}. SESSÃO RESTAURADA — o usuário já tem um roteiro gerado.`,
         );
 
         setCalculatedMRP(restoredMRP);
         setSelectedCity((session.city || "") as City);
-        setGemsUnlocked(true); // Restored sessions are always unlocked
+        setGemsUnlocked(true);
 
         const groupedDays = groupGemsByDay(restoredGems);
 
@@ -427,8 +514,6 @@ export default function App({ embedded = false, initialFlow = "city_selection" }
       }
     };
 
-    // Pagantes: sempre restaura automaticamente
-    // Free: só restaura se veio de um pagamento bem-sucedido
     const params = new URLSearchParams(window.location.search);
     if (isPremium) {
       loadSavedSession();
@@ -451,7 +536,6 @@ export default function App({ embedded = false, initialFlow = "city_selection" }
       const requestedDays = extractRequestedDays(daysText, getDaysLimit(isFree));
       const cycleDays = getEffectiveRequestedDays(daysText, isFree);
 
-      // APENAS DADOS — sem regras de formato, persona ou instruções de conteúdo.
       const prompt = `CIDADE: ${selectedCity}
 DIAS: ${cycleDays} (ciclo 1 de ${Math.ceil(requestedDays / 7)})
 DESEJOS: ${needsText}
@@ -466,16 +550,15 @@ IDIOMA: ${language}`;
 
       const parsedRoteiro = parseCultRoteiro(responseText);
       const aiData = parsedRoteiro.success ? parsedRoteiro.data : null;
-      const followUpText = parsedRoteiro.followUpText || "";
+
+      // Aplicando a Vassoura de JSON e garantindo segurança
+      const followUpText = cleanAI(parsedRoteiro.followUpText || "");
 
       if (!aiData || !Array.isArray(aiData.gems) || aiData.gems.length === 0) {
-        // FALLBACK: A AWS retornou texto puro em vez de JSON estruturado.
-        // Exibe o texto da IA como mensagem normal + aviso para tentar de novo.
-        const fallbackText = responseText.trim();
+        const fallbackText = cleanAI(responseText);
         const fallbackMessages: Message[] = [];
 
         if (fallbackText && fallbackText.length > 20) {
-          // Mostra o que a IA mandou (texto corrido) para não perder o conteúdo
           fallbackMessages.push({
             id: `ai-text-${Date.now()}`,
             role: "model",
@@ -487,7 +570,7 @@ IDIOMA: ${language}`;
         fallbackMessages.push({
           id: "retry-hint",
           role: "model",
-          text: "### 🔄 Roteiro em texto livre\n\n*A IA respondeu sem a estrutura de gemas. Envie uma nova mensagem (ex: \"gere o roteiro em JSON\") ou tente novamente.*",
+          text: uiText.retryHint,
           timestamp: Date.now() + 1,
         });
 
@@ -498,14 +581,14 @@ IDIOMA: ${language}`;
 
       const finalData: MRPData = {
         scores: averagedScores as MRPData["scores"],
-        emotionalStatus: aiData.emotional_status || "O Explorador Cult",
-        poeticProposition: aiData.poetic_proposition || "Aproveite a jornada.",
+        emotionalStatus: cleanAI(aiData.emotional_status) || "O Explorador Cult",
+        poeticProposition: cleanAI(aiData.poetic_proposition) || "Aproveite a jornada.",
         rawAnswers: finalRawScores,
       };
 
       const finalGems = normalizeGems(aiData.gems);
       if (finalGems.length === 0) {
-        setMessages([{ id: "error-empty-gems", role: "model", text: "### Ops, algo deu errado\n\n*Não foi possível exibir o roteiro com segurança. Tente novamente.*", timestamp: Date.now() }]);
+        setMessages([{ id: "error-empty-gems", role: "model", text: uiText.emptyGems, timestamp: Date.now() }]);
         setFlowState("diagnosis_result");
         return;
       }
@@ -513,43 +596,34 @@ IDIOMA: ${language}`;
       setCalculatedMRP(finalData);
       setAllCycleGems([[...finalGems]]);
       setCurrentCycle(1);
-      setGemsUnlocked(false); // Start locked
+      setGemsUnlocked(false);
 
       const groupedDays = groupGemsByDay(finalGems);
+      const diagnosticMsg = cleanAI(aiData.diagnostic_text) || "Seu roteiro começou a se formar.";
 
-      // Messages: only the diagnostic text (NO graph/radar). The ArchetypeResultCard is rendered separately.
       const newMessages: Message[] = [
         {
           id: `diag-${Date.now()}`,
           role: "model",
-          text: `*${aiData.diagnostic_text || "Seu roteiro começou a se formar."}*`,
+          text: `*${diagnosticMsg}*`,
           timestamp: Date.now() + 5,
         },
       ];
 
-      // GATE DE LOGIN: se o usuário é anônimo, mostra o arquétipo mas bloqueia as gemas
       if (isAnonymous) {
-        const loginGateText = language === "en"
-          ? "### ✨ Your itinerary is ready!\n\nWe mapped your unique profile and curated secret gems just for you. **Sign in to reveal your full itinerary and save it to your profile** — it takes 5 seconds."
-          : language === "es"
-            ? "### ✨ ¡Tu itinerario está listo!\n\nMapeamos tu perfil único y curamos gemas secretas solo para ti. **Inicia sesión para revelar tu itinerario completo y guardarlo en tu perfil** — toma 5 segundos."
-            : "### ✨ Seu roteiro está pronto!\n\nMapeamos seu perfil único e curamos gemas secretas só para você. **Faça login para revelar seu roteiro completo e salvar no seu perfil** — leva 5 segundos.";
-
         newMessages.push({
           id: `login-gate-${Date.now()}`,
           role: "model",
-          text: loginGateText,
+          text: uiText.loginGate,
           isLoginGate: true,
           timestamp: Date.now() + 8,
         });
 
         setMessages(newMessages);
         setFlowState("diagnosis_result");
-        // Persist gems in memory so they appear after login
         return;
       }
 
-      // Gemas agrupadas por dia (usuários logados)
       let ts = Date.now() + 10;
       for (const { day, gems } of groupedDays) {
         newMessages.push({
@@ -570,27 +644,29 @@ IDIOMA: ${language}`;
 
       if (isFree) {
         newMessages.push({
-          ...createPremiumLockMessage(`cilada-lock-${Date.now()}`, "⚠️ A Cilada — Evite Isso", ts++),
+          ...createPremiumLockMessage(`cilada-lock-${Date.now()}`, uiText.ciladaTitle, uiText.ciladaLockDesc, ts++),
         });
         newMessages.push({
-          ...createPremiumLockMessage(`daytrip-lock-${Date.now()}`, "🎒 Viagem Curta", ts++),
+          ...createPremiumLockMessage(`daytrip-lock-${Date.now()}`, uiText.daytripTitle, uiText.daytripLockDesc, ts++),
         });
       } else {
+        const ciladaClean = cleanAI(aiData.cilada_logistica) || uiText.ciladaFallback;
+        const daytripClean = cleanAI(aiData.day_trip) || uiText.daytripFallback;
+
         newMessages.push({
           id: `cilada-${Date.now()}`,
           role: "model",
-          text: `### ⚠️ A Cilada — Evite Isso\n\n${aiData.cilada_logistica || "Sem alertas logísticos por enquanto."}`,
+          text: `### ${uiText.ciladaTitle}\n\n${ciladaClean}`,
           timestamp: ts++,
         });
         newMessages.push({
           id: `daytrip-${Date.now()}`,
           role: "model",
-          text: `### 🎒 Viagem Curta\n\n${aiData.day_trip || "Sem viagem curta sugerida por enquanto."}`,
+          text: `### ${uiText.daytripTitle}\n\n${daytripClean}`,
           timestamp: ts++,
         });
       }
 
-      // Texto pós-JSON do agente (ex: "Quer ajustar algum detalhe do roteiro?")
       if (followUpText) {
         newMessages.push({
           id: `followup-${Date.now()}`,
@@ -604,7 +680,6 @@ IDIOMA: ${language}`;
       setFlowState("diagnosis_result");
       if (isFree) setFreeAlreadyUsed(true);
 
-      // PERSISTIR no backend para recuperação pós-pagamento
       if (user) {
         try {
           const savedSession = await saveMRPSession({
@@ -652,7 +727,6 @@ IDIOMA: ${language}`;
   const handleSendMessage = async () => {
     if (!inputValue.trim() || isLoading) return;
 
-    // TRAVA PLANO FREE: Limite de 1 mensagem no chat
     const userMessageCount = messages.filter((m) => m.role === "user").length;
     if (isFree && userMessageCount >= 1) {
       setShowPaywall(true);
@@ -666,7 +740,8 @@ IDIOMA: ${language}`;
     setIsLoading(true);
     try {
       const response = await sendMessageToGemini(userMsg);
-      const botMsg = typeof response === "string" ? response : (response as any)?.text || "";
+      // CONSERTO: Agora o texto direto do chat também passa pela vassoura de limpeza robusa
+      const botMsg = cleanAI(typeof response === "string" ? response : (response as any)?.text || "");
       setMessages((prev) => [
         ...prev,
         { id: (Date.now() + 1).toString(), role: "model", text: botMsg, timestamp: Date.now() },
@@ -678,7 +753,6 @@ IDIOMA: ${language}`;
     }
   };
 
-  // GERAÇÃO POR CICLOS: solicita próximos 7 dias ao agente
   const handleNextCycle = async () => {
     if (cycleLoading || isFree) return;
     const nextCycleNum = currentCycle + 1;
@@ -718,7 +792,7 @@ IDIOMA: ${language}`;
           {
             id: `cycle-header-${Date.now()}`,
             role: "model",
-            text: `### 🗓️ Ciclo ${nextCycleNum} — Dias ${startDay} a ${endDay}`,
+            text: `### 🗓️ Dia ${startDay} - ${endDay}`,
             timestamp: Date.now(),
           },
         ];
@@ -741,26 +815,28 @@ IDIOMA: ${language}`;
         }
 
         if (isFree) {
-          cycleMessages.push(createPremiumLockMessage(`cilada-c${nextCycleNum}-${ts}`, "⚠️ A Cilada — Evite Isso", ts++));
-          cycleMessages.push(createPremiumLockMessage(`daytrip-c${nextCycleNum}-${ts}`, "🎒 Viagem Curta", ts++));
+          cycleMessages.push(createPremiumLockMessage(`cilada-c${nextCycleNum}-${ts}`, uiText.ciladaTitle, uiText.ciladaLockDesc, ts++));
+          cycleMessages.push(createPremiumLockMessage(`daytrip-c${nextCycleNum}-${ts}`, uiText.daytripTitle, uiText.daytripLockDesc, ts++));
         } else {
+          const ciladaClean = cleanAI(aiData.cilada_logistica) || uiText.ciladaFallback;
+          const daytripClean = cleanAI(aiData.day_trip) || uiText.daytripFallback;
+
           cycleMessages.push({
             id: `cilada-c${nextCycleNum}-${ts}`,
             role: "model",
-            text: `### ⚠️ A Cilada — Evite Isso\n\n${aiData.cilada_logistica || "Sem alertas logísticos por enquanto."}`,
+            text: `### ${uiText.ciladaTitle}\n\n${ciladaClean}`,
             timestamp: ts++,
           });
           cycleMessages.push({
             id: `daytrip-c${nextCycleNum}-${ts}`,
             role: "model",
-            text: `### 🎒 Viagem Curta\n\n${aiData.day_trip || "Sem viagem curta sugerida por mientras."}`,
+            text: `### ${uiText.daytripTitle}\n\n${daytripClean}`,
             timestamp: ts++,
           });
         }
 
         setMessages((prev) => [...prev, ...cycleMessages]);
 
-        // Persistir novas gemas
         if (user) {
           try {
             const { data: sessions } = await supabase
@@ -794,7 +870,7 @@ IDIOMA: ${language}`;
           {
             id: `cycle-error-${Date.now()}`,
             role: "model",
-            text: "### Ops\n\n*Não foi possível gerar o próximo ciclo. Tente novamente.*",
+            text: uiText.oopsError,
             timestamp: Date.now(),
           },
         ]);
@@ -832,7 +908,6 @@ IDIOMA: ${language}`;
         <SplashScreen onComplete={() => {
           setShowSplash(false);
           sessionStorage.setItem("cult_splash_shown", "true");
-          // If user has no existing session, show hook
           if (flowState === "city_selection" && !freeAlreadyUsed) {
             setShowHook(true);
           }
@@ -851,12 +926,10 @@ IDIOMA: ${language}`;
       {showPaywall && <PricingPaywall lang={language} onClose={() => setShowPaywall(false)} />}
 
       <main className="flex-grow flex flex-col relative overflow-hidden">
-        {/* HOOK SCREEN — full screen, no scroll */}
         {showHook && flowState === "city_selection" && !freeAlreadyUsed && (
           <HookScreen onStart={() => setShowHook(false)} />
         )}
 
-        {/* CITY SELECTION — dark, clean */}
         {flowState === "city_selection" && !showHook && (
           <div className="flex flex-col items-center justify-center flex-grow p-4 sm:p-6 w-full max-w-3xl mx-auto space-y-8 animate-fade-in">
             {isFree && freeAlreadyUsed ? (
@@ -899,28 +972,26 @@ IDIOMA: ${language}`;
                   <button
                     onClick={async () => {
                       await startChatSession(
-                        `IDIOMA: ${language}. O usuário é assinante premium e quer conversar livremente. Responda como Boba, a IA cultural da Feltrip.`,
+                        `IDIOMA: ${language}. O usuário é assinante premium e quer conversar livremente. Responda como Culti, a Antropóloga de Bolso da Feltrip.`,
                       );
                       setMessages([
                         {
                           id: `welcome-chat-${Date.now()}`,
                           role: "model",
-                          text: language === "en"
-                            ? "### 💬 Direct Chat\n\n*Ask me anything — about cities, culture, relocation, or your journey.*"
-                            : language === "es"
-                              ? "### 💬 Chat Directo\n\n*Pregúntame lo que quieras — sobre ciudades, cultura, mudanza o tu viaje.*"
-                              : "### 💬 Chat Direto\n\n*Pergunte o que quiser — sobre cidades, cultura, mudança ou sua jornada.*",
+                          text: uiText.chatDirect,
                           timestamp: Date.now(),
                         },
                       ]);
+                      setGemsUnlocked(true);  // ← linha adicionada
                       setFlowState("diagnosis_result");
                     }}
                     className="mt-4 text-sm font-bold text-accent underline underline-offset-4 hover:text-foreground transition-colors flex items-center gap-2"
                   >
                     <MessageCircle size={16} />
-                    {t('cultChat.skipQuiz')}
+                    {t("cultChat.skipQuiz")}
                   </button>
                 )}
+
               </>
             )}
           </div>
@@ -935,7 +1006,6 @@ IDIOMA: ${language}`;
               <ArrowLeft size={14} /> {t('cultChat.backButton')}
             </button>
 
-            {/* Character reacting in corner */}
             <div className="absolute top-4 right-4 opacity-60">
               <CultCharacter
                 variant={quizIndex <= 1 ? "explorer" : "analyst"}
@@ -958,7 +1028,7 @@ IDIOMA: ${language}`;
                   className="w-full p-4 rounded-xl border border-border bg-muted/30 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-accent text-center text-foreground placeholder:text-muted-foreground/60"
                 />
                 <p className="text-xs text-center text-muted-foreground/60">
-                  {isFree ? "Plano gratuito: 1 dia por roteiro." : "Plano Pro: até 7 dias por roteiro."}
+                  {isFree ? uiText.planLimit : uiText.proLimit}
                 </p>
                 {daysLimitMessage && <p className="text-sm text-center text-accent font-bold">{daysLimitMessage}</p>}
                 <Button
@@ -1029,10 +1099,8 @@ IDIOMA: ${language}`;
 
         {flowState === "diagnosis_result" && (
           <div className="flex flex-col h-full w-full overflow-hidden animate-fade-in">
-            {/* ÁREA DE MENSAGENS E RESULTADOS */}
             <div className="flex-grow overflow-y-auto px-4 py-6 scrollbar-hide">
               <div className="max-w-2xl mx-auto space-y-6 pb-24">
-                {/* Botão para gerar novo roteiro (pagantes) */}
                 {isPremium && (
                   <div className="flex justify-end">
                     <button
@@ -1051,7 +1119,6 @@ IDIOMA: ${language}`;
                   </div>
                 )}
 
-                {/* 1. ARCHETYPE CARD — always visible */}
                 {calculatedMRP && (
                   <ArchetypeResultCard
                     data={calculatedMRP}
@@ -1060,7 +1127,6 @@ IDIOMA: ${language}`;
                     onShare={() => setShowArchetypeShare(true)}
                     onUnlock={() => {
                       setGemsUnlocked(true);
-                      // If anonymous, trigger login
                       if (isAnonymous) {
                         setIsAuthModalOpen(true);
                       }
@@ -1069,7 +1135,6 @@ IDIOMA: ${language}`;
                   />
                 )}
 
-                {/* 2. GATED CONTENT — only visible after unlock */}
                 {gemsUnlocked && (
                   <>
                     {messages.map((m) => (
@@ -1082,17 +1147,16 @@ IDIOMA: ${language}`;
                               onClick={() => setIsAuthModalOpen(true)}
                               className="w-full h-14 rounded-2xl font-bold text-base shadow-xl bg-primary text-primary-foreground hover:bg-primary/90 transition-all hover:scale-[1.02]"
                             >
-                              {language === "en" ? "🔓 Reveal my Itinerary" : language === "es" ? "🔓 Revelar mi Itinerario" : "🔓 Revelar meu Roteiro"}
+                              {uiText.revealBtn}
                             </Button>
                             <p className="text-center text-xs text-muted-foreground">
-                              {language === "en" ? "Google or email • 5 seconds • Your data stays safe" : language === "es" ? "Google o email • 5 segundos • Tus datos están seguros" : "Google ou email • 5 segundos • Seus dados ficam seguros"}
+                              {uiText.revealDesc}
                             </p>
                           </div>
                         )}
                       </div>
                     ))}
 
-                    {/* BOTÃO "LIBERAR PRÓXIMO CICLO" */}
                     {!isFree &&
                       (() => {
                         const requestedDays = getEffectiveRequestedDays(daysText, isFree);
@@ -1101,10 +1165,10 @@ IDIOMA: ${language}`;
                       })() && (
                         <div className="mt-8 p-6 border-2 border-dashed border-primary/40 rounded-2xl text-center space-y-3 bg-primary/5">
                           <h4 className="font-serif font-bold text-lg text-foreground">
-                            🗓️ Ciclo {currentCycle} de {Math.ceil(getEffectiveRequestedDays(daysText, isFree) / 7)} concluído
+                            {uiText.cycleDone(currentCycle, Math.ceil(getEffectiveRequestedDays(daysText, isFree) / 7))}
                           </h4>
                           <p className="text-sm text-muted-foreground">
-                            Para manter a densidade da curadoria, entregamos sua imersão em ciclos semanais.
+                            {uiText.cycleDesc}
                           </p>
                           <Button
                             type="button"
@@ -1115,28 +1179,27 @@ IDIOMA: ${language}`;
                             {cycleLoading ? (
                               <span className="flex items-center gap-2">
                                 <span className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                                Gerando próximo ciclo...
+                                {uiText.generating}
                               </span>
                             ) : (
-                              `Liberar Próximo Ciclo (Dias ${currentCycle * 7 + 1} a ${Math.min((currentCycle + 1) * 7, getEffectiveRequestedDays(daysText, isFree))})`
+                              uiText.nextCycleBtn(currentCycle * 7 + 1, Math.min((currentCycle + 1) * 7, getEffectiveRequestedDays(daysText, isFree)))
                             )}
                           </Button>
                         </div>
                       )}
 
-                    {/* BOTÃO DE UPSELL EXPLORER */}
+                    {/* CONSERTO: Botão de Upsell com CSS responsivo para não vazar texto */}
                     <div className="mt-12 p-8 bg-white/[0.03] border border-border rounded-2xl text-center space-y-4">
-                      <h4 className="font-serif font-bold text-2xl text-accent">Quer mergulhar fundo?</h4>
+                      <h4 className="font-serif font-bold text-2xl text-accent">{uiText.upsellTitle}</h4>
                       <p className="text-sm text-muted-foreground leading-relaxed">
-                        Desbloqueie o seu <strong className="text-foreground/70">bairro ideal (Housing)</strong>, o Roteiro de até 30 dias e ganhe o
-                        Estúdio de Idiomas com IA.
+                        {uiText.upsellDesc}
                       </p>
                       <Button
                         type="button"
                         onClick={() => openCheckout("explorer")}
-                        className="w-full sm:w-auto px-10 py-6 bg-gradient-to-r from-accent to-secondary text-accent-foreground rounded-xl font-bold uppercase tracking-widest shadow-xl"
+                        className="w-full sm:w-auto px-6 py-4 h-auto bg-gradient-to-r from-accent to-secondary text-accent-foreground rounded-xl font-bold uppercase tracking-normal whitespace-normal shadow-xl leading-tight"
                       >
-                        Combo Imersão — até 30 dias — R$ 129,90
+                        {uiText.upsellBtn}
                       </Button>
                     </div>
                   </>
@@ -1144,7 +1207,6 @@ IDIOMA: ${language}`;
               </div>
             </div>
 
-            {/* INPUT DO ORÁCULO (FIXO NO RODAPÉ) — only when unlocked */}
             {gemsUnlocked && (
               <div className="p-4 border-t border-border bg-background/90 backdrop-blur-md">
                 <div className="max-w-2xl mx-auto">
@@ -1167,8 +1229,8 @@ IDIOMA: ${language}`;
                       }}
                       placeholder={
                         isFree && messages.filter((m) => m.role === "user").length >= 1
-                          ? "Limite do plano grátis atingido..."
-                          : "Pergunte ao Oráculo..."
+                          ? uiText.limitReached
+                          : uiText.askOracle
                       }
                       disabled={isLoading || (isFree && messages.filter((m) => m.role === "user").length >= 1)}
                       className="flex-1 p-3 rounded-2xl border border-border bg-muted/30 text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-accent disabled:opacity-40"
@@ -1188,7 +1250,7 @@ IDIOMA: ${language}`;
                   </div>
                   {isFree && messages.filter((m) => m.role === "user").length >= 1 && (
                     <p className="text-[10px] text-center mt-2 text-accent font-bold uppercase tracking-tighter">
-                      Libere chat ilimitado 24h + roteiro até 7 dias por R$ 29,90!
+                      {uiText.freeUpsell}
                     </p>
                   )}
                 </div>
